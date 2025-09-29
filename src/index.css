@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* DHMS Design System - Professional Agricultural Theme */
-
 @layer base {
   :root {
     /* Base colors - Clean, professional backgrounds */
@@ -35,12 +33,12 @@
     /* Accent - Warm agricultural yellow */
     --accent: 45 93% 47%;
     --accent-foreground: 220 8.9% 13.9%;
-    
+
     /* Health status colors */
     --health-good: 142 71% 45%;
     --health-warning: 43 89% 58%;
     --health-critical: 0 84% 60%;
-    
+
     /* Data visualization colors */
     --chart-1: 142 76% 36%;
     --chart-2: 45 93% 47%;
@@ -75,13 +73,26 @@
     --sidebar-ring: 142 76% 36%;
 
     /* Custom gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-hover)));
-    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-light)));
-    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--health-good)));
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--primary-hover))
+    );
+    --gradient-accent: linear-gradient(
+      135deg,
+      hsl(var(--accent)),
+      hsl(var(--accent-light))
+    );
+    --gradient-success: linear-gradient(
+      135deg,
+      hsl(var(--success)),
+      hsl(var(--health-good))
+    );
 
     /* Custom shadows */
     --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-    --shadow-elevated: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-elevated: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+      0 2px 4px -2px rgb(0 0 0 / 0.1);
   }
 
   .dark {

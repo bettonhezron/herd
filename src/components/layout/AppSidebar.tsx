@@ -4,10 +4,8 @@ import {
   Heart,
   Droplets,
   Activity,
-  BarChart3,
   Users,
   Settings,
-  Bell,
   FileText,
   PawPrintIcon,
 } from "lucide-react";
