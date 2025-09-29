@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# Dairy Herd Management System
 
 **URL**: https://herd-51h9.vercel.app/
 
