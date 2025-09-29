@@ -1,9 +1,36 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Circle, Droplets, Heart, Activity, TrendingUp, AlertTriangle, Plus } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
+import {
+  Circle,
+  Droplets,
+  Heart,
+  Activity,
+  TrendingUp,
+  AlertTriangle,
+  Plus,
+} from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 import farmHero from "@/assets/farm-hero.jpg";
 
 // Sample data
@@ -23,9 +50,27 @@ const herdHealthData = [
 ];
 
 const recentAlerts = [
-  { id: 1, type: "health", message: "Cow #247 vaccination due", priority: "medium", time: "2 hours ago" },
-  { id: 2, type: "breeding", message: "Cow #156 expected calving tomorrow", priority: "high", time: "4 hours ago" },
-  { id: 3, type: "milking", message: "Production drop in Barn 2", priority: "medium", time: "6 hours ago" },
+  {
+    id: 1,
+    type: "health",
+    message: "Cow #247 vaccination due",
+    priority: "medium",
+    time: "2 hours ago",
+  },
+  {
+    id: 2,
+    type: "breeding",
+    message: "Cow #156 expected calving tomorrow",
+    priority: "high",
+    time: "4 hours ago",
+  },
+  {
+    id: 3,
+    type: "milking",
+    message: "Production drop in Barn 2",
+    priority: "medium",
+    time: "6 hours ago",
+  },
 ];
 
 export default function Dashboard() {
@@ -33,18 +78,18 @@ export default function Dashboard() {
     <div className="space-y-6">
       {/* Hero Section */}
       <div className="relative rounded-2xl overflow-hidden">
-        <img 
-          src={farmHero} 
+        <img
+          src={farmHero}
           alt="Modern dairy farm with green pastures and Holstein cows"
           className="w-full h-64 object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/20 flex items-center">
           <div className="px-8">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
-              Green Valley Farm
+              DHMS
             </h1>
             <p className="text-xl text-white/90 mb-4">
-              Advanced Dairy Herd Management System
+              Dairy Herd Management System
             </p>
             <Button className="bg-primary hover:bg-primary-hover">
               <Plus className="w-4 h-4 mr-2" />
@@ -56,15 +101,22 @@ export default function Dashboard() {
 
       {/* Welcome Message */}
       <div className="bg-card/50 backdrop-blur-sm rounded-xl p-6 border border-border/50">
-        <h2 className="text-2xl font-semibold text-foreground mb-2">Welcome back, Farm Manager!</h2>
-        <p className="text-muted-foreground">Here's your farm overview for today. Everything is running smoothly with 92% of your herd in good health.</p>
+        <h2 className="text-2xl font-semibold text-foreground mb-2">
+          Welcome back, Farm Manager!
+        </h2>
+        <p className="text-muted-foreground">
+          Here's your farm overview for today. Everything is running smoothly
+          with 92% of your herd in good health.
+        </p>
       </div>
 
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="border-l-4 border-l-primary">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Animals</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Animals
+            </CardTitle>
             <Circle className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
@@ -78,7 +130,9 @@ export default function Dashboard() {
 
         <Card className="border-l-4 border-l-chart-2">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Daily Milk Production</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Daily Milk Production
+            </CardTitle>
             <Droplets className="h-4 w-4 text-chart-2" />
           </CardHeader>
           <CardContent>
@@ -92,26 +146,35 @@ export default function Dashboard() {
 
         <Card className="border-l-4 border-l-chart-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Breeding Program</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Breeding Program
+            </CardTitle>
             <Heart className="h-4 w-4 text-chart-3" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">23</div>
-            <p className="text-xs text-muted-foreground">Expecting calves this month</p>
+            <p className="text-xs text-muted-foreground">
+              Expecting calves this month
+            </p>
             <Progress value={76} className="mt-2" />
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-l-health-good">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Health Status</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Health Status
+            </CardTitle>
             <Activity className="h-4 w-4 text-health-good" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">92%</div>
             <p className="text-xs text-success">Healthy animals</p>
             <div className="flex gap-1 mt-2">
-              <Badge variant="outline" className="text-xs bg-health-good/10 text-health-good border-health-good/20">
+              <Badge
+                variant="outline"
+                className="text-xs bg-health-good/10 text-health-good border-health-good/20"
+              >
                 210 Healthy
               </Badge>
             </div>
@@ -128,7 +191,9 @@ export default function Dashboard() {
               <Droplets className="w-5 h-5 text-chart-2" />
               Milk Production Trend
             </CardTitle>
-            <CardDescription>Daily production over the last 6 months</CardDescription>
+            <CardDescription>
+              Daily production over the last 6 months
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -136,14 +201,18 @@ export default function Dashboard() {
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                 <XAxis dataKey="month" className="text-xs" />
                 <YAxis className="text-xs" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'hsl(var(--card))', 
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px'
-                  }} 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "8px",
+                  }}
                 />
-                <Bar dataKey="production" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
+                <Bar
+                  dataKey="production"
+                  fill="hsl(var(--chart-2))"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -156,7 +225,9 @@ export default function Dashboard() {
               <Activity className="w-5 h-5 text-health-good" />
               Herd Health Distribution
             </CardTitle>
-            <CardDescription>Current health status of all animals</CardDescription>
+            <CardDescription>
+              Current health status of all animals
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -166,7 +237,9 @@ export default function Dashboard() {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) =>
+                    `${name} ${(percent * 100).toFixed(0)}%`
+                  }
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
@@ -175,12 +248,12 @@ export default function Dashboard() {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'hsl(var(--card))', 
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px'
-                  }} 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "8px",
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -195,20 +268,34 @@ export default function Dashboard() {
             <AlertTriangle className="w-5 h-5 text-warning" />
             Recent Alerts & Notifications
           </CardTitle>
-          <CardDescription>Important events requiring your attention</CardDescription>
+          <CardDescription>
+            Important events requiring your attention
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {recentAlerts.map((alert) => (
-              <div key={alert.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
+              <div
+                key={alert.id}
+                className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50"
+              >
                 <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${
-                    alert.priority === 'high' ? 'bg-health-critical' : 
-                    alert.priority === 'medium' ? 'bg-health-warning' : 'bg-health-good'
-                  }`} />
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      alert.priority === "high"
+                        ? "bg-health-critical"
+                        : alert.priority === "medium"
+                        ? "bg-health-warning"
+                        : "bg-health-good"
+                    }`}
+                  />
                   <div>
-                    <p className="font-medium text-foreground">{alert.message}</p>
-                    <p className="text-sm text-muted-foreground">{alert.time}</p>
+                    <p className="font-medium text-foreground">
+                      {alert.message}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {alert.time}
+                    </p>
                   </div>
                 </div>
                 <Button variant="outline" size="sm">
