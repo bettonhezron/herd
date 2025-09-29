@@ -2,17 +2,7 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/b7894388-0341-4389-a2f6-0d53d624efaa
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/b7894388-0341-4389-a2f6-0d53d624efaa) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
+**URL**: https://herd-51h9.vercel.app/
 
 **Use your preferred IDE**
 
