@@ -8,6 +8,7 @@ import {
   User,
   Edit3,
   Trash2,
+  Stethoscope,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,9 +40,10 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "manager" | "worker";
+  role: "admin" | "manager" | "worker" | "veterinary";
   status: "active" | "inactive";
   avatar?: string;
+  phoneNo: String;
   lastLogin: string;
   department: string;
 }
@@ -54,6 +56,7 @@ const mockUsers: User[] = [
     role: "admin",
     status: "active",
     lastLogin: "2024-01-15 09:30",
+    phoneNo: "0726509023",
     department: "Management",
   },
   {
@@ -62,6 +65,7 @@ const mockUsers: User[] = [
     email: "sarah.johnson@farm.com",
     role: "manager",
     status: "active",
+    phoneNo: "",
     lastLogin: "2024-01-15 08:45",
     department: "Dairy Operations",
   },
@@ -72,8 +76,10 @@ const mockUsers: User[] = [
     role: "worker",
     status: "active",
     lastLogin: "2024-01-14 16:20",
+    phoneNo: "",
     department: "Milking",
   },
+
   {
     id: "4",
     name: "Lisa Brown",
@@ -81,7 +87,28 @@ const mockUsers: User[] = [
     role: "worker",
     status: "inactive",
     lastLogin: "2024-01-10 14:15",
+    phoneNo: "",
     department: "Animal Care",
+  },
+  {
+    id: "5",
+    name: "Dr. Sarah Collins",
+    email: "sarah.collins@farm.com",
+    role: "veterinary",
+    status: "active",
+    lastLogin: "2024-03-12 09:30",
+    phoneNo: "",
+    department: "Veterinary",
+  },
+  {
+    id: "6",
+    name: "Dr. Michael Green",
+    email: "michael.green@farm.com",
+    role: "veterinary",
+    status: "active",
+    lastLogin: "2024-04-18 11:45",
+    phoneNo: "",
+    department: "Veterinary",
   },
 ];
 
@@ -93,6 +120,8 @@ const getRoleIcon = (role: string) => {
       return <UserCheck className="w-4 h-4" />;
     case "worker":
       return <User className="w-4 h-4" />;
+    case "veterinary":
+      return <Stethoscope className="w-4 h-4" />;
     default:
       return <User className="w-4 h-4" />;
   }
@@ -106,6 +135,8 @@ const getRoleColor = (role: string) => {
       return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
     case "worker":
       return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
+    case "veterinary":
+      return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300";
     default:
       return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
   }
@@ -213,6 +244,16 @@ export default function UserManagement() {
                 className="pl-10"
               />
             </div>
+
+            <select
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
+              className="px-3 py-2 border border-input bg-background rounded-md text-sm"
+            >
+              <option value="all">Status </option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
@@ -221,6 +262,7 @@ export default function UserManagement() {
               <option value="all">All Roles</option>
               <option value="admin">Administrators</option>
               <option value="manager">Managers</option>
+              <option value="veterinary">Veterinary</option>
               <option value="worker">Workers</option>
             </select>
           </div>
@@ -231,6 +273,7 @@ export default function UserManagement() {
               <TableHeader>
                 <TableRow>
                   <TableHead>User</TableHead>
+                  <TableHead>Phone No.</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Department</TableHead>
                   <TableHead>Status</TableHead>
@@ -260,6 +303,9 @@ export default function UserManagement() {
                         </div>
                       </div>
                     </TableCell>
+
+                    <TableCell> {user.phoneNo}</TableCell>
+
                     <TableCell>
                       <Badge
                         variant="secondary"
