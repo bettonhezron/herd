@@ -230,23 +230,28 @@ export default function Milking() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             Milking Management
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-sm sm:text-base text-muted-foreground mt-2">
             Monitor milk production, quality, and milking schedules
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className="gap-2">
-            <Download className="w-4 h-4" />
-            Export Report
-          </Button>
-          <Button className="gap-2">
+
+        <div className="flex gap-3">
+          <Button className="gap-2 px-4 py-2 text-sm sm:px-5 sm:py-2.5 sm:text-base">
             <Plus className="w-4 h-4" />
             Record Milking
+          </Button>
+
+          <Button
+            variant="outline"
+            className="gap-2 px-4 py-2 text-sm sm:px-5 sm:py-2.5 sm:text-base"
+          >
+            <Download className="w-4 h-4" />
+            Export Report
           </Button>
         </div>
       </div>

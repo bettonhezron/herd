@@ -38,11 +38,31 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="farm" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="farm">Farm Profile</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="data">Data & Backup</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
+        <TabsList className="flex flex-wrap gap-2">
+          <TabsTrigger
+            value="farm"
+            className="text-sm sm:text-base px-2 sm:px-4 py-1 sm:py-2"
+          >
+            Farm Profile
+          </TabsTrigger>
+          <TabsTrigger
+            value="notifications"
+            className="text-sm sm:text-base px-2 sm:px-4 py-1 sm:py-2"
+          >
+            Notifications
+          </TabsTrigger>
+          <TabsTrigger
+            value="data"
+            className="text-sm sm:text-base px-2 sm:px-4 py-1 sm:py-2"
+          >
+            Data & Backup
+          </TabsTrigger>
+          <TabsTrigger
+            value="security"
+            className="text-sm sm:text-base px-2 sm:px-4 py-1 sm:py-2"
+          >
+            Security
+          </TabsTrigger>
         </TabsList>
 
         {/* Farm Profile Tab */}
@@ -193,6 +213,7 @@ export default function SettingsPage() {
                 Manage your farm data, backups, and sync settings
               </CardDescription>
             </CardHeader>
+
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -216,16 +237,23 @@ export default function SettingsPage() {
                 </div>
               </div>
               <Separator />
+
               <div className="space-y-4">
                 <h4 className="font-medium">Backup Actions</h4>
-                <div className="flex gap-3">
-                  <Button variant="outline">
-                    <Database className="w-4 h-4 mr-2" />
-                    Create Backup Now
+                <div className="flex gap-2 sm:gap-3 flex-wrap">
+                  <Button
+                    variant="outline"
+                    className="text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2 gap-1 sm:gap-2"
+                  >
+                    <Database className="w-3 h-3 sm:w-4 sm:h-4" />
+                    Create Backup
                   </Button>
-                  <Button variant="outline">
-                    <Database className="w-4 h-4 mr-2" />
-                    Restore from Backup
+                  <Button
+                    variant="outline"
+                    className="text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2 gap-1 sm:gap-2"
+                  >
+                    <Database className="w-3 h-3 sm:w-4 sm:h-4" />
+                    Restore Backup
                   </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -244,10 +272,25 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-3">
-                <Button variant="outline">Export to PDF</Button>
-                <Button variant="outline">Export to Excel</Button>
-                <Button variant="outline">Export to CSV</Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
+                >
+                  Export to PDF
+                </Button>
+                <Button
+                  variant="outline"
+                  className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
+                >
+                  Export to Excel
+                </Button>
+                <Button
+                  variant="outline"
+                  className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
+                >
+                  Export to CSV
+                </Button>
               </div>
             </CardContent>
           </Card>
