@@ -294,8 +294,8 @@ export default function Milking() {
           <CardContent>
             <ChartContainer
               config={{
-                morning: { label: "Morning", color: "hsl(var(--primary))" },
-                evening: { label: "Evening", color: "hsl(var(--secondary))" },
+                morning: { label: "Morning", color: "hsl(var(--chart-1))" },
+                evening: { label: "Evening", color: "hsl(var(--chart-3))" },
               }}
             >
               <ResponsiveContainer width="100%" height={300}>
@@ -303,8 +303,8 @@ export default function Milking() {
                   <XAxis dataKey="day" />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="morning" fill="hsl(var(--primary))" />
-                  <Bar dataKey="evening" fill="hsl(var(--secondary))" />
+                  <Bar dataKey="morning" fill="hsl(var(--chart-1))" />
+                  <Bar dataKey="evening" fill="hsl(var(--chart-3))" />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>

@@ -39,8 +39,24 @@ const milkProductionData = [
   { month: "Feb", production: 2600 },
   { month: "Mar", production: 2800 },
   { month: "Apr", production: 3200 },
-  { month: "May", production: 3400 },
-  { month: "Jun", production: 3600 },
+  { month: "May", production: 3600 },
+  { month: "Jun", production: 3400 },
+  // { month: "Jul", production: 3200 },
+  // { month: "Aug", production: 4000 },
+  // { month: "Sep", production: 3800 },
+  // { month: "Oct", production: 3700 },
+  // { month: "Nov", production: 4200 },
+  // { month: "Dec", production: 3500 },
+];
+
+const milkProductionDataWeek = [
+  { month: "Mon", production: 2400 },
+  { month: "Tue", production: 2600 },
+  { month: "Wed", production: 2800 },
+  { month: "Thur", production: 3200 },
+  { month: "Fri", production: 3600 },
+  { month: "Sat", production: 3400 },
+  { month: "Sun", production: 3200 },
 ];
 
 const herdHealthData = [
@@ -188,8 +204,7 @@ export default function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Droplets className="w-5 h-5 text-chart-2" />
-              Milk Production Trend
+              Milk Production OverTime
             </CardTitle>
             <CardDescription>
               Daily production over the last 6 months
@@ -210,7 +225,7 @@ export default function Dashboard() {
                 />
                 <Bar
                   dataKey="production"
-                  fill="hsl(var(--chart-2))"
+                  fill="hsl(var(--chart-1))"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>
@@ -222,7 +237,6 @@ export default function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Activity className="w-5 h-5 text-health-good" />
               Herd Health Distribution
             </CardTitle>
             <CardDescription>
