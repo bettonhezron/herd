@@ -30,6 +30,7 @@ import {
   Cell,
 } from "recharts";
 import farmHero from "@/assets/farm-hero.jpg";
+import { WelcomeMessage } from "@/components/ui/wecome";
 
 // Sample data
 const milkProductionData = [
@@ -100,7 +101,7 @@ export default function Dashboard() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/20 flex items-center">
           <div className="px-4 sm:px-8">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
-              Dairy Farm
+              Green Valley Dairy Farm
             </h1>
             <p className="text-base md:text-xl text-white/90 mb-4">
               Monitor your herds, milk production, and farm performance metrics
@@ -124,15 +125,7 @@ export default function Dashboard() {
       </div>
 
       {/* Welcome Message */}
-      <div className="bg-card/50 backdrop-blur-sm rounded-xl p-6 border border-border/50">
-        <h2 className="text-2xl font-semibold text-foreground mb-2">
-          Welcome back, Farm Manager!
-        </h2>
-        <p className="text-muted-foreground">
-          Here's your farm overview for today. Everything is running smoothly
-          with 92% of your herd in good health.
-        </p>
-      </div>
+      <WelcomeMessage name="Hezron" />
 
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
