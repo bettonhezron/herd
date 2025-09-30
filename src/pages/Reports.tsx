@@ -132,7 +132,6 @@ export default function Reports() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-              <FileText className="w-8 h-8 text-primary" />
               Reports & Documentation
             </h1>
             <p className="text-muted-foreground mt-2">
@@ -156,7 +155,6 @@ export default function Reports() {
       <Card className="print:hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Filter className="w-5 h-5" />
             Report Configuration
           </CardTitle>
           <CardDescription>
@@ -284,7 +282,6 @@ export default function Reports() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Milk className="w-5 h-5" />
                   Production Performance Summary
                 </CardTitle>
                 <CardDescription>
@@ -401,7 +398,6 @@ export default function Reports() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Activity className="w-5 h-5" />
                   Health Management Summary
                 </CardTitle>
                 <CardDescription>
@@ -489,7 +485,6 @@ export default function Reports() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Heart className="w-5 h-5" />
                   Breeding Performance Summary
                 </CardTitle>
                 <CardDescription>
@@ -577,7 +572,6 @@ export default function Reports() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="w-5 h-5" />
                   Financial Performance Summary
                 </CardTitle>
                 <CardDescription>
@@ -656,7 +650,7 @@ export default function Reports() {
         {/* Report Footer - Only visible when printing */}
         <div className="hidden print:block mt-8 pt-4 border-t text-center text-sm text-muted-foreground">
           <p>Green Valley Dairy Farm • 1234 Rural Road, Farmville, ST 12345</p>
-          <p>Tel: +1 (555) 123-4567 • Email: contact@greenvalley.farm</p>
+          <p>Phone No: 0726509023 • Email: contact@greenvalley.farm</p>
           <p className="mt-2">
             Report generated on {new Date().toLocaleDateString()} at{" "}
             {new Date().toLocaleTimeString()}

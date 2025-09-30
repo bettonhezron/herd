@@ -99,15 +99,14 @@ export default function Dashboard() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/20 flex items-center">
           <div className="px-8">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
-              Dairy Herd Management System
+              Dairy Farm
             </h1>
             <p className="text-xl text-white/90 mb-4">
-              Monitor your herds, milk production, health, breeding cycles and
-              farm performance metrics
+              Monitor your herds, milk production, and farm performance metrics
             </p>
             <Button className="bg-primary hover:bg-primary-hover">
               <Plus className="w-4 h-4 mr-2" />
-              Quick Actions
+              Add Animal
             </Button>
           </div>
         </div>
