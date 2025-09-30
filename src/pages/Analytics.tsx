@@ -119,7 +119,6 @@ export default function Analytics() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-          <BarChart3 className="w-8 h-8 text-primary" />
           Analytics Dashboard
         </h1>
         <p className="text-muted-foreground mt-2">

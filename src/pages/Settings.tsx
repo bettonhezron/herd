@@ -30,7 +30,6 @@ export default function SettingsPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-          <SettingsIcon className="w-8 h-8 text-primary" />
           System Settings
         </h1>
         <p className="text-muted-foreground mt-2">
@@ -51,7 +50,6 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Building2 className="w-5 h-5" />
                 Farm Information
               </CardTitle>
               <CardDescription>
@@ -69,7 +67,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="owner-name">Owner Name</Label>
-                  <Input id="owner-name" defaultValue="John Anderson" />
+                  <Input id="owner-name" defaultValue="Hezron Bett" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
@@ -81,11 +79,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    defaultValue="+1 (555) 123-4567"
-                  />
+                  <Input id="phone" type="tel" defaultValue="0726509023" />
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="address">Farm Address</Label>
@@ -115,7 +109,6 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Bell className="w-5 h-5" />
                 Notification Preferences
               </CardTitle>
               <CardDescription>
@@ -194,7 +187,6 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Database className="w-5 h-5" />
                 Data Management
               </CardTitle>
               <CardDescription>
@@ -266,7 +258,6 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Lock className="w-5 h-5" />
                 Security Settings
               </CardTitle>
               <CardDescription>

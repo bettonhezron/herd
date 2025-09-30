@@ -227,7 +227,6 @@ export default function Health() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-            <Activity className="w-8 h-8 text-primary" />
             Health Management
           </h1>
           <p className="text-muted-foreground mt-2">
