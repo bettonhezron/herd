@@ -23,6 +23,7 @@ import {
 } from "recharts";
 import farmHero from "@/assets/farm-hero.jpg";
 import { WelcomeMessage } from "@/components/ui/wecome";
+import { useState } from "react";
 
 // Sample data
 const milkProductionData = [
@@ -32,12 +33,22 @@ const milkProductionData = [
   { month: "Apr", production: 3200 },
   { month: "May", production: 3600 },
   { month: "Jun", production: 3400 },
-  // { month: "Jul", production: 3200 },
-  // { month: "Aug", production: 4000 },
-  // { month: "Sep", production: 3800 },
-  // { month: "Oct", production: 3700 },
-  // { month: "Nov", production: 4200 },
-  // { month: "Dec", production: 3500 },
+];
+
+// 1 Year Mock
+const milkProductionDataYear = [
+  { month: "Jan", production: 2400 },
+  { month: "Feb", production: 2600 },
+  { month: "Mar", production: 2800 },
+  { month: "Apr", production: 3200 },
+  { month: "May", production: 3600 },
+  { month: "Jun", production: 3400 },
+  { month: "Jul", production: 3200 },
+  { month: "Aug", production: 4000 },
+  { month: "Sep", production: 3800 },
+  { month: "Oct", production: 3700 },
+  { month: "Nov", production: 4200 },
+  { month: "Dec", production: 3500 },
 ];
 
 const milkProductionDataWeek = [
@@ -81,6 +92,15 @@ const recentAlerts = [
 ];
 
 export default function Dashboard() {
+  const [range, setRange] = useState("6M");
+
+  const filteredData =
+    range === "1W"
+      ? milkProductionDataWeek
+      : range === "1Y"
+      ? milkProductionDataYear
+      : milkProductionData;
+
   return (
     <div className="space-y-6">
       {/* Hero Section */}
@@ -200,18 +220,36 @@ export default function Dashboard() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Milk Production Chart - takes 2/3 on desktop */}
+
         <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              Milk Production Over Time
-            </CardTitle>
-            <CardDescription>
-              Daily production over the last 6 months
-            </CardDescription>
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                Milk Production Over Time
+              </CardTitle>
+              <CardDescription>
+                Daily production over the last {range}
+              </CardDescription>
+            </div>
+
+            {/* Time Range Filter */}
+            <div className="flex gap-2">
+              {["1W", "6M", "1Y"].map((option) => (
+                <Button
+                  key={option}
+                  size="sm"
+                  variant={range === option ? "default" : "outline"}
+                  onClick={() => setRange(option)}
+                >
+                  {option}
+                </Button>
+              ))}
+            </div>
           </CardHeader>
+
           <CardContent>
             <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={milkProductionData}>
+              <BarChart data={filteredData}>
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                 <XAxis dataKey="month" className="text-xs" />
                 <YAxis className="text-xs" />
