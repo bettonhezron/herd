@@ -8,15 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import {
-  Circle,
-  Droplets,
-  Heart,
-  Activity,
-  TrendingUp,
-  Plus,
-  FileText,
-} from "lucide-react";
+import { TrendingUp, Plus, FileText } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -129,12 +121,12 @@ export default function Dashboard() {
 
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-l-4 border-l-primary">
+        {/* Total Animals */}
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Animals
             </CardTitle>
-            <Circle className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">247</div>
@@ -142,15 +134,18 @@ export default function Dashboard() {
               <TrendingUp className="w-3 h-3 mr-1" />
               +2.5% from last month
             </p>
+            <div className="mt-3 text-xs text-muted-foreground flex justify-between">
+              <span>Active count</span>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-chart-2">
+        {/* Daily Milk Production */}
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Daily Milk Production
             </CardTitle>
-            <Droplets className="h-4 w-4 text-chart-2" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">3,642L</div>
@@ -158,15 +153,18 @@ export default function Dashboard() {
               <TrendingUp className="w-3 h-3 mr-1" />
               +8.2% from yesterday
             </p>
+            <div className="mt-3 text-xs text-muted-foreground flex justify-between">
+              <span>Today's production </span>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-chart-3">
+        {/* Breeding Program */}
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Breeding Program
             </CardTitle>
-            <Heart className="h-4 w-4 text-chart-3" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">23</div>
@@ -177,12 +175,12 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-health-good">
+        {/* Health Status */}
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Health Status
             </CardTitle>
-            <Activity className="h-4 w-4 text-health-good" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">92%</div>
@@ -190,7 +188,7 @@ export default function Dashboard() {
             <div className="flex gap-1 mt-2">
               <Badge
                 variant="outline"
-                className="text-xs bg-health-good/10 text-health-good border-health-good/20"
+                className="text-xs bg-green-100 text-green-700 border-green-200"
               >
                 210 Healthy
               </Badge>
