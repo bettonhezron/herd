@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import UserManagement from "./pages/Users";
 import Milking from "./pages/Milking";
+import SettingsPage from "./pages/Settings";
+import Reports from "./pages/Reports";
 
 const queryClient = new QueryClient();
 
@@ -84,41 +86,9 @@ const App = () => (
                 />
               }
             />
-            <Route
-              path="/reports"
-              element={
-                <PlaceholderPage
-                  title="Reports & Documentation"
-                  description="Generate compliance reports and documentation"
-                  icon={<Calendar className="w-8 h-8 text-primary" />}
-                  features={[
-                    "Regulatory compliance reporting",
-                    "Custom report builder with templates",
-                    "Export data to PDF, Excel, and CSV",
-                    "Automated report scheduling and delivery",
-                    "Historical data analysis and trends",
-                  ]}
-                />
-              }
-            />
+            <Route path="/reports" element={<Reports />} />
             <Route path="/users" element={<UserManagement />} />
-            <Route
-              path="/settings"
-              element={
-                <PlaceholderPage
-                  title="System Settings"
-                  description="Configure farm settings and system preferences"
-                  icon={<Settings className="w-8 h-8 text-primary" />}
-                  features={[
-                    "Farm profile and configuration",
-                    "Alert and notification preferences",
-                    "Data backup and sync settings",
-                    "Integration with farm equipment",
-                    "System maintenance and updates",
-                  ]}
-                />
-              }
-            />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </DashboardLayout>
