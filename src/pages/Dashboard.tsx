@@ -198,19 +198,19 @@ export default function Dashboard() {
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Milk Production Chart */}
-        <Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Milk Production Chart - takes 2/3 on desktop */}
+        <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              Milk Production OverTime
+              Milk Production Over Time
             </CardTitle>
             <CardDescription>
               Daily production over the last 6 months
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={350}>
               <BarChart data={milkProductionData}>
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                 <XAxis dataKey="month" className="text-xs" />
@@ -232,7 +232,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Herd Health Distribution */}
+        {/* Herd Health Distribution - 1/3 on desktop */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -242,19 +242,14 @@ export default function Dashboard() {
               Current health status of all animals
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+          <CardContent className="flex flex-col items-center">
+            <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
                   data={herdHealthData}
                   cx="50%"
                   cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) =>
-                    `${name} ${(percent * 100).toFixed(0)}%`
-                  }
-                  outerRadius={80}
-                  fill="#8884d8"
+                  outerRadius="70%"
                   dataKey="value"
                 >
                   {herdHealthData.map((entry, index) => (
@@ -270,6 +265,18 @@ export default function Dashboard() {
                 />
               </PieChart>
             </ResponsiveContainer>
+            {/* Legend under chart for mobile clarity */}
+            <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs">
+              {herdHealthData.map((entry, i) => (
+                <div key={i} className="flex items-center gap-1">
+                  <span
+                    className="inline-block w-3 h-3 rounded-full"
+                    style={{ backgroundColor: entry.color }}
+                  />
+                  {entry.name}
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
