@@ -1,6 +1,5 @@
 import {
   Home,
-  Circle,
   Heart,
   Droplets,
   Activity,

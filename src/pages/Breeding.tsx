@@ -142,7 +142,6 @@ const calvingEvents = [
   {
     id: "C001",
     animalTag: "A-2390",
-    animalName: "Molly",
     expectedDate: "2024-03-25",
     daysUntil: 5,
     status: "imminent",
@@ -150,7 +149,6 @@ const calvingEvents = [
   {
     id: "C002",
     animalTag: "A-2392",
-    animalName: "Bella",
     expectedDate: "2024-03-28",
     daysUntil: 8,
     status: "upcoming",
@@ -158,7 +156,6 @@ const calvingEvents = [
   {
     id: "C003",
     animalTag: "A-2395",
-    animalName: "Matilda",
     expectedDate: "2024-04-05",
     daysUntil: 16,
     status: "upcoming",
@@ -334,9 +331,9 @@ export default function Breeding() {
                         <TableCell>
                           <div>
                             <p className="font-medium">{record.animalTag}</p>
-                            <p className="text-sm text-muted-foreground">
+                            {/* <p className="text-sm text-muted-foreground">
                               {record.animalName}
-                            </p>
+                            </p> */}
                           </div>
                         </TableCell>
                         <TableCell>{record.breedingDate}</TableCell>
@@ -384,9 +381,7 @@ export default function Breeding() {
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="font-semibold">
-                            {record.animalTag} - {record.animalName}
-                          </p>
+                          <p className="font-semibold">{record.animalTag}</p>
                           <Badge
                             variant="secondary"
                             className={`gap-1 ${getStatusColor(record.status)}`}
@@ -463,9 +458,6 @@ export default function Breeding() {
                         <Baby className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="font-medium">
-                          {event.animalTag} - {event.animalName}
-                        </p>
                         <p className="text-sm text-muted-foreground">
                           Expected calving date
                         </p>

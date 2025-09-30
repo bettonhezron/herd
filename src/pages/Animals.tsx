@@ -24,13 +24,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Search, Filter, Circle, Calendar, Activity } from "lucide-react";
+import { Plus, Search, Filter, Calendar, Activity } from "lucide-react";
 
 // Sample animal data
 const animals = [
   {
     id: "A247",
-    name: "Bessie",
     breed: "Holstein",
     age: "3 years",
     status: "healthy",
@@ -40,7 +39,6 @@ const animals = [
   },
   {
     id: "A156",
-    name: "Daisy",
     breed: "Jersey",
     age: "5 years",
     status: "pregnant",
@@ -50,7 +48,6 @@ const animals = [
   },
   {
     id: "A198",
-    name: "Luna",
     breed: "Holstein",
     age: "2 years",
     status: "healthy",
@@ -60,7 +57,6 @@ const animals = [
   },
   {
     id: "A203",
-    name: "Rosie",
     breed: "Guernsey",
     age: "4 years",
     status: "treatment",
@@ -70,7 +66,6 @@ const animals = [
   },
   {
     id: "A089",
-    name: "Belle",
     breed: "Holstein",
     age: "6 years",
     status: "healthy",
@@ -111,7 +106,7 @@ export default function Animals() {
 
   const filteredAnimals = animals.filter((animal) => {
     const matchesSearch =
-      animal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      animal.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       animal.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
       filterStatus === "all" || animal.status === filterStatus;
@@ -226,7 +221,6 @@ export default function Animals() {
               <TableHeader>
                 <TableRow>
                   <TableHead>ID</TableHead>
-                  <TableHead>Name</TableHead>
                   <TableHead>Breed</TableHead>
                   <TableHead>Age</TableHead>
                   <TableHead>Status</TableHead>
@@ -240,7 +234,7 @@ export default function Animals() {
                 {filteredAnimals.map((animal) => (
                   <TableRow key={animal.id}>
                     <TableCell className="font-medium">{animal.id}</TableCell>
-                    <TableCell>{animal.name}</TableCell>
+
                     <TableCell>{animal.breed}</TableCell>
                     <TableCell>{animal.age}</TableCell>
                     <TableCell>{getStatusBadge(animal.status)}</TableCell>
