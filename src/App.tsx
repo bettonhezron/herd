@@ -6,21 +6,15 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import Animals from "./pages/Animals";
-import PlaceholderPage from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
-import {
-  Heart,
-  Droplets,
-  Activity,
-  BarChart3,
-  Calendar,
-  Users,
-  Settings,
-} from "lucide-react";
+
 import UserManagement from "./pages/Users";
 import Milking from "./pages/Milking";
 import SettingsPage from "./pages/Settings";
 import Reports from "./pages/Reports";
+import Analytics from "./pages/Analytics";
+import Health from "./pages/Health";
+import Breeding from "./pages/Breeding";
 
 const queryClient = new QueryClient();
 
@@ -34,58 +28,10 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/animals" element={<Animals />} />
-            <Route
-              path="/breeding"
-              element={
-                <PlaceholderPage
-                  title="Breeding Management"
-                  description="Track breeding cycles, artificial insemination, and calving records"
-                  icon={<Heart className="w-8 h-8 text-primary" />}
-                  features={[
-                    "Breeding cycle tracking and heat detection",
-                    "Artificial insemination scheduling and records",
-                    "Pregnancy monitoring and ultrasound tracking",
-                    "Calving calendar and birth notifications",
-                    "Genetic lineage and breeding value calculations",
-                  ]}
-                />
-              }
-            />
+            <Route path="/breeding" element={<Breeding />} />
             <Route path="/milking" element={<Milking />} />
-            <Route
-              path="/health"
-              element={
-                <PlaceholderPage
-                  title="Health Management"
-                  description="Track veterinary treatments, vaccinations, and health events"
-                  icon={<Activity className="w-8 h-8 text-primary" />}
-                  features={[
-                    "Vaccination scheduling and reminders",
-                    "Health event logging and treatment records",
-                    "Veterinary visit planning and history",
-                    "Disease outbreak monitoring and alerts",
-                    "Body condition scoring and weight tracking",
-                  ]}
-                />
-              }
-            />
-            <Route
-              path="/analytics"
-              element={
-                <PlaceholderPage
-                  title="Analytics Dashboard"
-                  description="Advanced analytics and performance insights"
-                  icon={<BarChart3 className="w-8 h-8 text-primary" />}
-                  features={[
-                    "Production efficiency analytics",
-                    "Feed conversion ratio calculations",
-                    "Financial performance tracking",
-                    "Herd performance benchmarking",
-                    "Predictive analytics for decision making",
-                  ]}
-                />
-              }
-            />
+            <Route path="/health" element={<Health />} />
+            <Route path="/analytics" element={<Analytics />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/users" element={<UserManagement />} />
             <Route path="/settings" element={<SettingsPage />} />
