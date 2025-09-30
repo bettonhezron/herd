@@ -44,7 +44,7 @@ export function TopBar() {
                 <Avatar className="w-8 h-8">
                   <AvatarImage src="/avatars/farm-manager.png" />
                   <AvatarFallback className="bg-primary text-primary-foreground">
-                    FM
+                    H
                   </AvatarFallback>
                 </Avatar>
                 <div className="hidden md:block text-left">

@@ -270,10 +270,25 @@ export default function Breeding() {
       </div>
 
       <Tabs defaultValue="breeding" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="breeding"> Records</TabsTrigger>
-          <TabsTrigger value="pregnancy">Pregnancy Tracking</TabsTrigger>
-          <TabsTrigger value="calving">Calving Calendar</TabsTrigger>
+        <TabsList className="flex flex-wrap sm:flex-nowrap gap-1">
+          <TabsTrigger
+            value="breeding"
+            className="text-[12px] sm:text-xs md:text-sm px-1 sm:px-2 md:px-3 py-1"
+          >
+            Breeding Records
+          </TabsTrigger>
+          <TabsTrigger
+            value="pregnancy"
+            className="text-[12px] sm:text-xs md:text-sm px-1 sm:px-2 md:px-3 py-1"
+          >
+            Pregnancy Tracking
+          </TabsTrigger>
+          <TabsTrigger
+            value="calving"
+            className="text-[12px] sm:text-xs md:text-sm px-1 sm:px-2 md:px-3 py-1"
+          >
+            Calving Calendar
+          </TabsTrigger>
         </TabsList>
 
         {/* Breeding Records Tab */}

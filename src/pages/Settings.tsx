@@ -1,15 +1,4 @@
-import {
-  Settings as SettingsIcon,
-  Bell,
-  Database,
-  Smartphone,
-  Mail,
-  Lock,
-  User,
-  Building2,
-  MapPin,
-  Phone,
-} from "lucide-react";
+import { Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
