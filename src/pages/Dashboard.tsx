@@ -106,14 +106,14 @@ export default function Dashboard() {
               Monitor your herds, milk production, and farm performance metrics
             </p>
 
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex gap-3">
               {/* Add Animal button */}
               <Button className="bg-primary hover:bg-primary-hover">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Animal
               </Button>
 
-              {/* New View/Generate Reports button */}
+              {/* View Reports button */}
               <Button variant="secondary" className="flex items-center gap-2">
                 <FileText className="w-4 h-4" />
                 View Reports
