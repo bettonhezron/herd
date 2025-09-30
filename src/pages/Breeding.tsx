@@ -1,9 +1,7 @@
 import { useState } from "react";
 import {
-  Heart,
   Plus,
   Search,
-  Calendar,
   AlertCircle,
   CheckCircle,
   Clock,
@@ -217,25 +215,21 @@ export default function Breeding() {
       title: "Active Pregnancies",
       value: "28",
       change: "+3 this month",
-      icon: Heart,
     },
     {
       title: "Breeding Success Rate",
       value: "79.2%",
       change: "+2.1% vs last quarter",
-      icon: CheckCircle,
     },
     {
       title: "Upcoming Calvings",
       value: "12",
       change: "Next 30 days",
-      icon: Calendar,
     },
     {
       title: "Heat Detection",
       value: "8",
       change: "Animals in heat",
-      icon: AlertCircle,
     },
   ];
 
@@ -265,7 +259,6 @@ export default function Breeding() {
               <CardTitle className="text-sm font-medium">
                 {stat.title}
               </CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>

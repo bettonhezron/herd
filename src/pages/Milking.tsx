@@ -1,14 +1,5 @@
 import { useState } from "react";
-import {
-  Plus,
-  Search,
-  Droplets,
-  TrendingUp,
-  AlertTriangle,
-  Calendar,
-  Download,
-  Filter,
-} from "lucide-react";
+import { Plus, Search, Calendar, Download, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -58,7 +49,7 @@ interface MilkingRecord {
   quantity: number;
   fat: number;
   protein: number;
-  scc: number; // Somatic Cell Count
+  scc: number;
   temperature: number;
   quality: "excellent" | "good" | "fair" | "poor";
   session: "morning" | "evening";
@@ -218,25 +209,21 @@ export default function Milking() {
       title: "Total Production",
       value: `${totalQuantity.toFixed(1)}L`,
       change: "+5.2% from yesterday",
-      icon: Droplets,
     },
     {
       title: "Average Fat %",
       value: `${avgFat.toFixed(2)}%`,
       change: "Within target range",
-      icon: TrendingUp,
     },
     {
       title: "Average Protein %",
       value: `${avgProtein.toFixed(2)}%`,
       change: "+0.1% from last week",
-      icon: TrendingUp,
     },
     {
       title: "Average SCC",
       value: `${(avgSCC / 1000).toFixed(0)}K`,
       change: "2 alerts need attention",
-      icon: AlertTriangle,
     },
   ];
 
@@ -272,7 +259,6 @@ export default function Milking() {
               <CardTitle className="text-sm font-medium">
                 {stat.title}
               </CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
@@ -486,7 +472,6 @@ export default function Milking() {
 
           {filteredRecords.length === 0 && (
             <div className="text-center py-8">
-              <Droplets className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">
                 No milking records found matching your search criteria.
               </p>
