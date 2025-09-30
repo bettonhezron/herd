@@ -62,7 +62,7 @@ export function AppSidebar() {
           <div>
             <h2 className="font-semibold text-lg text-sidebar-primary">DHMS</h2>
             <p className="text-xs text-sidebar-foreground/70">
-              Dairy Management
+              Dairy Herd Management System
             </p>
           </div>
         </div>
