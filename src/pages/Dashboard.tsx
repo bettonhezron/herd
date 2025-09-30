@@ -98,16 +98,15 @@ export default function Dashboard() {
           className="w-full h-64 object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/20 flex items-center">
-          <div className="px-8">
+          <div className="px-4 sm:px-8">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
-              Green Valley Dairy Farm
+              Dairy Farm
             </h1>
-
             <p className="text-base md:text-xl text-white/90 mb-4">
               Monitor your herds, milk production, and farm performance metrics
             </p>
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap">
               {/* Add Animal button */}
               <Button className="bg-primary hover:bg-primary-hover">
                 <Plus className="w-4 h-4 mr-2" />
