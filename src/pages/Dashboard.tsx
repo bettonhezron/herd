@@ -24,6 +24,7 @@ import {
 import farmHero from "@/assets/farm-hero.jpg";
 import { WelcomeMessage } from "@/components/ui/wecome";
 import { useState } from "react";
+import { AddAnimalModal } from "@/components/modals/AddAnimalModal";
 
 // Sample data
 const milkProductionData = [
@@ -93,6 +94,7 @@ const recentAlerts = [
 
 export default function Dashboard() {
   const [range, setRange] = useState("6M");
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
   const filteredData =
     range === "1W"
@@ -121,7 +123,10 @@ export default function Dashboard() {
 
             <div className="flex gap-3">
               {/* Add Animal button */}
-              <Button className="bg-primary hover:bg-primary-hover">
+              <Button
+                onClick={() => setAddModalOpen(true)}
+                className="bg-primary hover:bg-primary-hover"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Animal
               </Button>
@@ -363,6 +368,8 @@ export default function Dashboard() {
           </div>
         </CardContent>
       </Card>
+
+      <AddAnimalModal open={addModalOpen} onOpenChange={setAddModalOpen} />
     </div>
   );
 }

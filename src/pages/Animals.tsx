@@ -24,16 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Plus,
-  Search,
-  Filter,
-  Calendar,
-  Activity,
-  Pencil,
-  Trash2,
-  EyeIcon,
-} from "lucide-react";
+import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { AddAnimalModal } from "@/components/modals/AddAnimalModal";
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 
