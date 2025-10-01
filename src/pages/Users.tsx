@@ -35,6 +35,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
+import { AddUserModal } from "@/components/modals/AddUserModal";
+import { ManagePermissionsModal } from "@/components/modals/ManagePemission";
 
 interface User {
   id: string;
@@ -151,6 +154,10 @@ const getStatusColor = (status: string) => {
 export default function UserManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState<string>("all");
+  const [addUserOpen, setAddUserOpen] = useState(false);
+  const [editUser, setEditUser] = useState<User | null>(null);
+  const [permissionsUser, setPermissionsUser] = useState<User | null>(null);
+  const [deleteUser, setDeleteUser] = useState<User | null>(null);
 
   const filteredUsers = mockUsers.filter((user) => {
     const matchesSearch =
@@ -180,6 +187,7 @@ export default function UserManagement() {
       icon: Shield,
       change: "System access",
     },
+
     {
       title: "Farm Workers",
       value: mockUsers.filter((u) => u.role === "worker").length,
@@ -201,7 +209,10 @@ export default function UserManagement() {
           </p>
         </div>
 
-        <Button className="gap-2 px-3 py-2 self-start sm:self-auto text-sm sm:text-base bg-primary hover:bg-primary-hover">
+        <Button
+          className="gap-2 px-3 py-2 self-start sm:self-auto text-sm sm:text-base bg-primary hover:bg-primary-hover"
+          onClick={() => setAddUserOpen(true)}
+        >
           <Plus className="w-4 h-4" />
           Add User
         </Button>
@@ -341,15 +352,20 @@ export default function UserManagement() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setEditUser(user)}>
                             <Edit3 className="w-4 h-4 mr-2" />
                             Edit User
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => setPermissionsUser(user)}
+                          >
                             <Shield className="w-4 h-4 mr-2" />
                             Manage Permissions
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => setDeleteUser(user)}
+                          >
                             <Trash2 className="w-4 h-4 mr-2" />
                             Delete User
                           </DropdownMenuItem>
@@ -372,6 +388,24 @@ export default function UserManagement() {
           )}
         </CardContent>
       </Card>
+
+      <AddUserModal open={addUserOpen} onOpenChange={setAddUserOpen} />
+      <AddUserModal
+        open={!!editUser}
+        onOpenChange={(open) => !open && setEditUser(null)}
+        user={editUser}
+      />
+      <ManagePermissionsModal
+        open={!!permissionsUser}
+        onOpenChange={(open) => !open && setPermissionsUser(null)}
+        userName={permissionsUser?.name}
+      />
+      <DeleteConfirmModal
+        open={!!deleteUser}
+        onOpenChange={(open) => !open && setDeleteUser(null)}
+        title="Delete User"
+        description={`Are you sure you want to delete ${deleteUser?.name}? This action cannot be undone.`}
+      />
     </div>
   );
 }
