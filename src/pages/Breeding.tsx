@@ -30,6 +30,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
+import { AddBreedingModal } from "@/components/modals/AddBreedingModal";
+import { AddPregnancyModal } from "@/components/modals/AddPregnancyModal";
 
 interface BreedingRecord {
   id: string;
@@ -204,6 +206,8 @@ export default function Breeding() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMethod, setSelectedMethod] = useState<string>("all");
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [addBreedingOpen, setAddBreedingOpen] = useState(false);
+  const [addPregnancyOpen, setAddPregnancyOpen] = useState(false);
 
   const filteredRecords = mockBreedingRecords.filter((record) => {
     const matchesSearch =
@@ -250,10 +254,23 @@ export default function Breeding() {
           </p>
         </div>
 
-        <Button className="gap-2 px-3 py-2 self-start sm:self-auto text-sm sm:text-base">
-          <Plus className="w-4 h-4" />
-          Record Breeding
-        </Button>
+        <div className="flex flex-wrap gap-2 sm:gap-4">
+          <Button
+            className="gap-2 px-3 py-2 text-sm sm:text-base"
+            onClick={() => setAddBreedingOpen(true)}
+          >
+            <Plus className="w-4 h-4" />
+            Record Breeding
+          </Button>
+
+          <Button
+            className="gap-2 px-3 py-2 text-sm sm:text-base"
+            variant="outline"
+            onClick={() => setAddPregnancyOpen(true)}
+          >
+            Confirm Pregnancy
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -495,6 +512,15 @@ export default function Breeding() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <AddBreedingModal
+        open={addBreedingOpen}
+        onOpenChange={setAddBreedingOpen}
+      />
+      <AddPregnancyModal
+        open={addPregnancyOpen}
+        onOpenChange={setAddPregnancyOpen}
+      />
 
       <DeleteConfirmModal
         open={deleteModalOpen}

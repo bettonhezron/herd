@@ -139,6 +139,7 @@ export function AddUserModal({
                 <SelectContent>
                   <SelectItem value="admin">Administrator</SelectItem>
                   <SelectItem value="manager">Manager</SelectItem>
+                  <SelectItem value="veterianry">Veterinary</SelectItem>
                   <SelectItem value="worker">Worker</SelectItem>
                 </SelectContent>
               </Select>
