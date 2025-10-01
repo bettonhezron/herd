@@ -15,6 +15,8 @@ import Reports from "./pages/Reports";
 import Analytics from "./pages/Analytics";
 import Health from "./pages/Health";
 import Breeding from "./pages/Breeding";
+import Profile from "./pages/Profile";
+import Preferences from "./pages/Preferences";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +36,8 @@ const App = () => (
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/users" element={<UserManagement />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/preferences" element={<Preferences />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
