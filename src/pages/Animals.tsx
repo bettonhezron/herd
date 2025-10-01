@@ -28,52 +28,46 @@ import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { AddAnimalModal } from "@/components/modals/AddAnimalModal";
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 
-// Sample animal data
-const animals = [
+export interface Animal {
+  id?: string;
+  name: string;
+  tagId: string;
+  breed: string;
+  dateOfBirth: string;
+  gender: "male" | "female";
+  status: "healthy" | "pregnant" | "treatment";
+  nextEvent: string;
+  production: string;
+  lastMilking: string;
+  age: string;
+}
+
+const animals: Animal[] = [
   {
     id: "A247",
+    name: "Bella",
+    tagId: "TAG247",
     breed: "Holstein",
-    age: "3 years",
+    dateOfBirth: "2022-03-01",
+    gender: "female",
     status: "healthy",
-    lastMilking: "6 hours ago",
-    production: "28.5L",
     nextEvent: "Vaccination due",
+    production: "",
+    lastMilking: "",
+    age: "",
   },
   {
     id: "A156",
+    name: "Daisy",
+    tagId: "TAG156",
     breed: "Jersey",
-    age: "5 years",
+    dateOfBirth: "2020-05-12",
+    gender: "female",
     status: "pregnant",
-    lastMilking: "5 hours ago",
-    production: "22.3L",
     nextEvent: "Calving expected",
-  },
-  {
-    id: "A198",
-    breed: "Holstein",
-    age: "2 years",
-    status: "healthy",
-    lastMilking: "4 hours ago",
-    production: "31.2L",
-    nextEvent: "Health check",
-  },
-  {
-    id: "A203",
-    breed: "Guernsey",
-    age: "4 years",
-    status: "treatment",
-    lastMilking: "8 hours ago",
-    production: "18.7L",
-    nextEvent: "Treatment follow-up",
-  },
-  {
-    id: "A089",
-    breed: "Holstein",
-    age: "6 years",
-    status: "healthy",
-    lastMilking: "3 hours ago",
-    production: "26.8L",
-    nextEvent: "Breeding program",
+    production: "",
+    lastMilking: "",
+    age: "",
   },
 ];
 
@@ -106,6 +100,7 @@ export default function Animals() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editingAnimal, setEditingAnimal] = useState<Animal | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const filteredAnimals = animals.filter((animal) => {
@@ -257,7 +252,12 @@ export default function Animals() {
 
                     <TableCell>
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="sm" title="Edit">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title="Edit"
+                          onClick={() => setEditingAnimal(animal)}
+                        >
                           <Pencil className="w-4 h-4" />
                         </Button>
                         <Button
@@ -279,6 +279,11 @@ export default function Animals() {
       </Card>
 
       <AddAnimalModal open={addModalOpen} onOpenChange={setAddModalOpen} />
+      <AddAnimalModal
+        open={!!editingAnimal}
+        onOpenChange={(open) => !open && setEditingAnimal(null)}
+        animal={editingAnimal}
+      />
       <DeleteConfirmModal
         open={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
