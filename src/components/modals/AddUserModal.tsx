@@ -34,7 +34,6 @@ interface AddUserModalProps {
   user?: User | null;
   onSave?: (user: User) => void;
 }
-
 export function AddUserModal({
   open,
   onOpenChange,
@@ -77,7 +76,7 @@ export function AddUserModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="w-[85%] max-w-[500px]">
         <DialogHeader>
           <DialogTitle>{user ? "Edit User" : "Add New User"}</DialogTitle>
           <DialogDescription>
@@ -86,8 +85,10 @@ export function AddUserModal({
               : "Add a new staff member to your farm management system"}
           </DialogDescription>
         </DialogHeader>
+
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
+            {/* Name */}
             <div className="grid gap-2">
               <Label htmlFor="name">Full Name</Label>
               <Input
@@ -100,6 +101,8 @@ export function AddUserModal({
                 required
               />
             </div>
+
+            {/* Email */}
             <div className="grid gap-2">
               <Label htmlFor="email">Email Address</Label>
               <Input
@@ -113,6 +116,8 @@ export function AddUserModal({
                 required
               />
             </div>
+
+            {/* Department */}
             <div className="grid gap-2">
               <Label htmlFor="department">Department</Label>
               <Input
@@ -125,6 +130,8 @@ export function AddUserModal({
                 required
               />
             </div>
+
+            {/* Role */}
             <div className="grid gap-2">
               <Label htmlFor="role">Role</Label>
               <Select
@@ -139,11 +146,13 @@ export function AddUserModal({
                 <SelectContent>
                   <SelectItem value="admin">Administrator</SelectItem>
                   <SelectItem value="manager">Manager</SelectItem>
-                  <SelectItem value="veterianry">Veterinary</SelectItem>
+                  <SelectItem value="veterinary">Veterinary</SelectItem>
                   <SelectItem value="worker">Worker</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Status */}
             <div className="grid gap-2">
               <Label htmlFor="status">Status</Label>
               <Select
@@ -162,15 +171,19 @@ export function AddUserModal({
               </Select>
             </div>
           </div>
-          <DialogFooter>
+
+          <DialogFooter className="flex flex-row justify-end gap-3">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              className="min-w-[100px]"
             >
               Cancel
             </Button>
-            <Button type="submit">{user ? "Update User" : "Add User"}</Button>
+            <Button type="submit" className="min-w-[140px]">
+              {user ? "Update User" : "Add User"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
