@@ -6,6 +6,8 @@ import {
   CheckCircle,
   Clock,
   Baby,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +29,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 
 interface BreedingRecord {
   id: string;
@@ -200,6 +203,7 @@ function getStatusIcon(status: string) {
 export default function Breeding() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMethod, setSelectedMethod] = useState<string>("all");
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const filteredRecords = mockBreedingRecords.filter((record) => {
     const matchesSearch =
@@ -317,6 +321,7 @@ export default function Breeding() {
                       <TableHead>Bull ID</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Expected Calving</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -349,6 +354,22 @@ export default function Breeding() {
                         </TableCell>
                         <TableCell className="text-sm">
                           {record.expectedCalvingDate || "-"}
+                        </TableCell>
+
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="sm" title="Edit">
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              title="Delete"
+                              onClick={() => setDeleteModalOpen(true)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -474,6 +495,13 @@ export default function Breeding() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <DeleteConfirmModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        title="Delete Health Record?"
+        description="Are you sure you want to delete this health record? This action cannot be undone."
+      />
     </div>
   );
 }

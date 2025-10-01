@@ -9,6 +9,8 @@ import {
   CheckCircle,
   Clock,
   Calendar,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +31,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AddHealthRecordModal } from "@/components/modals/AddHealthRecordModal";
+import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 
 interface HealthRecord {
   id: string;
@@ -184,6 +188,8 @@ function getStatusColor(status: string) {
 export default function Health() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<string>("all");
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const filteredRecords = mockHealthRecords.filter((record) => {
     const matchesSearch =
@@ -199,25 +205,21 @@ export default function Health() {
       title: "Total Health Events",
       value: "152",
       change: "+12 this month",
-      icon: Activity,
     },
     {
       title: "Scheduled Events",
       value: "8",
       change: "Next 30 days",
-      icon: Calendar,
     },
     {
       title: "Overdue Vaccinations",
       value: "3",
       change: "Requires attention",
-      icon: AlertTriangle,
     },
     {
       title: "Active Treatments",
       value: "5",
       change: "In progress",
-      icon: Stethoscope,
     },
   ];
 
@@ -234,7 +236,10 @@ export default function Health() {
           </p>
         </div>
 
-        <Button className="gap-2 px-3 py-2 self-start sm:self-auto text-sm sm:text-base bg-primary hover:bg-primary-hover">
+        <Button
+          className="gap-2 px-3 py-2 self-start sm:self-auto text-sm sm:text-base bg-primary hover:bg-primary-hover"
+          onClick={() => setAddModalOpen(true)}
+        >
           <Plus className="w-4 h-4" />
           Add Health Record
         </Button>
@@ -248,7 +253,6 @@ export default function Health() {
               <CardTitle className="text-sm font-medium">
                 {stat.title}
               </CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
@@ -307,6 +311,7 @@ export default function Health() {
                       <TableHead>Date</TableHead>
                       <TableHead>Veterinarian</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -361,6 +366,22 @@ export default function Health() {
                             {record.status.charAt(0).toUpperCase() +
                               record.status.slice(1)}
                           </Badge>
+                        </TableCell>
+
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="sm" title="Edit">
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              title="Delete"
+                              onClick={() => setDeleteModalOpen(true)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -424,6 +445,18 @@ export default function Health() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <AddHealthRecordModal
+        open={addModalOpen}
+        onOpenChange={setAddModalOpen}
+      />
+
+      <DeleteConfirmModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        title="Delete Health Record?"
+        description="Are you sure you want to delete this health record? This action cannot be undone."
+      />
     </div>
   );
 }

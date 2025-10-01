@@ -1,12 +1,4 @@
-import {
-  BarChart3,
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Milk,
-  Heart,
-  Activity,
-} from "lucide-react";
+import { TrendingUp, TrendingDown } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -34,7 +26,6 @@ import {
   YAxis,
   CartesianGrid,
   Legend,
-  ResponsiveContainer,
 } from "recharts";
 
 const productionData = [
@@ -89,28 +80,24 @@ export default function Analytics() {
       value: "32.5L",
       change: "+5.2%",
       trend: "up",
-      icon: Milk,
     },
     {
       title: "Herd Growth Rate",
       value: "+8.3%",
       change: "vs last quarter",
       trend: "up",
-      icon: TrendingUp,
     },
     {
       title: "Breeding Success",
       value: "79.2%",
       change: "+2.1%",
       trend: "up",
-      icon: Heart,
     },
     {
       title: "Health Events",
       value: "152",
       change: "-12.3%",
       trend: "down",
-      icon: Activity,
     },
   ];
 
@@ -134,7 +121,6 @@ export default function Analytics() {
               <CardTitle className="text-sm font-medium">
                 {stat.title}
               </CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
