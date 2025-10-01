@@ -8,7 +8,6 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
-  Calendar,
   Pencil,
   Trash2,
 } from "lucide-react";
@@ -189,6 +188,7 @@ export default function Health() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<string>("all");
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editHealth, setEditHealth] = useState<HealthRecord | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const filteredRecords = mockHealthRecords.filter((record) => {
@@ -370,7 +370,12 @@ export default function Health() {
 
                         <TableCell>
                           <div className="flex gap-1">
-                            <Button variant="ghost" size="sm" title="Edit">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              title="Edit"
+                              onClick={() => setEditHealth(record)}
+                            >
                               <Pencil className="w-4 h-4" />
                             </Button>
                             <Button
@@ -449,6 +454,12 @@ export default function Health() {
       <AddHealthRecordModal
         open={addModalOpen}
         onOpenChange={setAddModalOpen}
+      />
+
+      <AddHealthRecordModal
+        open={!!editHealth}
+        onOpenChange={(open) => !open && setEditHealth(null)}
+        health={editHealth}
       />
 
       <DeleteConfirmModal

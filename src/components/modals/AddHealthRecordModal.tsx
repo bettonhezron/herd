@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,49 +20,86 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
+interface HealthRecord {
+  id?: string;
+  animalId: string;
+  type: "vaccination" | "treatment" | "checkup" | "emergency" | "";
+  date: string;
+  veterinarian?: string;
+  diagnosis: string;
+  treatment: string;
+  notes: string;
+}
+
 interface AddHealthRecordModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  health?: HealthRecord | null;
+  onSave?: (record: HealthRecord) => void;
 }
 
 export function AddHealthRecordModal({
   open,
   onOpenChange,
+  health,
+  onSave,
 }: AddHealthRecordModalProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<HealthRecord>({
     animalId: "",
     type: "",
-    date: "",
+    date: new Date().toISOString().split("T")[0],
     veterinarian: "",
     diagnosis: "",
     treatment: "",
     notes: "",
   });
 
+  useEffect(() => {
+    if (health) {
+      setFormData(health);
+    } else {
+      setFormData({
+        animalId: "",
+        type: "",
+        date: new Date().toISOString().split("T")[0],
+        veterinarian: "",
+        diagnosis: "",
+        treatment: "",
+        notes: "",
+      });
+    }
+  }, [health, open]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Health record added successfully");
+
+    if (onSave) {
+      onSave(formData);
+    } else {
+      toast.success(
+        health
+          ? "Health record updated successfully"
+          : "Health record added successfully"
+      );
+    }
+
     onOpenChange(false);
-    setFormData({
-      animalId: "",
-      type: "",
-      date: "",
-      veterinarian: "",
-      diagnosis: "",
-      treatment: "",
-      notes: "",
-    });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add Health Record</DialogTitle>
+          <DialogTitle>
+            {health ? "Edit Health Record" : "Add Health Record"}
+          </DialogTitle>
           <DialogDescription>
-            Record a new health event or treatment.
+            {health
+              ? "Update the selected health event or treatment."
+              : "Record a new health event or treatment."}
           </DialogDescription>
         </DialogHeader>
+
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -77,12 +114,16 @@ export function AddHealthRecordModal({
                 required
               />
             </div>
+
             <div className="grid gap-2">
               <Label htmlFor="type">Type</Label>
               <Select
                 value={formData.type}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, type: value })
+                  setFormData({
+                    ...formData,
+                    type: value as HealthRecord["type"],
+                  })
                 }
               >
                 <SelectTrigger id="type">
@@ -96,6 +137,7 @@ export function AddHealthRecordModal({
                 </SelectContent>
               </Select>
             </div>
+
             <div className="grid gap-2">
               <Label htmlFor="date">Date</Label>
               <Input
@@ -110,6 +152,18 @@ export function AddHealthRecordModal({
             </div>
 
             <div className="grid gap-2">
+              <Label htmlFor="veterinarian">Veterinarian</Label>
+              <Input
+                id="veterinarian"
+                value={formData.veterinarian}
+                onChange={(e) =>
+                  setFormData({ ...formData, veterinarian: e.target.value })
+                }
+                placeholder="Dr. Jane Doe"
+              />
+            </div>
+
+            <div className="grid gap-2">
               <Label htmlFor="diagnosis">Diagnosis</Label>
               <Input
                 id="diagnosis"
@@ -119,6 +173,7 @@ export function AddHealthRecordModal({
                 }
               />
             </div>
+
             <div className="grid gap-2">
               <Label htmlFor="treatment">Treatment</Label>
               <Input
@@ -129,6 +184,7 @@ export function AddHealthRecordModal({
                 }
               />
             </div>
+
             <div className="grid gap-2">
               <Label htmlFor="notes">Notes</Label>
               <Textarea
@@ -142,7 +198,8 @@ export function AddHealthRecordModal({
               />
             </div>
           </div>
-          <DialogFooter>
+
+          <DialogFooter className="flex flex-row justify-end gap-3">
             <Button
               type="button"
               variant="outline"
@@ -150,7 +207,9 @@ export function AddHealthRecordModal({
             >
               Cancel
             </Button>
-            <Button type="submit">Add Record</Button>
+            <Button type="submit">
+              {health ? "Update Record" : "Add Record"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

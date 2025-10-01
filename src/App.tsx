@@ -17,6 +17,7 @@ import Health from "./pages/Health";
 import Breeding from "./pages/Breeding";
 import Profile from "./pages/Profile";
 import Preferences from "./pages/Preferences";
+import FeedsPage from "./pages/Feeds";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/animals" element={<Animals />} />
             <Route path="/breeding" element={<Breeding />} />
             <Route path="/milking" element={<Milking />} />
+            <Route path="/feeding" element={<FeedsPage />} />
             <Route path="/health" element={<Health />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/reports" element={<Reports />} />

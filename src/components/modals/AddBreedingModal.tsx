@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
 interface BreedingData {
+  id?: string;
   animalTag: string;
   animalName: string;
   breedingDate: string;
@@ -32,11 +33,14 @@ interface BreedingData {
 interface AddBreedingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  breeding?: BreedingData | null;
   onSave?: (data: BreedingData) => void;
 }
+
 export function AddBreedingModal({
   open,
   onOpenChange,
+  breeding,
   onSave,
 }: AddBreedingModalProps) {
   const [formData, setFormData] = useState<BreedingData>({
@@ -48,32 +52,46 @@ export function AddBreedingModal({
     notes: "",
   });
 
+  useEffect(() => {
+    if (breeding) {
+      setFormData(breeding);
+    } else {
+      setFormData({
+        animalTag: "",
+        animalName: "",
+        breedingDate: new Date().toISOString().split("T")[0],
+        method: "AI",
+        bullId: "",
+        notes: "",
+      });
+    }
+  }, [breeding, open]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (onSave) {
       onSave(formData);
     } else {
-      toast.success("Breeding record added successfully");
+      toast.success(
+        breeding
+          ? "Breeding record updated successfully"
+          : "Breeding record added successfully"
+      );
     }
     onOpenChange(false);
-    setFormData({
-      animalTag: "",
-      animalName: "",
-      breedingDate: new Date().toISOString().split("T")[0],
-      method: "AI",
-      bullId: "",
-      notes: "",
-    });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[85%] max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Record Breeding Event</DialogTitle>
+          <DialogTitle>
+            {breeding ? "Edit Breeding Event" : "Record Breeding Event"}
+          </DialogTitle>
           <DialogDescription>
-            Add a new breeding record for artificial insemination or natural
-            breeding
+            {breeding
+              ? "Update breeding details for this animal"
+              : "Add a new breeding record for artificial insemination or natural breeding"}
           </DialogDescription>
         </DialogHeader>
 
@@ -170,7 +188,7 @@ export function AddBreedingModal({
             </div>
           </div>
 
-          {/* ✅ Footer buttons fixed */}
+          {/* Footer buttons */}
           <DialogFooter className="flex flex-row justify-end gap-3">
             <Button
               type="button"
@@ -181,7 +199,7 @@ export function AddBreedingModal({
               Cancel
             </Button>
             <Button type="submit" className="min-w-[140px]">
-              Save Record
+              {breeding ? "Update Record" : "Save Record"}
             </Button>
           </DialogFooter>
         </form>

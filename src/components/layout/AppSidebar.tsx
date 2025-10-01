@@ -7,6 +7,7 @@ import {
   Settings,
   FileText,
   PawPrintIcon,
+  LeafIcon,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -28,6 +29,7 @@ const mainItems = [
   { title: "Breeding", url: "/breeding", icon: Heart },
   { title: "Milking", url: "/milking", icon: Droplets },
   { title: "Health", url: "/health", icon: Activity },
+  { title: "Feeding", url: "/feeding", icon: LeafIcon },
 ];
 
 const analyticsItems = [

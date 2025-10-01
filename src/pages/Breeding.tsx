@@ -207,6 +207,7 @@ export default function Breeding() {
   const [selectedMethod, setSelectedMethod] = useState<string>("all");
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [addBreedingOpen, setAddBreedingOpen] = useState(false);
+  const [editBreeding, setEditBreeding] = useState<BreedingRecord | null>(null);
   const [addPregnancyOpen, setAddPregnancyOpen] = useState(false);
 
   const filteredRecords = mockBreedingRecords.filter((record) => {
@@ -375,9 +376,15 @@ export default function Breeding() {
 
                         <TableCell>
                           <div className="flex gap-1">
-                            <Button variant="ghost" size="sm" title="Edit">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              title="Edit"
+                              onClick={() => setEditBreeding(record)}
+                            >
                               <Pencil className="w-4 h-4" />
                             </Button>
+
                             <Button
                               variant="ghost"
                               size="sm"
@@ -517,6 +524,13 @@ export default function Breeding() {
         open={addBreedingOpen}
         onOpenChange={setAddBreedingOpen}
       />
+
+      <AddBreedingModal
+        open={!!editBreeding}
+        onOpenChange={(open) => !open && setEditBreeding(null)}
+        breeding={editBreeding}
+      />
+
       <AddPregnancyModal
         open={addPregnancyOpen}
         onOpenChange={setAddPregnancyOpen}
