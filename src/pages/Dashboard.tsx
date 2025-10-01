@@ -25,6 +25,7 @@ import farmHero from "@/assets/farm-hero.jpg";
 import { WelcomeMessage } from "@/components/ui/wecome";
 import { useState } from "react";
 import { AddAnimalModal } from "@/components/modals/AddAnimalModal";
+import { useNavigate } from "react-router-dom";
 
 // Sample data
 const milkProductionData = [
@@ -95,6 +96,7 @@ const recentAlerts = [
 export default function Dashboard() {
   const [range, setRange] = useState("6M");
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const filteredData =
     range === "1W"
@@ -132,7 +134,11 @@ export default function Dashboard() {
               </Button>
 
               {/* View Reports button */}
-              <Button variant="secondary" className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                className="flex items-center gap-2"
+                onClick={() => navigate("/reports")}
+              >
                 <FileText className="w-4 h-4" />
                 View Reports
               </Button>
