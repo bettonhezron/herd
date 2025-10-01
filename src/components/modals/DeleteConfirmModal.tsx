@@ -36,16 +36,22 @@ export function DeleteConfirmModal({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent className="max-w-sm w-[90%] rounded-xl p-6 sm:max-w-md md:max-w-lg">
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          <AlertDialogTitle className="text-lg font-semibold sm:text-xl">
+            {title}
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-sm text-muted-foreground sm:text-base">
+            {description}
+          </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+        <AlertDialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+          <AlertDialogCancel className="w-full sm:w-auto">
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            className="w-full sm:w-auto bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             Delete
           </AlertDialogAction>

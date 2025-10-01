@@ -50,15 +50,16 @@ export function AddAnimalModal({ open, onOpenChange }: AddAnimalModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="w-[85%] max-w-md sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add New Animal</DialogTitle>
           <DialogDescription>
             Enter the details of the new animal to add to your herd.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="name">Name</Label>
               <Input
@@ -130,15 +131,19 @@ export function AddAnimalModal({ open, onOpenChange }: AddAnimalModalProps) {
               </Select>
             </div>
           </div>
-          <DialogFooter>
+
+          <DialogFooter className="flex flex-row justify-end gap-2 sm:gap-3">
             <Button
               type="button"
               variant="outline"
+              className="shrink-0"
               onClick={() => onOpenChange(false)}
             >
               Cancel
             </Button>
-            <Button type="submit">Add Animal</Button>
+            <Button type="submit" className="shrink-0">
+              Add Animal
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
