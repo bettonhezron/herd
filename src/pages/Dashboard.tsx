@@ -8,7 +8,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { TrendingUp, Plus, FileText } from "lucide-react";
+import {
+  TrendingUp,
+  Plus,
+  FileText,
+  Stethoscope,
+  Baby,
+  Users,
+  Droplets,
+} from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -104,6 +112,40 @@ export default function Dashboard() {
       : range === "1Y"
       ? milkProductionDataYear
       : milkProductionData;
+
+  const quickActions = [
+    {
+      icon: Plus,
+      label: "Add Animal",
+      description: "Register new animal",
+      action: "/animals",
+    },
+    {
+      icon: Stethoscope,
+      label: "Health Record",
+      description: "Log health event",
+      action: "/health",
+    },
+
+    {
+      icon: FileText,
+      label: "Generate Report",
+      description: "Create new report",
+      action: "/reports",
+    },
+    {
+      icon: Users,
+      label: "Manage Users",
+      description: "Add staff member",
+      action: "/users",
+    },
+    {
+      icon: Droplets,
+      label: "Log Milking",
+      description: "Record production",
+      action: "/milking",
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -329,6 +371,31 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Quick Actions Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            Quick Actions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {quickActions.map((action) => (
+              <Button
+                key={action.label}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 p-2 min-w-[150px] text-sm"
+                onClick={() => navigate(action.action)}
+              >
+                <action.icon className="w-4 h-4 text-primary" />
+                <span>{action.label}</span>
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Recent Alerts */}
       <Card>
