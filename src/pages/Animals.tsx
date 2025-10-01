@@ -24,7 +24,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Search, Filter, Calendar, Activity } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Filter,
+  Calendar,
+  Activity,
+  Pencil,
+  Trash2,
+  EyeIcon,
+} from "lucide-react";
+import { AddAnimalModal } from "@/components/modals/AddAnimalModal";
+import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 
 // Sample animal data
 const animals = [
@@ -103,6 +114,8 @@ const getStatusBadge = (status: string) => {
 export default function Animals() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const filteredAnimals = animals.filter((animal) => {
     const matchesSearch =
@@ -126,7 +139,10 @@ export default function Animals() {
           </p>
         </div>
 
-        <Button className="gap-2 px-3 py-2 self-start sm:self-auto text-sm sm:text-base bg-primary hover:bg-primary-hover">
+        <Button
+          onClick={() => setAddModalOpen(true)}
+          className="gap-2 px-3 py-2 self-start sm:self-auto text-sm sm:text-base bg-primary hover:bg-primary-hover"
+        >
           <Plus className="w-4 h-4" />
           Add Animal
         </Button>
@@ -247,13 +263,19 @@ export default function Animals() {
                     <TableCell className="text-muted-foreground">
                       {animal.nextEvent}
                     </TableCell>
+
                     <TableCell>
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="sm">
-                          <Activity className="w-4 h-4" />
+                        <Button variant="ghost" size="sm" title="Edit">
+                          <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
-                          <Calendar className="w-4 h-4" />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title="Delete"
+                          onClick={() => setDeleteModalOpen(true)}
+                        >
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </TableCell>
@@ -264,6 +286,14 @@ export default function Animals() {
           </div>
         </CardContent>
       </Card>
+
+      <AddAnimalModal open={addModalOpen} onOpenChange={setAddModalOpen} />
+      <DeleteConfirmModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        title="Delete Animal?"
+        description="Are you sure you want to delete this animal? This action cannot be undone and will remove all associated records."
+      />
     </div>
   );
 }
