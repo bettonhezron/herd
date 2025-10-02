@@ -48,7 +48,7 @@ export default function SignIn() {
       email: "",
       password: "",
     },
-    reValidateMode: "onSubmit",
+    reValidateMode: "onChange",
   });
 
   async function onSubmit(values: SignInFormValues) {
@@ -123,7 +123,7 @@ export default function SignIn() {
                         <Input
                           className="py-2.5 px-4 h-auto focus-visible:ring-green-400 focus-visible:ring-offset-green-50 pr-[65px]"
                           type={showPassword ? "text" : "password"}
-                          placeholder="••••••••"
+                          placeholder="Password"
                           autoComplete="current-password"
                           disabled={loginMutation.isPending}
                           {...field}
@@ -163,7 +163,6 @@ export default function SignIn() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                // Match the style of the shared design: full width, squared corners, with vertical spacing
                 className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 mt-5 h-auto rounded-lg text-base font-semibold transition-colors"
                 disabled={loginMutation.isPending}
               >

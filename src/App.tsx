@@ -29,10 +29,12 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <DashboardLayout>
-          <Routes>
-            <Route path="/login" element={<SignIn />} />
+        <Routes>
+          {/* Public route */}
+          <Route path="/login" element={<SignIn />} />
 
+          {/* Dashboard routes */}
+          <Route element={<DashboardLayout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/animals" element={<Animals />} />
             <Route path="/breeding" element={<Breeding />} />
@@ -46,9 +48,11 @@ const App = () => (
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/preferences" element={<Preferences />} />
             <Route path="/settings" element={<SettingsPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </DashboardLayout>
+          </Route>
+
+          {/* 404 */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
