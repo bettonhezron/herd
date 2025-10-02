@@ -11,6 +11,8 @@ import {
   Stethoscope,
   Users,
   Briefcase,
+  ToggleLeft, // Icon for Deactivate
+  ToggleRight, // Icon for Activate
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,11 +48,13 @@ import {
   useUpdateUser,
   useDeleteUser,
   useUserStats,
+  useActivateUser, // <-- NEW
+  useDeactivateUser, // <-- NEW
   userKeys,
 } from "@/hooks/useUser";
 import { useRegister } from "@/hooks/useAuth";
 import { User as UserType } from "@/types/user";
-import { formatLastLogin } from "@/lib/timeUtils"; // Import for Last Login formatting
+import { formatLastLogin } from "@/lib/timeUtils";
 
 interface StatCard {
   title: string;
@@ -65,6 +69,8 @@ export default function UserManagement() {
   const updateUserMutation = useUpdateUser();
   const deleteUserMutation = useDeleteUser();
   const registerMutation = useRegister();
+  const activateUserMutation = useActivateUser(); // <-- NEW
+  const deactivateUserMutation = useDeactivateUser(); // <-- NEW
   const { data, isLoading, isError } = useUserStats();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -160,6 +166,19 @@ export default function UserManagement() {
       );
     } else {
       registerMutation.mutate(payload, { onSuccess: onSuccessHandler });
+    }
+  };
+
+  const handleActivateDeactivate = (user: UserType) => {
+    const onSuccessHandler = () => {
+      // Invalidate stats to update Active Users count
+      queryClient.invalidateQueries({ queryKey: userKeys.stats() });
+    };
+
+    if (user.status === "ACTIVE") {
+      deactivateUserMutation.mutate(user.id, { onSuccess: onSuccessHandler });
+    } else {
+      activateUserMutation.mutate(user.id, { onSuccess: onSuccessHandler });
     }
   };
 
@@ -297,7 +316,6 @@ export default function UserManagement() {
                     </TableCell>
 
                     <TableCell className="text-sm text-muted-foreground">
-                      {/* Using the new utility for relative time */}
                       {formatLastLogin(user.lastLogin)}
                     </TableCell>
 
@@ -319,6 +337,24 @@ export default function UserManagement() {
                             <Shield className="w-4 h-4 mr-2" />
                             Manage Permissions
                           </DropdownMenuItem>
+
+                          {/* Conditional Activate/Deactivate Item */}
+                          <DropdownMenuItem
+                            onClick={() => handleActivateDeactivate(user)}
+                          >
+                            {user.status === "ACTIVE" ? (
+                              <>
+                                <ToggleLeft className="w-4 h-4 mr-2" />
+                                Deactivate User
+                              </>
+                            ) : (
+                              <>
+                                <ToggleRight className="w-4 h-4 mr-2" />
+                                Activate User
+                              </>
+                            )}
+                          </DropdownMenuItem>
+
                           <DropdownMenuItem
                             className="text-destructive"
                             onClick={() => setDeleteUser(user)}
