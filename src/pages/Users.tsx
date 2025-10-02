@@ -344,12 +344,12 @@ export default function UserManagement() {
                           >
                             {user.status === "ACTIVE" ? (
                               <>
-                                <ToggleLeft className="w-4 h-4 mr-2" />
+                                <ToggleRight className="w-4 h-4 mr-2" />
                                 Deactivate User
                               </>
                             ) : (
                               <>
-                                <ToggleRight className="w-4 h-4 mr-2" />
+                                <ToggleLeft className="w-4 h-4 mr-2" />
                                 Activate User
                               </>
                             )}
