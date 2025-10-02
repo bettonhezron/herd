@@ -340,7 +340,8 @@ export default function Notifications() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {/* Left section */}
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold">Notifications</h1>
@@ -354,8 +355,14 @@ export default function Notifications() {
             Manage all your farm notifications and alerts
           </p>
         </div>
-        <Button onClick={handleMarkAllAsRead} disabled={unreadCount === 0}>
-          <Check className="w-4 h-4 mr-2" />
+
+        {/* Right section */}
+        <Button
+          onClick={handleMarkAllAsRead}
+          disabled={unreadCount === 0}
+          className="gap-2 px-3 py-2 self-start sm:self-auto text-sm sm:text-base"
+        >
+          <Check className="w-4 h-4" />
           Mark All as Read
         </Button>
       </div>
