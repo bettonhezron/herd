@@ -1,14 +1,16 @@
 import { useState, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Plus,
   Search,
   UserCheck,
-  UserX,
   Shield,
   User,
   Edit3,
   Trash2,
   Stethoscope,
+  Users,
+  Briefcase,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,15 +41,30 @@ import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 import { AddUserModal } from "@/components/modals/AddUserModal";
 import { ManagePermissionsModal } from "@/components/modals/ManagePemission";
 
-import { useUsers, useUpdateUser, useDeleteUser } from "@/hooks/useUser";
+import {
+  useUsers,
+  useUpdateUser,
+  useDeleteUser,
+  useUserStats,
+  userKeys, // Assuming userKeys is exported and imported from "@/hooks/useUser"
+} from "@/hooks/useUser";
 import { useRegister } from "@/hooks/useAuth";
 import { User as UserType } from "@/types/user";
 
+interface StatCard {
+  title: string;
+  value: number;
+  icon: React.ElementType;
+  change: string;
+}
+
 export default function UserManagement() {
-  const { data: users = [], isLoading } = useUsers();
+  const queryClient = useQueryClient();
+  const { data: users = [], isPending } = useUsers();
   const updateUserMutation = useUpdateUser();
   const deleteUserMutation = useDeleteUser();
   const registerMutation = useRegister();
+  const { data, isLoading, isError } = useUserStats();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState<string>("all");
@@ -56,7 +73,33 @@ export default function UserManagement() {
   const [permissionsUser, setPermissionsUser] = useState<UserType | null>(null);
   const [deleteUser, setDeleteUser] = useState<UserType | null>(null);
 
-  // Filtering
+  const stats: StatCard[] = [
+    {
+      title: "Total Users",
+      value: data?.totalUsers ?? 0,
+      icon: Users,
+      change: "All staff members",
+    },
+    {
+      title: "Active Users",
+      value: data?.activeUsers ?? 0,
+      icon: UserCheck,
+      change: "Currently active staff",
+    },
+    {
+      title: "Admin Users",
+      value: data?.adminUsers ?? 0,
+      icon: Shield,
+      change: "Users with admin access",
+    },
+    {
+      title: "Worker Users",
+      value: data?.workerUsers ?? 0,
+      icon: Briefcase,
+      change: "General farm workers",
+    },
+  ];
+
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
       const matchesSearch =
@@ -68,7 +111,6 @@ export default function UserManagement() {
     });
   }, [users, searchTerm, selectedRole]);
 
-  // Role / status helper
   const getRoleIcon = (role: string) => {
     switch (role) {
       case "ADMIN":
@@ -104,18 +146,24 @@ export default function UserManagement() {
       ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
       : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
 
-  // Save handler
   const handleSaveUser = (payload: any, isUpdate: boolean) => {
+    const onSuccessHandler = () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.stats() });
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+    };
+
     if (isUpdate && editUser) {
-      updateUserMutation.mutate({ id: editUser.id, payload });
+      updateUserMutation.mutate(
+        { id: editUser.id, payload },
+        { onSuccess: onSuccessHandler }
+      );
     } else {
-      registerMutation.mutate(payload);
+      registerMutation.mutate(payload, { onSuccess: onSuccessHandler });
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground flex items-center gap-2">
@@ -135,7 +183,33 @@ export default function UserManagement() {
         </Button>
       </div>
 
-      {/* Filters */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {isLoading ? (
+          <div className="col-span-full text-center py-4 text-muted-foreground">
+            Loading user statistics...
+          </div>
+        ) : isError ? (
+          <div className="col-span-full text-center py-4 text-red-500">
+            Error loading user statistics.
+          </div>
+        ) : (
+          stats.map((stat) => (
+            <Card key={stat.title}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  {stat.title}
+                </CardTitle>
+                <stat.icon className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stat.value}</div>
+                <p className="text-xs text-muted-foreground">{stat.change}</p>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Staff Directory</CardTitle>
@@ -168,7 +242,6 @@ export default function UserManagement() {
             </select>
           </div>
 
-          {/* Users Table */}
           <div className="rounded-md border">
             <Table>
               <TableHeader>
@@ -271,7 +344,6 @@ export default function UserManagement() {
         </CardContent>
       </Card>
 
-      {/* Modals */}
       <AddUserModal
         open={addUserOpen}
         onOpenChange={setAddUserOpen}
@@ -297,6 +369,8 @@ export default function UserManagement() {
           if (deleteUser) {
             deleteUserMutation.mutate(deleteUser.id, {
               onSuccess: () => {
+                queryClient.invalidateQueries({ queryKey: userKeys.stats() });
+                queryClient.invalidateQueries({ queryKey: userKeys.lists() });
                 setDeleteUser(null);
               },
             });
