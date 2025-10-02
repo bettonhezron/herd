@@ -67,7 +67,8 @@ export function AddMilkingModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      {/* Wider but scrollable dialog for long forms */}
+      <DialogContent className="w-[90%] max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {editData ? "Edit Milking Record" : "Add Milking Record"}
@@ -78,8 +79,10 @@ export function AddMilkingModal({
               : "Record new milking session details and quality metrics"}
           </DialogDescription>
         </DialogHeader>
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          {/* Animal + Session */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="animalId">Animal ID *</Label>
               <Select
@@ -110,7 +113,7 @@ export function AddMilkingModal({
                 }
               >
                 <SelectTrigger id="session">
-                  <SelectValue />
+                  <SelectValue placeholder="Select session" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="morning">Morning</SelectItem>
@@ -120,7 +123,8 @@ export function AddMilkingModal({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          {/* Date + Time */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="date">Date *</Label>
               <Input
@@ -148,7 +152,8 @@ export function AddMilkingModal({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          {/* Quantity + Temperature */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="quantity">Quantity (Liters) *</Label>
               <Input
@@ -180,7 +185,8 @@ export function AddMilkingModal({
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          {/* Fat + Protein + SCC */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="fat">Fat % *</Label>
               <Input
@@ -226,6 +232,7 @@ export function AddMilkingModal({
             </div>
           </div>
 
+          {/* Quality */}
           <div className="space-y-2">
             <Label htmlFor="quality">Quality Assessment *</Label>
             <Select
@@ -235,7 +242,7 @@ export function AddMilkingModal({
               }
             >
               <SelectTrigger id="quality">
-                <SelectValue />
+                <SelectValue placeholder="Select quality" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="excellent">Excellent</SelectItem>
@@ -246,16 +253,18 @@ export function AddMilkingModal({
             </Select>
           </div>
 
-          <div className="flex justify-end space-x-2 pt-4">
+          {/* Footer */}
+          <div className="flex justify-end gap-3 pt-4">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              className="min-w-[100px]"
             >
               Cancel
             </Button>
-            <Button type="submit">
-              {editData ? "Update Record" : "Add Record"}
+            <Button type="submit" className="min-w-[140px]">
+              {editData ? "Update Record" : "Save Record"}
             </Button>
           </div>
         </form>

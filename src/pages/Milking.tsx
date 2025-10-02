@@ -486,6 +486,7 @@ export default function Milking() {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
+
                         <Button
                           variant="ghost"
                           size="sm"
@@ -524,7 +525,7 @@ export default function Milking() {
         open={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
         title="Delete Milking Record"
-        description="Are you sure you want to delete this milking record? This action cannot be undone."
+        description="Are you sure you want to delete this milking record?"
       />
     </div>
   );
