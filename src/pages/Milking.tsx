@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Plus, Search, Calendar, Download, Filter } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Calendar,
+  Download,
+  Filter,
+  Edit,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -38,6 +46,8 @@ import {
   LineChart,
   Line,
 } from "recharts";
+import { AddMilkingModal } from "@/components/modals/AddMilking";
+import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 
 interface MilkingRecord {
   id: string;
@@ -177,6 +187,12 @@ export default function Milking() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSession, setSelectedSession] = useState<string>("all");
   const [selectedQuality, setSelectedQuality] = useState<string>("all");
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<MilkingRecord | null>(
+    null
+  );
 
   const filteredRecords = mockMilkingData.filter((record) => {
     const matchesSearch =
@@ -241,7 +257,10 @@ export default function Milking() {
         </div>
 
         <div className="flex gap-3">
-          <Button className="gap-2 px-4 py-2 text-sm sm:px-5 sm:py-2.5 sm:text-base">
+          <Button
+            className="gap-2 px-4 py-2 text-sm sm:px-5 sm:py-2.5 sm:text-base"
+            onClick={() => setAddModalOpen(true)}
+          >
             <Plus className="w-4 h-4" />
             Record Milking
           </Button>
@@ -456,18 +475,28 @@ export default function Milking() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <Filter className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>View Details</DropdownMenuItem>
-                          <DropdownMenuItem>Edit Record</DropdownMenuItem>
-                          <DropdownMenuItem>Flag Quality</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedRecord(record);
+                            setEditModalOpen(true);
+                          }}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedRecord(record);
+                            setDeleteModalOpen(true);
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -484,6 +513,19 @@ export default function Milking() {
           )}
         </CardContent>
       </Card>
+
+      <AddMilkingModal open={addModalOpen} onOpenChange={setAddModalOpen} />
+      <AddMilkingModal
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        editData={selectedRecord || undefined}
+      />
+      <DeleteConfirmModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        title="Delete Milking Record"
+        description="Are you sure you want to delete this milking record? This action cannot be undone."
+      />
     </div>
   );
 }
