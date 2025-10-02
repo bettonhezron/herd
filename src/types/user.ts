@@ -1,12 +1,21 @@
-export type UserRole = "ADMIN" | "FARM_OWNER" | "MANAGER" | "WORKER" | "VETERINARIAN"; 
+export type UserRole = "ADMIN" | "FARM_OWNER" | "MANAGER" | "WORKER" | "VETERINARIAN";
 export type UserStatus = "ACTIVE" | "INACTIVE";
 
 export interface User {
-  id?: number;          
+  id: number;
   email: string;
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
   role: UserRole;
-  status?: UserStatus;
+  firstName: string;
+  lastName: string;
+  lastLogin: string;
+  phoneNumber: string | null;
+  photoUrl: string | null;
+  updatedAt: string;
+  createdAt: string;
+  status: UserStatus;
 }
+
+export type UpdateUserPayload = Omit<
+  User,
+  'id' | 'createdAt' | 'updatedAt' | 'lastLogin' | 'status' | 'role'
+> & { role?: UserRole };
