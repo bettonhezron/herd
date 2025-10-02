@@ -21,6 +21,12 @@ export interface LoginPayload {
     firstName: string;
     lastName: string;
     lastLogin: string;
+    phoneNumber: string | null;
+    photoUrl: string | null;
+    updatedAt: string;
+    createdAt: string; 
+    
+
   }
   
   export interface AuthState {
@@ -29,4 +35,5 @@ export interface LoginPayload {
     login: (user: User, token: string) => void;
     logout: () => void;
   }
+  
   

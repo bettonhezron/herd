@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Bell, ChevronDown, Heart, Droplets, Stethoscope } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -16,6 +15,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useMe } from "@/hooks/useAuth";
+import { useAuthStore } from "@/store/authStore";
+import { toast } from "../ui/use-toast";
 
 const recentAlerts = [
   {
@@ -69,6 +71,35 @@ export function TopBar() {
   const navigate = useNavigate();
   const [alertsOpen, setAlertsOpen] = useState(false);
 
+  const logoutUser = useAuthStore((state) => state.logout);
+
+  const { isLoading } = useMe();
+
+  const user = useAuthStore((state) => state.user);
+  const getInitials = (firstName: string) => {
+    return (firstName?.[0] || "G").toUpperCase();
+  };
+
+  if (isLoading && !user) {
+  }
+
+  const userFirstName = user?.firstName || "Guest";
+  const userLastName = user?.lastName || "User";
+  const userRole = user?.role || "Loading...";
+  const initials = getInitials(userFirstName);
+  const fullName = `${userFirstName} ${userLastName}`.trim();
+
+  const handleLogout = () => {
+    logoutUser();
+    toast({
+      title: "Logged Out Successfully!",
+      description: "You have been securely signed out of your account.",
+      variant: "default",
+    });
+
+    navigate("/login");
+  };
+
   return (
     <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
       <div className="flex items-center justify-between h-full px-6">
@@ -77,7 +108,7 @@ export function TopBar() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Alerts Dropdown */}
+          {/* Alerts Dropdown (no change needed here) */}
           <DropdownMenu open={alertsOpen} onOpenChange={setAlertsOpen}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">
@@ -146,20 +177,20 @@ export function TopBar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 px-3">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src="/avatars/farm-manager.png" />
+                  <AvatarImage src="/avatars/farm-manager.png" alt={fullName} />
                   <AvatarFallback className="bg-primary text-primary-foreground">
-                    FM
+                    {/* Use the dynamically generated initials */}
+                    {initials}
                   </AvatarFallback>
                 </Avatar>
                 <div className="hidden md:block text-left">
-                  <div className="text-sm font-medium">Farm Manager</div>
+                  <div className="text-sm font-medium">{fullName}</div>
                   <div className="text-xs text-muted-foreground">
-                    Green Valley Farm
+                    {userRole}
                   </div>
                 </div>
                 <ChevronDown className="w-4 h-4 text-muted-foreground" />
@@ -178,7 +209,10 @@ export function TopBar() {
                 Preferences
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem
+                className="text-destructive"
+                onClick={handleLogout}
+              >
                 Log out
               </DropdownMenuItem>
             </DropdownMenuContent>
