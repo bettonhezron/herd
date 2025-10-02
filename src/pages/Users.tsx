@@ -46,10 +46,11 @@ import {
   useUpdateUser,
   useDeleteUser,
   useUserStats,
-  userKeys, // Assuming userKeys is exported and imported from "@/hooks/useUser"
+  userKeys,
 } from "@/hooks/useUser";
 import { useRegister } from "@/hooks/useAuth";
 import { User as UserType } from "@/types/user";
+import { formatLastLogin } from "@/lib/timeUtils"; // Import for Last Login formatting
 
 interface StatCard {
   title: string;
@@ -296,7 +297,8 @@ export default function UserManagement() {
                     </TableCell>
 
                     <TableCell className="text-sm text-muted-foreground">
-                      {user.lastLogin}
+                      {/* Using the new utility for relative time */}
+                      {formatLastLogin(user.lastLogin)}
                     </TableCell>
 
                     <TableCell className="text-right">
