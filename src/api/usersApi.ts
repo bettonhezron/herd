@@ -1,4 +1,5 @@
 import { apiFetch } from "@/lib/fetcher";
+import { UserAnalytics } from "@/types/auths";
 import { UpdateUserPayload, User } from "@/types/user";
 
 const USER_BASE_URL = "/users";
@@ -29,3 +30,9 @@ export const deleteUser = (id: number): Promise<void> =>
   apiFetch(`${USER_BASE_URL}/${id}`, {
     method: "DELETE",
   });
+
+  export const fetchUserStats = (): Promise<UserAnalytics> =>
+    apiFetch(`${USER_BASE_URL}/analytics`, {
+      method: "GET",
+    });
+  

@@ -4,6 +4,7 @@ import {
   deleteUser,
   fetchUserById,
   fetchUsers,
+  fetchUserStats,
   updateUser,
 } from "@/api/usersApi";
 import { UpdateUserPayload, User } from "@/types/user";
@@ -19,6 +20,7 @@ const USER_BASE_URL = "/users";
 export const userKeys = {
   all: [USER_BASE_URL] as const,
   lists: () => [...userKeys.all, "list"] as const,
+  stats: () => [...userKeys.all, "stats"] as const,
   detail: (id: number) => [...userKeys.all, "detail", id] as const,
 };
 
@@ -86,5 +88,13 @@ export const useDeleteUser = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
+  });
+};
+
+export const useUserStats = () => {
+  return useQuery({
+    queryKey: userKeys.stats(),
+    queryFn: fetchUserStats,
+    staleTime: 5 * 60 * 1000, 
   });
 };

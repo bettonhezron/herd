@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Plus,
   Search,
@@ -39,162 +39,79 @@ import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 import { AddUserModal } from "@/components/modals/AddUserModal";
 import { ManagePermissionsModal } from "@/components/modals/ManagePemission";
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: "admin" | "manager" | "worker" | "veterinary";
-  status: "active" | "inactive";
-  avatar?: string;
-  phoneNo: String;
-  lastLogin: string;
-  department: string;
-}
-
-const mockUsers: User[] = [
-  {
-    id: "1",
-    name: "John Smith",
-    email: "john.smith@farm.com",
-    role: "admin",
-    status: "active",
-    lastLogin: "2024-01-15 09:30",
-    phoneNo: "0726509023",
-    department: "Management",
-  },
-  {
-    id: "2",
-    name: "Sarah Johnson",
-    email: "sarah.johnson@farm.com",
-    role: "manager",
-    status: "active",
-    phoneNo: "",
-    lastLogin: "2024-01-15 08:45",
-    department: "Dairy Operations",
-  },
-  {
-    id: "3",
-    name: "Mike Wilson",
-    email: "mike.wilson@farm.com",
-    role: "worker",
-    status: "active",
-    lastLogin: "2024-01-14 16:20",
-    phoneNo: "",
-    department: "Milking",
-  },
-
-  {
-    id: "4",
-    name: "Lisa Brown",
-    email: "lisa.brown@farm.com",
-    role: "worker",
-    status: "inactive",
-    lastLogin: "2024-01-10 14:15",
-    phoneNo: "",
-    department: "Animal Care",
-  },
-  {
-    id: "5",
-    name: "Dr. Sarah Collins",
-    email: "sarah.collins@farm.com",
-    role: "veterinary",
-    status: "active",
-    lastLogin: "2024-03-12 09:30",
-    phoneNo: "",
-    department: "Veterinary",
-  },
-  {
-    id: "6",
-    name: "Dr. Michael Green",
-    email: "michael.green@farm.com",
-    role: "veterinary",
-    status: "active",
-    lastLogin: "2024-04-18 11:45",
-    phoneNo: "",
-    department: "Veterinary",
-  },
-];
-
-const getRoleIcon = (role: string) => {
-  switch (role) {
-    case "admin":
-      return <Shield className="w-4 h-4" />;
-    case "manager":
-      return <UserCheck className="w-4 h-4" />;
-    case "worker":
-      return <User className="w-4 h-4" />;
-    case "veterinary":
-      return <Stethoscope className="w-4 h-4" />;
-    default:
-      return <User className="w-4 h-4" />;
-  }
-};
-
-const getRoleColor = (role: string) => {
-  switch (role) {
-    case "admin":
-      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
-    case "manager":
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
-    case "worker":
-      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-    case "veterinary":
-      return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300";
-    default:
-      return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
-  }
-};
-
-const getStatusColor = (status: string) => {
-  return status === "active"
-    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-    : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
-};
+import { useUsers, useUpdateUser, useDeleteUser } from "@/hooks/useUser";
+import { useRegister } from "@/hooks/useAuth";
+import { User as UserType } from "@/types/user";
 
 export default function UserManagement() {
+  const { data: users = [], isLoading } = useUsers();
+  const updateUserMutation = useUpdateUser();
+  const deleteUserMutation = useDeleteUser();
+  const registerMutation = useRegister();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState<string>("all");
   const [addUserOpen, setAddUserOpen] = useState(false);
-  const [editUser, setEditUser] = useState<User | null>(null);
-  const [permissionsUser, setPermissionsUser] = useState<User | null>(null);
-  const [deleteUser, setDeleteUser] = useState<User | null>(null);
+  const [editUser, setEditUser] = useState<UserType | null>(null);
+  const [permissionsUser, setPermissionsUser] = useState<UserType | null>(null);
+  const [deleteUser, setDeleteUser] = useState<UserType | null>(null);
 
-  const filteredUsers = mockUsers.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.department.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = selectedRole === "all" || user.role === selectedRole;
-    return matchesSearch && matchesRole;
-  });
+  // Filtering
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const matchesSearch =
+        user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesRole = selectedRole === "all" || user.role === selectedRole;
+      return matchesSearch && matchesRole;
+    });
+  }, [users, searchTerm, selectedRole]);
 
-  const stats = [
-    {
-      title: "Total Users",
-      value: mockUsers.length,
-      icon: User,
-      change: "+2 this month",
-    },
-    {
-      title: "Active Users",
-      value: mockUsers.filter((u) => u.status === "active").length,
-      icon: UserCheck,
-      change: "Last login today",
-    },
-    {
-      title: "Administrators",
-      value: mockUsers.filter((u) => u.role === "admin").length,
-      icon: Shield,
-      change: "System access",
-    },
+  // Role / status helper
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case "ADMIN":
+        return <Shield className="w-4 h-4" />;
+      case "MANAGER":
+        return <UserCheck className="w-4 h-4" />;
+      case "WORKER":
+        return <User className="w-4 h-4" />;
+      case "VETERINARIAN":
+        return <Stethoscope className="w-4 h-4" />;
+      default:
+        return <User className="w-4 h-4" />;
+    }
+  };
 
-    {
-      title: "Farm Workers",
-      value: mockUsers.filter((u) => u.role === "worker").length,
-      icon: User,
-      change: "Field operations",
-    },
-  ];
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case "ADMIN":
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
+      case "MANAGER":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
+      case "WORKER":
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
+      case "VETERINARIAN":
+        return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
+    }
+  };
+
+  const getStatusColor = (status: string) =>
+    status === "ACTIVE"
+      ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+      : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
+
+  // Save handler
+  const handleSaveUser = (payload: any, isUpdate: boolean) => {
+    if (isUpdate && editUser) {
+      updateUserMutation.mutate({ id: editUser.id, payload });
+    } else {
+      registerMutation.mutate(payload);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -218,25 +135,7 @@ export default function UserManagement() {
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">{stat.change}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Filters and Search */}
+      {/* Filters */}
       <Card>
         <CardHeader>
           <CardTitle>Staff Directory</CardTitle>
@@ -249,7 +148,7 @@ export default function UserManagement() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
-                placeholder="Search users by name, email, or department..."
+                placeholder="Search users by name, email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -261,20 +160,11 @@ export default function UserManagement() {
               onChange={(e) => setSelectedRole(e.target.value)}
               className="px-3 py-2 border border-input bg-background rounded-md text-sm"
             >
-              <option value="all">Status </option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-            <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
-              className="px-3 py-2 border border-input bg-background rounded-md text-sm"
-            >
               <option value="all">All Roles</option>
-              <option value="admin">Administrators</option>
-              <option value="manager">Managers</option>
-              <option value="veterinary">Veterinary</option>
-              <option value="worker">Workers</option>
+              <option value="ADMIN">Administrators</option>
+              <option value="MANAGER">Managers</option>
+              <option value="VETERINARIAN">Veterinarians</option>
+              <option value="WORKER">Workers</option>
             </select>
           </div>
 
@@ -284,9 +174,8 @@ export default function UserManagement() {
               <TableHeader>
                 <TableRow>
                   <TableHead>User</TableHead>
-                  <TableHead>Phone No.</TableHead>
+                  <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
-                  <TableHead>Department</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Last Login</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -298,16 +187,19 @@ export default function UserManagement() {
                     <TableCell>
                       <div className="flex items-center space-x-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={user.avatar} alt={user.name} />
+                          <AvatarImage
+                            src={user.photoUrl || undefined}
+                            alt={user.firstName}
+                          />
                           <AvatarFallback>
-                            {user.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")}
+                            {user.firstName[0]}
+                            {user.lastName[0]}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium">{user.name}</p>
+                          <p className="font-medium">
+                            {user.firstName} {user.lastName}
+                          </p>
                           <p className="text-sm text-muted-foreground">
                             {user.email}
                           </p>
@@ -315,35 +207,25 @@ export default function UserManagement() {
                       </div>
                     </TableCell>
 
-                    <TableCell> {user.phoneNo}</TableCell>
+                    <TableCell>{user.email}</TableCell>
 
                     <TableCell>
-                      <Badge
-                        variant="secondary"
-                        className={`gap-1 ${getRoleColor(user.role)}`}
-                      >
+                      <Badge className={`gap-1 ${getRoleColor(user.role)}`}>
                         {getRoleIcon(user.role)}
-                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                        {user.role}
                       </Badge>
                     </TableCell>
-                    <TableCell>{user.department}</TableCell>
+
                     <TableCell>
-                      <Badge
-                        variant="secondary"
-                        className={getStatusColor(user.status)}
-                      >
-                        {user.status === "active" ? (
-                          <UserCheck className="w-3 h-3 mr-1" />
-                        ) : (
-                          <UserX className="w-3 h-3 mr-1" />
-                        )}
-                        {user.status.charAt(0).toUpperCase() +
-                          user.status.slice(1)}
+                      <Badge className={getStatusColor(user.status)}>
+                        {user.status}
                       </Badge>
                     </TableCell>
+
                     <TableCell className="text-sm text-muted-foreground">
                       {user.lastLogin}
                     </TableCell>
+
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -389,22 +271,37 @@ export default function UserManagement() {
         </CardContent>
       </Card>
 
-      <AddUserModal open={addUserOpen} onOpenChange={setAddUserOpen} />
+      {/* Modals */}
+      <AddUserModal
+        open={addUserOpen}
+        onOpenChange={setAddUserOpen}
+        onSave={handleSaveUser}
+      />
       <AddUserModal
         open={!!editUser}
         onOpenChange={(open) => !open && setEditUser(null)}
         user={editUser}
+        onSave={handleSaveUser}
       />
       <ManagePermissionsModal
         open={!!permissionsUser}
         onOpenChange={(open) => !open && setPermissionsUser(null)}
-        userName={permissionsUser?.name}
+        userName={permissionsUser?.firstName}
       />
       <DeleteConfirmModal
         open={!!deleteUser}
         onOpenChange={(open) => !open && setDeleteUser(null)}
         title="Delete User"
-        description={`Are you sure you want to delete ${deleteUser?.name}? This action cannot be undone.`}
+        description={`Are you sure you want to delete ${deleteUser?.firstName}? This action cannot be undone.`}
+        onConfirm={() => {
+          if (deleteUser) {
+            deleteUserMutation.mutate(deleteUser.id, {
+              onSuccess: () => {
+                setDeleteUser(null);
+              },
+            });
+          }
+        }}
       />
     </div>
   );

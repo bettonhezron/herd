@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { login as loginApi, getMe, register as registerApi } from "@/api/authApi";
 import { useAuthStore } from "@/store/authStore";
 import { LoginPayload, LoginResponse, RegisterPayload, User } from "@/types/auths";
@@ -27,19 +27,24 @@ export function useLogin() {
 //  register hook 
 export function useRegister() {
   const { login } = useAuthStore();
+  const queryClient = useQueryClient(); 
 
   return useMutation<LoginResponse, Error, RegisterPayload>({
     mutationFn: registerApi,
     onSuccess: (data) => {
+      // Update auth store
       const user: User = {
         email: data.userEmail,
         role: data.role,
         firstName: data.firstName,
         lastName: data.lastName,
-        lastLogin: data.lastLogin,
+        lastLogin: data.lastLogin,      
+        phoneNumber: null,
+      
+       
       };
-
       login(user, data.token);
+      queryClient.invalidateQueries({ queryKey: ["/users", "list"] });
     },
   });
 }
