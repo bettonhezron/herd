@@ -4,10 +4,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
+
 import Dashboard from "./pages/Dashboard";
 import Animals from "./pages/Animals";
 import NotFound from "./pages/NotFound";
-
 import UserManagement from "./pages/Users";
 import Milking from "./pages/Milking";
 import SettingsPage from "./pages/Settings";
@@ -20,6 +20,7 @@ import Preferences from "./pages/Preferences";
 import FeedsPage from "./pages/Feeds";
 import NotificationsPage from "./pages/Notification";
 import SignIn from "./pages/SignIn";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -33,8 +34,14 @@ const App = () => (
           {/* Public route */}
           <Route path="/login" element={<SignIn />} />
 
-          {/* Dashboard routes */}
-          <Route element={<DashboardLayout />}>
+          {/* Protected dashboard routes */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route path="/" element={<Dashboard />} />
             <Route path="/animals" element={<Animals />} />
             <Route path="/breeding" element={<Breeding />} />
