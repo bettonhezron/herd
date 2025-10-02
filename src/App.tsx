@@ -19,6 +19,7 @@ import Profile from "./pages/Profile";
 import Preferences from "./pages/Preferences";
 import FeedsPage from "./pages/Feeds";
 import NotificationsPage from "./pages/Notification";
+import SignIn from "./pages/SignIn";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,8 @@ const App = () => (
       <BrowserRouter>
         <DashboardLayout>
           <Routes>
+            <Route path="/login" element={<SignIn />} />
+
             <Route path="/" element={<Dashboard />} />
             <Route path="/animals" element={<Animals />} />
             <Route path="/breeding" element={<Breeding />} />

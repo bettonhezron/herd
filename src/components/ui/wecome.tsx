@@ -19,8 +19,7 @@ export const WelcomeMessage: React.FC<WelcomeProps> = ({ name }) => {
         {getGreeting()}, {name}!
       </h2>
       <p className="text-muted-foreground">
-        Here’s your farm overview for today. Everything is running smoothly with
-        92% of your herd in good health.
+        Here’s your farm overview for today.
       </p>
     </div>
   );
