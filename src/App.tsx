@@ -18,6 +18,7 @@ import Breeding from "./pages/Breeding";
 import Profile from "./pages/Profile";
 import Preferences from "./pages/Preferences";
 import FeedsPage from "./pages/Feeds";
+import NotificationsPage from "./pages/Notification";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/reports" element={<Reports />} />
             <Route path="/users" element={<UserManagement />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/preferences" element={<Preferences />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<NotFound />} />
