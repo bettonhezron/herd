@@ -6,8 +6,8 @@ export interface FeedRecord {
   animalTag: string;
   animalName: string;
   feedType: FeedType;
-  quantity: number;     // in kg or liters
+  quantity: number;     
   unit: "kg" | "liters";
-  date: string;         // ISO date
+  date: string;      
   notes?: string;
 }

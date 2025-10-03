@@ -23,10 +23,13 @@ export async function apiFetch<T>(
       const errorData = await res.json();
       errorMessage = errorData.message || errorMessage;
     } catch {
+      
     }
 
-    if (res.status === 401) {
-      useAuthStore.getState().logout();
+    // handle expired / forbidden tokens
+    if (res.status === 401 || res.status === 403) {
+      useAuthStore.getState().logout(); 
+      window.location.href = "/login";   
     }
 
     throw new Error(errorMessage);

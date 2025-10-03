@@ -18,17 +18,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-
-export interface Animal {
-  id?: string;
-  name: string;
-  tagId: string;
-  breed: string;
-  dateOfBirth: string;
-  gender: "male" | "female";
-  status: "healthy" | "pregnant" | "treatment";
-  nextEvent: string;
-}
+import {
+  Animal,
+  CreateAnimalPayload,
+  UpdateAnimalPayload,
+} from "@/types/animal";
+import { useCreateAnimal, useUpdateAnimal } from "@/hooks/useAnimal";
 
 interface AddAnimalModalProps {
   open: boolean;
@@ -41,44 +36,70 @@ export function AddAnimalModal({
   open,
   onOpenChange,
   animal,
-  onSave,
 }: AddAnimalModalProps) {
   const [formData, setFormData] = useState<Animal>({
-    name: "",
-    tagId: "",
-    breed: "",
-    dateOfBirth: "",
-    gender: "female",
-    status: "healthy",
-    nextEvent: "",
+    tagNumber: "",
+    breed: "HOLSTEIN",
+    gender: "FEMALE",
+    status: "ACTIVE",
+    weight: "",
+    dob: "",
   });
+
+  const createMutation = useCreateAnimal();
+  const updateMutation = useUpdateAnimal();
 
   useEffect(() => {
     if (animal) {
       setFormData(animal);
     } else {
       setFormData({
-        name: "",
-        tagId: "",
-        breed: "",
-        dateOfBirth: "",
-        gender: "female",
-        status: "healthy",
-        nextEvent: "",
+        tagNumber: "",
+        breed: "HOLSTEIN",
+        gender: "FEMALE",
+        status: "ACTIVE",
+        weight: "",
+        dob: "",
       });
     }
   }, [animal, open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSave) {
-      onSave(formData);
-    } else {
-      toast.success(
-        animal ? "Animal updated successfully" : "Animal added successfully"
+
+    if (animal?.id) {
+      // Update existing animal
+      const payload: UpdateAnimalPayload = {
+        ...formData,
+      };
+      updateMutation.mutate(
+        { id: Number(animal.id), payload },
+        {
+          onSuccess: () => {
+            toast.success("Animal updated successfully");
+            onOpenChange(false);
+          },
+          onError: () => toast.error("Failed to update animal"),
+        }
       );
+    } else {
+      //  Create new animal
+      const payload: CreateAnimalPayload = {
+        tagNumber: formData.tagNumber,
+        breed: formData.breed,
+        gender: formData.gender,
+        status: formData.status,
+        weight: formData.weight,
+        dob: formData.dob,
+      };
+      createMutation.mutate(payload, {
+        onSuccess: () => {
+          toast.success("Animal added successfully");
+          onOpenChange(false);
+        },
+        onError: () => toast.error("Failed to add animal"),
+      });
     }
-    onOpenChange(false);
   };
 
   return (
@@ -95,35 +116,25 @@ export function AddAnimalModal({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4">
+            {/* Tag Number */}
             <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="tagNumber">Tag Number</Label>
               <Input
-                id="name"
-                value={formData.name}
+                id="tagNumber"
+                value={formData.tagNumber}
                 onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
+                  setFormData({ ...formData, tagNumber: e.target.value })
                 }
                 required
               />
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="tagId">Tag ID</Label>
-              <Input
-                id="tagId"
-                value={formData.tagId}
-                onChange={(e) =>
-                  setFormData({ ...formData, tagId: e.target.value })
-                }
-                required
-              />
-            </div>
-
+            {/* Breed */}
             <div className="grid gap-2">
               <Label htmlFor="breed">Breed</Label>
               <Select
                 value={formData.breed}
-                onValueChange={(value) =>
+                onValueChange={(value: Animal["breed"]) =>
                   setFormData({ ...formData, breed: value })
                 }
               >
@@ -131,32 +142,45 @@ export function AddAnimalModal({
                   <SelectValue placeholder="Select breed" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Holstein">Holstein</SelectItem>
-                  <SelectItem value="Jersey">Jersey</SelectItem>
-                  <SelectItem value="Guernsey">Guernsey</SelectItem>
-                  <SelectItem value="Brown Swiss">Brown Swiss</SelectItem>
+                  <SelectItem value="HOLSTEIN">Holstein</SelectItem>
+                  <SelectItem value="JERSEY">Jersey</SelectItem>
+                  <SelectItem value="GUERNSEY">Guernsey</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
+            {/* Weight */}
             <div className="grid gap-2">
-              <Label htmlFor="dateOfBirth">Date of Birth</Label>
+              <Label htmlFor="weight">Weight (kg)</Label>
               <Input
-                id="dateOfBirth"
-                type="date"
-                value={formData.dateOfBirth}
+                id="weight"
+                value={formData.weight}
                 onChange={(e) =>
-                  setFormData({ ...formData, dateOfBirth: e.target.value })
+                  setFormData({ ...formData, weight: e.target.value })
                 }
                 required
               />
             </div>
 
+            {/* DOB */}
+            <div className="grid gap-2">
+              <Label htmlFor="dob">Date of Birth</Label>
+              <Input
+                id="dob"
+                type="date"
+                value={formData.dob}
+                onChange={(e) =>
+                  setFormData({ ...formData, dob: e.target.value })
+                }
+              />
+            </div>
+
+            {/* Gender */}
             <div className="grid gap-2">
               <Label htmlFor="gender">Gender</Label>
               <Select
                 value={formData.gender}
-                onValueChange={(value: "male" | "female") =>
+                onValueChange={(value: Animal["gender"]) =>
                   setFormData({ ...formData, gender: value })
                 }
               >
@@ -164,17 +188,18 @@ export function AddAnimalModal({
                   <SelectValue placeholder="Select gender" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="female">Female</SelectItem>
-                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="FEMALE">Female</SelectItem>
+                  <SelectItem value="MALE">Male</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
+            {/* Status */}
             <div className="grid gap-2">
               <Label htmlFor="status">Status</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value: "healthy" | "pregnant" | "treatment") =>
+                onValueChange={(value: Animal["status"]) =>
                   setFormData({ ...formData, status: value })
                 }
               >
@@ -182,12 +207,47 @@ export function AddAnimalModal({
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="healthy">Healthy</SelectItem>
-                  <SelectItem value="treatment">Sick</SelectItem>
-                  <SelectItem value="pregnant">Sick</SelectItem>
+                  <SelectItem value="ACTIVE">Active</SelectItem>
+                  <SelectItem value="SOLD">Sold</SelectItem>
+                  <SelectItem value="DEAD">Dead</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Show extra only if editing */}
+            {animal && (
+              <>
+                <div className="grid gap-2">
+                  <Label htmlFor="lactationStatus">Lactation Status</Label>
+                  <Select
+                    value={formData.lactationStatus}
+                    onValueChange={(value: Animal["lactationStatus"]) =>
+                      setFormData({ ...formData, lactationStatus: value })
+                    }
+                  >
+                    <SelectTrigger id="lactationStatus">
+                      <SelectValue placeholder="Select lactation status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="LACTATING">Lactating</SelectItem>
+                      <SelectItem value="DRY">Dry</SelectItem>
+                      <SelectItem value="UNKNOWN">Unknown</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="category">Category</Label>
+                  <Input
+                    id="category"
+                    value={formData.category || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
+                  />
+                </div>
+              </>
+            )}
           </div>
 
           <DialogFooter className="flex flex-row justify-end gap-3">
@@ -199,7 +259,11 @@ export function AddAnimalModal({
             >
               Cancel
             </Button>
-            <Button type="submit" className="min-w-[140px]">
+            <Button
+              type="submit"
+              className="min-w-[140px]"
+              disabled={createMutation.isPending || updateMutation.isPending}
+            >
               {animal ? "Update Animal" : "Add Animal"}
             </Button>
           </DialogFooter>

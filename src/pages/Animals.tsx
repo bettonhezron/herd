@@ -27,68 +27,35 @@ import {
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { AddAnimalModal } from "@/components/modals/AddAnimalModal";
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
+import { Animal } from "@/types/animal";
+import {
+  useAnimals,
+  useAnimalAnalytics,
+  useCreateAnimal,
+  useUpdateAnimal,
+  useDeleteAnimal,
+} from "@/hooks/useAnimal";
+import { toast } from "sonner";
+import { formatAge } from "@/lib/dateUtils";
 
-export interface Animal {
-  id?: string;
-  name: string;
-  tagId: string;
-  breed: string;
-  dateOfBirth: string;
-  gender: "male" | "female";
-  status: "healthy" | "pregnant" | "treatment";
-  nextEvent: string;
-  production: string;
-  lastMilking: string;
-  age: string;
-}
-
-const animals: Animal[] = [
-  {
-    id: "A247",
-    name: "Bella",
-    tagId: "TAG247",
-    breed: "Holstein",
-    dateOfBirth: "2022-03-01",
-    gender: "female",
-    status: "healthy",
-    nextEvent: "Vaccination due",
-    production: "",
-    lastMilking: "",
-    age: "",
-  },
-  {
-    id: "A156",
-    name: "Daisy",
-    tagId: "TAG156",
-    breed: "Jersey",
-    dateOfBirth: "2020-05-12",
-    gender: "female",
-    status: "pregnant",
-    nextEvent: "Calving expected",
-    production: "",
-    lastMilking: "",
-    age: "",
-  },
-];
-
-const getStatusBadge = (status: string) => {
+const getStatusBadge = (status: Animal["status"]) => {
   switch (status) {
-    case "healthy":
+    case "ACTIVE":
       return (
         <Badge className="bg-health-good/10 text-health-good border-health-good/20">
-          Healthy
+          Active
         </Badge>
       );
-    case "pregnant":
+    case "SOLD":
       return (
         <Badge className="bg-chart-3/10 text-chart-3 border-chart-3/20">
-          Pregnant
+          Sold
         </Badge>
       );
-    case "treatment":
+    case "DEAD":
       return (
         <Badge className="bg-health-warning/10 text-health-warning border-health-warning/20">
-          Treatment
+          Dead
         </Badge>
       );
     default:
@@ -102,15 +69,58 @@ export default function Animals() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editingAnimal, setEditingAnimal] = useState<Animal | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [animalToDelete, setAnimalToDelete] = useState<Animal | null>(null);
 
+  // Queries
+  const { data: animals = [], isLoading, isError } = useAnimals();
+  const { data: analytics } = useAnimalAnalytics();
+
+  // Mutations
+  const createAnimal = useCreateAnimal();
+  const updateAnimal = useUpdateAnimal();
+  const deleteAnimal = useDeleteAnimal();
+
+  // Filter + search
   const filteredAnimals = animals.filter((animal) => {
     const matchesSearch =
-      animal.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      animal.id.toLowerCase().includes(searchTerm.toLowerCase());
+      animal.tagNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (animal.id?.toString() ?? "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
     const matchesStatus =
-      filterStatus === "all" || animal.status === filterStatus;
+      filterStatus === "all" || animal.status === filterStatus.toUpperCase();
     return matchesSearch && matchesStatus;
   });
+
+  const handleSaveAnimal = (animal: Animal) => {
+    if (animal.id) {
+      // Update
+      updateAnimal.mutate(
+        { id: Number(animal.id), payload: animal },
+        {
+          onSuccess: () => toast.success("Animal updated successfully"),
+          onError: () => toast.error("Failed to update animal"),
+        }
+      );
+    } else {
+      // Create
+      createAnimal.mutate(animal, {
+        onSuccess: () => toast.success("Animal created successfully"),
+        onError: () => toast.error("Failed to create animal"),
+      });
+    }
+  };
+
+  const handleDeleteAnimal = () => {
+    if (!animalToDelete?.id) return;
+    deleteAnimal.mutate(Number(animalToDelete.id), {
+      onSuccess: () => {
+        toast.success("Animal deleted successfully");
+        setDeleteModalOpen(false);
+      },
+      onError: () => toast.error("Failed to delete animal"),
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -143,8 +153,10 @@ export default function Animals() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">247</div>
-            <p className="text-xs text-muted-foreground">Active in herd</p>
+            <div className="text-2xl font-bold text-foreground">
+              {analytics?.totalAnimals ?? "-"}
+            </div>
+            <p className="text-xs text-muted-foreground">All the animals</p>
           </CardContent>
         </Card>
 
@@ -155,7 +167,9 @@ export default function Animals() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-chart-2">189</div>
+            <div className="text-2xl font-bold text-chart-2">
+              {analytics?.lactatingAnimals ?? "-"}
+            </div>
             <p className="text-xs text-muted-foreground">Currently milking</p>
           </CardContent>
         </Card>
@@ -163,29 +177,33 @@ export default function Animals() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pregnant
+              Active
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-chart-3">23</div>
-            <p className="text-xs text-muted-foreground">Expecting calves</p>
+            <div className="text-2xl font-bold text-chart-3">
+              {analytics?.activeAnimals ?? "-"}
+            </div>
+            <p className="text-xs text-muted-foreground">Active animals</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Health Issues
+              Bulls
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-health-warning">8</div>
-            <p className="text-xs text-muted-foreground">Need attention</p>
+            <div className="text-2xl font-bold text-health-warning">
+              {analytics?.totalBulls ?? "-"}
+            </div>
+            <p className="text-xs text-muted-foreground">Bulls</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters and Search */}
+      {/* Filters + Search */}
       <Card>
         <CardHeader>
           <CardTitle>Animal Records</CardTitle>
@@ -198,7 +216,7 @@ export default function Animals() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
-                placeholder="Search by name or ID..."
+                placeholder="Search by tag or ID..."
                 className="pl-10"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -210,85 +228,109 @@ export default function Animals() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="healthy">Healthy</SelectItem>
-                <SelectItem value="pregnant">Pregnant</SelectItem>
-                <SelectItem value="treatment">Treatment</SelectItem>
+                <SelectItem value="ACTIVE">Active</SelectItem>
+                <SelectItem value="DEAD">Dead</SelectItem>
+                <SelectItem value="SOLD">Sold</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Animals Table */}
+          {/* Table */}
           <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Breed</TableHead>
-                  <TableHead>Age</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Last Milking</TableHead>
-                  <TableHead>Production</TableHead>
-                  <TableHead>Next Event</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredAnimals.map((animal) => (
-                  <TableRow key={animal.id}>
-                    <TableCell className="font-medium">{animal.id}</TableCell>
-
-                    <TableCell>{animal.breed}</TableCell>
-                    <TableCell>{animal.age}</TableCell>
-                    <TableCell>{getStatusBadge(animal.status)}</TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {animal.lastMilking}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {animal.production}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {animal.nextEvent}
-                    </TableCell>
-
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          title="Edit"
-                          onClick={() => setEditingAnimal(animal)}
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          title="Delete"
-                          onClick={() => setDeleteModalOpen(true)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+            {isLoading ? (
+              <div className="p-4 text-sm text-muted-foreground">
+                Loading animals...
+              </div>
+            ) : isError ? (
+              <div className="p-4 text-sm text-red-500">
+                Failed to load animals.
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Tag</TableHead>
+                    <TableHead>Breed</TableHead>
+                    <TableHead>Age</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Weight</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredAnimals.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={7}
+                        className="text-center text-muted-foreground"
+                      >
+                        No animals found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredAnimals.map((animal) => (
+                      <TableRow key={animal.id}>
+                        <TableCell>{animal.id}</TableCell>
+                        <TableCell>{animal.tagNumber}</TableCell>
+                        <TableCell>{animal.breed}</TableCell>
+                        <TableCell>{formatAge(animal.dob)}</TableCell>
+
+                        <TableCell>{animal.category}</TableCell>
+                        <TableCell>{getStatusBadge(animal.status)}</TableCell>
+                        <TableCell>{animal.weight} kg</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              title="Edit"
+                              onClick={() => setEditingAnimal(animal)}
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              title="Delete"
+                              onClick={() => {
+                                setAnimalToDelete(animal);
+                                setDeleteModalOpen(true);
+                              }}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      <AddAnimalModal open={addModalOpen} onOpenChange={setAddModalOpen} />
+      {/* Modals */}
+      <AddAnimalModal
+        open={addModalOpen}
+        onOpenChange={setAddModalOpen}
+        onSave={handleSaveAnimal}
+      />
       <AddAnimalModal
         open={!!editingAnimal}
         onOpenChange={(open) => !open && setEditingAnimal(null)}
         animal={editingAnimal}
+        onSave={handleSaveAnimal}
       />
       <DeleteConfirmModal
         open={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
         title="Delete Animal?"
-        description="Are you sure you want to delete this animal? This action cannot be undone and will remove all associated records."
+        description="Are you sure you want to delete this animal? This action cannot be undone."
+        onConfirm={handleDeleteAnimal}
       />
     </div>
   );
