@@ -11,8 +11,8 @@ import {
   Stethoscope,
   Users,
   Briefcase,
-  ToggleLeft, // Icon for Deactivate
-  ToggleRight, // Icon for Activate
+  ToggleLeft,
+  ToggleRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,8 +48,8 @@ import {
   useUpdateUser,
   useDeleteUser,
   useUserStats,
-  useActivateUser, // <-- NEW
-  useDeactivateUser, // <-- NEW
+  useActivateUser,
+  useDeactivateUser,
   userKeys,
 } from "@/hooks/useUser";
 import { useRegister } from "@/hooks/useAuth";
@@ -59,7 +59,7 @@ import { formatLastLogin } from "@/lib/timeUtils";
 interface StatCard {
   title: string;
   value: number;
-  icon: React.ElementType;
+  icon?: React.ElementType;
   change: string;
 }
 
@@ -69,8 +69,8 @@ export default function UserManagement() {
   const updateUserMutation = useUpdateUser();
   const deleteUserMutation = useDeleteUser();
   const registerMutation = useRegister();
-  const activateUserMutation = useActivateUser(); // <-- NEW
-  const deactivateUserMutation = useDeactivateUser(); // <-- NEW
+  const activateUserMutation = useActivateUser();
+  const deactivateUserMutation = useDeactivateUser();
   const { data, isLoading, isError } = useUserStats();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -102,7 +102,7 @@ export default function UserManagement() {
     {
       title: "Worker Users",
       value: data?.workerUsers ?? 0,
-      icon: Briefcase,
+
       change: "General farm workers",
     },
   ];
@@ -171,7 +171,6 @@ export default function UserManagement() {
 
   const handleActivateDeactivate = (user: UserType) => {
     const onSuccessHandler = () => {
-      // Invalidate stats to update Active Users count
       queryClient.invalidateQueries({ queryKey: userKeys.stats() });
     };
 
@@ -219,7 +218,9 @@ export default function UserManagement() {
                 <CardTitle className="text-sm font-medium">
                   {stat.title}
                 </CardTitle>
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
+                {stat.icon && (
+                  <stat.icon className="h-4 w-4 text-muted-foreground" />
+                )}
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>

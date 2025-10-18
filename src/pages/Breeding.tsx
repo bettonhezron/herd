@@ -38,9 +38,9 @@ interface BreedingRecord {
   animalTag: string;
   animalName: string;
   breedingDate: string;
-  method: "AI" | "Natural";
+  method: "AI" | "NATURAL";
   bullId?: string;
-  status: "pending" | "confirmed" | "failed";
+  status: "PENDING" | "CONFIRMED" | "FAILED";
   expectedCalvingDate?: string;
   actualCalvingDate?: string;
   notes?: string;
@@ -65,9 +65,9 @@ const mockBreedingRecords: BreedingRecord[] = [
     animalTag: "A-2401",
     animalName: "Bessie",
     breedingDate: "2024-01-15",
-    method: "AI",
+    method: "NATURAL",
     bullId: "BULL-789",
-    status: "confirmed",
+    status: "CONFIRMED",
     expectedCalvingDate: "2024-10-22",
     notes: "First insemination successful",
   },
@@ -76,9 +76,9 @@ const mockBreedingRecords: BreedingRecord[] = [
     animalTag: "A-2405",
     animalName: "Daisy",
     breedingDate: "2024-02-10",
-    method: "AI",
+    method: "NATURAL",
     bullId: "BULL-456",
-    status: "confirmed",
+    status: "CONFIRMED",
     expectedCalvingDate: "2024-11-18",
   },
   {
@@ -86,8 +86,8 @@ const mockBreedingRecords: BreedingRecord[] = [
     animalTag: "A-2410",
     animalName: "Luna",
     breedingDate: "2024-03-05",
-    method: "Natural",
-    status: "pending",
+    method: "AI",
+    status: "PENDING",
     notes: "Awaiting pregnancy confirmation",
   },
   {
@@ -95,9 +95,9 @@ const mockBreedingRecords: BreedingRecord[] = [
     animalTag: "A-2415",
     animalName: "Rosie",
     breedingDate: "2024-02-20",
-    method: "AI",
+    method: "NATURAL",
     bullId: "BULL-789",
-    status: "failed",
+    status: "FAILED",
     notes: "Did not conceive, scheduled for re-breeding",
   },
 ];
@@ -167,13 +167,13 @@ const calvingEvents = [
 
 function getStatusColor(status: string) {
   switch (status) {
-    case "confirmed":
+    case "CONFIRMED":
     case "healthy":
       return "bg-green-500/10 text-green-600 dark:text-green-400";
-    case "pending":
+    case "PENDING":
     case "upcoming":
       return "bg-blue-500/10 text-blue-600 dark:text-blue-400";
-    case "failed":
+    case "FAILED":
     case "critical":
       return "bg-red-500/10 text-red-600 dark:text-red-400";
     case "attention":
@@ -186,13 +186,13 @@ function getStatusColor(status: string) {
 
 function getStatusIcon(status: string) {
   switch (status) {
-    case "confirmed":
+    case "CONFIRMED":
     case "healthy":
       return <CheckCircle className="w-3 h-3" />;
-    case "pending":
+    case "PENDING":
     case "upcoming":
       return <Clock className="w-3 h-3" />;
-    case "failed":
+    case "FAILED":
     case "critical":
     case "attention":
     case "imminent":

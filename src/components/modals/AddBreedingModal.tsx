@@ -23,9 +23,9 @@ import { toast } from "sonner";
 interface BreedingData {
   id?: string;
   animalTag: string;
-  animalName: string;
+
   breedingDate: string;
-  method: "AI" | "Natural";
+  method: "AI" | "NATURAL";
   bullId?: string;
   notes?: string;
 }
@@ -45,7 +45,7 @@ export function AddBreedingModal({
 }: AddBreedingModalProps) {
   const [formData, setFormData] = useState<BreedingData>({
     animalTag: "",
-    animalName: "",
+
     breedingDate: new Date().toISOString().split("T")[0],
     method: "AI",
     bullId: "",
@@ -58,7 +58,7 @@ export function AddBreedingModal({
     } else {
       setFormData({
         animalTag: "",
-        animalName: "",
+
         breedingDate: new Date().toISOString().split("T")[0],
         method: "AI",
         bullId: "",
@@ -111,20 +111,6 @@ export function AddBreedingModal({
               />
             </div>
 
-            {/* Animal Name */}
-            <div className="grid gap-2">
-              <Label htmlFor="animalName">Animal Name</Label>
-              <Input
-                id="animalName"
-                value={formData.animalName}
-                onChange={(e) =>
-                  setFormData({ ...formData, animalName: e.target.value })
-                }
-                placeholder="Bessie"
-                required
-              />
-            </div>
-
             {/* Breeding Date */}
             <div className="grid gap-2">
               <Label htmlFor="breedingDate">Breeding Date</Label>
@@ -153,13 +139,13 @@ export function AddBreedingModal({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="AI">Artificial Insemination</SelectItem>
-                  <SelectItem value="Natural">Natural Breeding</SelectItem>
+                  <SelectItem value="NATURAL">Natural Breeding</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Bull ID - only if AI */}
-            {formData.method === "AI" && (
+            {/* Bull ID - only if natural */}
+            {formData.method === "NATURAL" && (
               <div className="grid gap-2">
                 <Label htmlFor="bullId">Bull ID (Optional)</Label>
                 <Input
