@@ -8,6 +8,7 @@ import {
   FileText,
   PawPrintIcon,
   LeafIcon,
+  HelpCircle,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -40,6 +41,7 @@ const analyticsItems = [
 const systemItems = [
   { title: "Users", url: "/users", icon: Users },
   { title: "Settings", url: "/settings", icon: Settings },
+  { title: "Support", url: "/support", icon: HelpCircle },
 ];
 
 export function AppSidebar() {

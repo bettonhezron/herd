@@ -125,10 +125,7 @@ export default function Preferences() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="dateFormat">
-                <CalendarIcon className="w-4 h-4 inline mr-2" />
-                Date Format
-              </Label>
+              <Label htmlFor="dateFormat">Date Format</Label>
               <Select
                 value={preferences.dateFormat}
                 onValueChange={(value) =>

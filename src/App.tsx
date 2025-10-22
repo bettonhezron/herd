@@ -21,6 +21,7 @@ import FeedsPage from "./pages/Feeds";
 import NotificationsPage from "./pages/Notification";
 import SignIn from "./pages/SignIn";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Support from "./pages/Support";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/preferences" element={<Preferences />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/support" element={<Support />} />
           </Route>
 
           {/* 404 */}

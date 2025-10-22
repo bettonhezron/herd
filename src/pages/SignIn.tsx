@@ -100,7 +100,7 @@ export default function SignIn() {
                     <FormControl>
                       <Input
                         className="py-2.5 px-4 h-auto focus-visible:ring-green-400 focus-visible:ring-offset-green-50"
-                        placeholder="abc@example.com"
+                        placeholder="you@example.com"
                         type="email"
                         autoComplete="email"
                         disabled={loginMutation.isPending}
