@@ -73,7 +73,7 @@ export default function ForgotPassword() {
           <div>
             <input
               type="text"
-              placeholder="Username"
+              placeholder="Email or Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full bg-white rounded-full py-6 px-6 text-gray-700 placeholder:text-gray-400 placeholder:italic border-none shadow-lg text-base focus:outline-none focus:ring-2 focus:ring-white/50"
@@ -148,11 +148,6 @@ export default function ForgotPassword() {
             src="/cow-silhouette1.svg"
             alt="Cow"
             className="h-12 w-16 opacity-70 scale-x-[-1]"
-          />
-          <img
-            src="/cow-silhouette1.svg"
-            alt="Cow"
-            className="h-14 w-18 opacity-70"
           />
         </div>
       </div>
