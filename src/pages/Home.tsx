@@ -16,7 +16,7 @@ export default function Home() {
 
         <div>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white drop-shadow-lg">
-            DHMS - Herd Manager
+            DHMS
           </h1>
           <p className="text-white text-lg sm:text-xl drop-shadow">
             Dairy Herd Management System
