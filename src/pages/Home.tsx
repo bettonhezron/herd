@@ -27,7 +27,6 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Controlled Spacer (instead of full flex-1) */}
       <div className="flex-grow-[0.6]" />
 
       {/* Cow Silhouettes */}
