@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-sky-400 via-sky-300 to-green-600">
       {/* Header Section */}
-      <header className="flex flex-col items-center text-center pt-12 px-6 space-y-4">
+      <header className="flex flex-col items-center text-center pt-10 px-6 space-y-4">
         <img
           src="/logo.png"
           alt="DHMS logo"
@@ -16,7 +16,7 @@ export default function Home() {
 
         <div>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white drop-shadow-lg">
-            DHMS
+            DHMS - Herd Manager
           </h1>
           <p className="text-white text-lg sm:text-xl drop-shadow">
             Dairy Herd Management System
@@ -27,11 +27,11 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Middle Spacer (push silhouettes & button down to ~3/4) */}
-      <div className="flex-1" />
+      {/* Controlled Spacer (instead of full flex-1) */}
+      <div className="flex-grow-[0.6]" />
 
       {/* Cow Silhouettes */}
-      <div className="w-full px-6 pb-8">
+      <div className="w-full px-6 pb-4">
         <div className="max-w-2xl mx-auto flex justify-between items-end">
           <img
             src="/cow-silhouette1.svg"
@@ -57,7 +57,7 @@ export default function Home() {
       </div>
 
       {/* Login Button */}
-      <div className="pb-12 text-center">
+      <div className="pb-16 text-center">
         <Button
           onClick={() => navigate("/login")}
           className="w-64 bg-white text-green-700 hover:bg-green-50 py-4 h-auto rounded-full text-xl font-bold uppercase tracking-wider shadow-2xl transition-all transform hover:scale-105"
