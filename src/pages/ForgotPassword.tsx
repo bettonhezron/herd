@@ -54,16 +54,15 @@ export default function ForgotPassword() {
         </div>
 
         {/* Title */}
-        <h1 className="text-white text-2xl sm:text-3xl font-bold text-center mb-6 tracking-wide uppercase drop-shadow-lg">
-          Please Provide the following details
+        <h1 className="text-white text-2xl sm:text-3xl font-bold text-center mb-4 tracking-wide drop-shadow-lg">
+          Enter Your Login Details
         </h1>
 
         {/* Instructions */}
         <div className="w-full max-w-md mb-6">
-          <p className="text-white text-base leading-relaxed drop-shadow italic">
-            When your username is not an e-mail address, please fill in your
-            username and the verification code is automatically sent to your
-            e-mail address.
+          <p className="text-white text-sm text-center leading-relaxed drop-shadow">
+            Enter your username or email address below. A verification code will
+            be sent to your registered email automatically.
           </p>
         </div>
 
