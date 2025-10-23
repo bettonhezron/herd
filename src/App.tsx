@@ -22,6 +22,7 @@ import NotificationsPage from "./pages/Notification";
 import SignIn from "./pages/SignIn";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Support from "./pages/Support";
+import Home from "./pages/Home";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           {/* Public route */}
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<SignIn />} />
 
           {/* Protected dashboard routes */}
@@ -43,7 +45,7 @@ const App = () => (
               </ProtectedRoute>
             }
           >
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/animals" element={<Animals />} />
             <Route path="/breeding" element={<Breeding />} />
             <Route path="/milking" element={<Milking />} />

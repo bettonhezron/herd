@@ -63,7 +63,7 @@ export default function SignIn() {
         });
       },
       onSuccess: () => {
-        navigate("/");
+        navigate("/dashboard");
       },
     });
   }

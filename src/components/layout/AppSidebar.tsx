@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const mainItems = [
-  { title: "Overview", url: "/", icon: Home },
+  { title: "Overview", url: "/dashboard", icon: Home },
   { title: "Animals", url: "/animals", icon: PawPrintIcon },
   { title: "Breeding", url: "/breeding", icon: Heart },
   { title: "Milking", url: "/milking", icon: Droplets },
