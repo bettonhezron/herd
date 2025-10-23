@@ -2,31 +2,118 @@ import { useState } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
 export default function ForgotPassword() {
+  // State to manage the flow: 1 (Enter Username/Email), 2 (Verify Code), 3 (Reset Password)
+  const [step, setStep] = useState(1);
+
   const [username, setUsername] = useState("");
+  const [code, setCode] = useState("");
+  const [newPassword, setNewPassword] = useState(""); // New state for the new password
+  const [confirmPassword, setConfirmPassword] = useState(""); // New state for password confirmation
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [codeSent, setCodeSent] = useState(false);
+  const [infoMessage, setInfoMessage] = useState(""); // For resend success or success notifications
 
+  // --- Utility for Input Styling ---
+  const inputStyle =
+    "w-full bg-white/70 rounded-full py-6 px-6 text-gray-700 placeholder:text-gray-400 placeholder:italic border-none shadow-lg text-base focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-70";
+  const buttonStyle =
+    "w-full py-6 rounded-full text-xl font-bold uppercase tracking-wider shadow-2xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed";
+
+  // --- Step 1: Send Code ---
   const handleSendCode = () => {
+    setInfoMessage("");
     if (!username.trim()) {
-      setError("Please enter your username");
+      setError("Please enter your email or username.");
       return;
     }
 
     setError("");
     setIsLoading(true);
 
-    // Simulate sending verification code
+    // Simulation: API call to send verification code
     setTimeout(() => {
       setIsLoading(false);
-      setCodeSent(true);
+      setStep(2); // Move to verification step
+      setError("");
+      setInfoMessage(`A verification code has been sent to ${username}.`);
       console.log("Verification code sent to:", username);
     }, 1500);
   };
 
-  const handleContinue = () => {
-    console.log("Continue clicked");
-    // Navigate to next step
+  // --- Step 2: Verify Code ---
+  const handleVerifyCode = () => {
+    setInfoMessage("");
+    if (!code.trim() || code.trim().length < 4) {
+      setError("Please enter the 4-digit verification code.");
+      return;
+    }
+
+    setError("");
+    setIsLoading(true);
+
+    // Simulation: API call to verify the code
+    setTimeout(() => {
+      setIsLoading(false);
+      // Simulate success condition
+      if (code === "1234") {
+        setError("");
+        setInfoMessage("Code verified. Please set your new password.");
+        setStep(3);
+      } else {
+        setError("Invalid code. Please check the code and try again.");
+      }
+    }, 1500);
+  };
+
+  // --- Step 2: Resend Code ---
+  const handleResendCode = () => {
+    setCode(""); // Clear previous code input
+    setInfoMessage("");
+    setError("");
+    setIsLoading(true);
+
+    // Simulation: API call to resend the code
+    setTimeout(() => {
+      setIsLoading(false);
+      setInfoMessage("Verification code resent successfully.");
+    }, 1500);
+  };
+
+  // --- Step 3: Reset Password ---
+  const handlePasswordReset = () => {
+    setInfoMessage("");
+    if (newPassword.length < 6) {
+      setError("New password must be at least 6 characters.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setError("");
+    setIsLoading(true);
+
+    // Simulation: API call to reset password
+    setTimeout(() => {
+      setIsLoading(false);
+
+      // Reset flow to the start, but show a success message
+      setStep(1);
+      setUsername("");
+      setCode("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+      // Show success message, which will appear in the infoMessage display area
+      setInfoMessage(
+        "Success! Your password has been reset. Please return to the Sign In page."
+      );
+
+      console.log(
+        `Password reset for user ${username}. New password: ${newPassword}`
+      );
+    }, 2000);
   };
 
   return (
@@ -55,70 +142,176 @@ export default function ForgotPassword() {
 
         {/* Title */}
         <h1 className="text-white text-2xl sm:text-3xl font-bold text-center mb-4 tracking-wide drop-shadow-lg">
-          Enter Your Login Details
+          {step === 1
+            ? "Enter Your Login Details"
+            : step === 2
+            ? "Verify Code"
+            : "Set New Password"}
         </h1>
 
         {/* Instructions */}
         <div className="w-full max-w-md mb-6">
-          <p className="text-white text-sm text-center leading-relaxed drop-shadow">
-            Enter your username or email address below. A verification code will
-            be sent to your registered email automatically.
+          <p className="text-white text-md text-center leading-relaxed drop-shadow">
+            {step === 1
+              ? "Enter your username or email address below to receive a password reset code."
+              : step === 2
+              ? `Enter the verification code sent to the email associated with ${username}.`
+              : "Choose a strong, new password for your account."}
           </p>
         </div>
 
         {/* Form */}
         <div className="w-full max-w-md space-y-5">
-          {/* Username Field */}
-          <div>
-            <input
-              type="text"
-              placeholder="Email or Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-white rounded-full py-6 px-6 text-gray-700 placeholder:text-gray-400 placeholder:italic border-none shadow-lg text-base focus:outline-none focus:ring-2 focus:ring-white/50"
-              disabled={isLoading}
-            />
-            {error && (
-              <p className="text-white text-sm ml-4 mt-1 drop-shadow">
-                {error}
-              </p>
-            )}
-          </div>
+          {/* --- Step 1: Send Code --- */}
+          {step === 1 && (
+            <div className="space-y-5">
+              {/* Username Field */}
+              <div>
+                <input
+                  type="text"
+                  placeholder="Email or Username"
+                  value={username}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    setError(""); // Clear error on change
+                  }}
+                  className={inputStyle}
+                  disabled={isLoading}
+                />
+              </div>
 
-          {/* Send Verification Code Button */}
-          <button
-            type="button"
-            onClick={handleSendCode}
-            className="w-full bg-white text-red-600 hover:bg-gray-50 py-6 rounded-full text-xl font-bold uppercase tracking-wider shadow-2xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={isLoading || codeSent}
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center">
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                SENDING...
-              </span>
-            ) : codeSent ? (
-              "CODE SENT ✓"
-            ) : (
-              "SEND VERIFICATION CODE"
-            )}
-          </button>
+              {/* Send Verification Code Button */}
+              <button
+                type="button"
+                onClick={handleSendCode}
+                className={`${buttonStyle} bg-white text-red-600 hover:bg-gray-50`}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    SENDING...
+                  </span>
+                ) : (
+                  "SEND VERIFICATION CODE"
+                )}
+              </button>
+            </div>
+          )}
 
-          {/* Continue Button */}
-          <button
-            type="button"
-            onClick={handleContinue}
-            className="w-full bg-white/30 text-white hover:bg-white/40 py-6 rounded-full text-xl font-bold uppercase tracking-wider shadow-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-            disabled={!codeSent}
-          >
-            CONTINUE
-          </button>
+          {/* --- Step 2: Verify Code --- */}
+          {step === 2 && (
+            <div className="space-y-5">
+              {/* Code Input Field */}
+              <div>
+                <input
+                  type="number"
+                  placeholder="4-digit Verification Code (e.g., 1234)"
+                  value={code}
+                  onChange={(e) => {
+                    setCode(e.target.value.slice(0, 4));
+                    setError("");
+                  }}
+                  className={inputStyle}
+                  disabled={isLoading}
+                  maxLength={4}
+                />
+              </div>
 
-          {/* Success Message */}
-          {codeSent && (
-            <div className="text-center">
-              <p className="text-white text-sm drop-shadow">
-                Verification code has been sent to your email address.
+              {/* Verify Code Button */}
+              <button
+                type="button"
+                onClick={handleVerifyCode}
+                className={`${buttonStyle} bg-red-600 text-white hover:bg-red-700`}
+                disabled={isLoading || code.length !== 4}
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    VERIFYING...
+                  </span>
+                ) : (
+                  "VERIFY CODE"
+                )}
+              </button>
+
+              {/* Resend Code Button */}
+              <button
+                type="button"
+                onClick={handleResendCode}
+                className={`${buttonStyle} bg-white/30 text-white hover:bg-white/40 text-lg`}
+                disabled={isLoading}
+              >
+                RESEND CODE
+              </button>
+            </div>
+          )}
+
+          {/* --- Step 3: Reset Password --- */}
+          {step === 3 && (
+            <div className="space-y-5">
+              {/* New Password Field */}
+              <div>
+                <input
+                  type="password"
+                  placeholder="New Password (min 6 characters)"
+                  value={newPassword}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value);
+                    setError("");
+                  }}
+                  className={inputStyle}
+                  disabled={isLoading}
+                />
+              </div>
+
+              {/* Confirm Password Field */}
+              <div>
+                <input
+                  type="password"
+                  placeholder="Confirm New Password"
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setError("");
+                  }}
+                  className={inputStyle}
+                  disabled={isLoading}
+                />
+              </div>
+
+              {/* Reset Password Button */}
+              <button
+                type="button"
+                onClick={handlePasswordReset}
+                className={`${buttonStyle} bg-green-600 text-white hover:bg-green-700`}
+                disabled={
+                  isLoading ||
+                  newPassword.length < 6 ||
+                  newPassword !== confirmPassword
+                }
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    RESETTING...
+                  </span>
+                ) : (
+                  "RESET PASSWORD"
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Error Message Display */}
+          {(error || infoMessage) && (
+            <div className="text-center pt-2">
+              <p
+                className={`${
+                  error ? "text-red-100" : "text-white"
+                } text-sm drop-shadow`}
+              >
+                {error || infoMessage}
               </p>
             </div>
           )}
