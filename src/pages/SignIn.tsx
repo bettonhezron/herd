@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { useLogin } from "@/hooks/useAuth";
@@ -11,13 +11,7 @@ import { LoginPayload } from "@/types/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
 import {
   Form,
   FormControl,
@@ -56,7 +50,7 @@ export default function SignIn() {
 
   async function onSubmit(values: SignInFormValues) {
     form.clearErrors("root.serverError");
-
+    // ... rest of the login logic
     loginMutation.mutate(values as LoginPayload, {
       onError: (error) => {
         form.setError("root.serverError", {
@@ -77,46 +71,61 @@ export default function SignIn() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-green-50 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-sm sm:max-w-md border-green-200 shadow-xl rounded-2xl p-2 sm:p-4">
-        <CardHeader className="text-center pb-4">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-sky-400 via-sky-300 to-green-600">
+      {/* Back Button */}
+      <div className="pt-6 px-6">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center text-white text-lg font-bold hover:opacity-80 transition-opacity drop-shadow"
+        >
+          <ArrowLeft className="mr-2 h-5 w-5" />
+          BACK
+        </button>
+      </div>
+
+      {/* Main Content - Form Area */}
+      <div className="flex-1 flex flex-col items-center justify-start px-4 sm:px-6 lg:px-8 py-8">
+        {/* Logo and Title - Use drop-shadow for visibility on the gradient */}
+        <div className="text-center mb-8 w-full max-w-sm sm:max-w-md">
           <img
             src="/logo.png"
             alt="DHMS logo"
-            className="mx-auto h-12 w-12 sm:h-14 sm:w-14 mb-3 rounded-xl object-contain"
+            className="mx-auto h-20 w-20 sm:h-24 sm:w-24 mb-6 rounded-2xl object-contain shadow-2xl bg-white p-3" // Larger logo for emphasis
           />
-          <CardTitle className="text-2xl font-bold text-sky-800">
+          <h1 className="text-3xl font-bold text-white tracking-wide drop-shadow-lg mb-2">
             Sign In to your Account
-          </CardTitle>
-          <CardDescription className="text-gray-600 text-sm mt-1">
-            Please enter your credentials to access the dashboard.
-          </CardDescription>
-        </CardHeader>
+          </h1>
+          <p className="text-white text-md drop-shadow-lg">
+            Access your dashboard below.
+          </p>
+        </div>
 
-        <CardContent>
+        {/* Form Container */}
+        <div className="w-full max-w-sm sm:max-w-md">
+          {" "}
+          {/* This acts as the new card area without borders */}
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-5 sm:space-y-6"
+              className="space-y-6 sm:space-y-7"
             >
-              {/* Email Field */}
+              {/* Email Field - Styled for the blended look */}
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem className="space-y-1">
-                    <FormLabel>Email or Username</FormLabel>
                     <FormControl>
                       <Input
-                        className="py-2.5 px-4 h-auto focus-visible:ring-green-400 focus-visible:ring-offset-green-50"
-                        placeholder="you@example.com"
+                        className="w-full bg-white/70 rounded-full py-6 px-6 text-gray-700 placeholder:text-gray-400 placeholder:italic border-none shadow-lg text-base focus:outline-none focus:ring-2 focus:ring-white/50 h-auto"
+                        placeholder="Email or Username"
                         type="email"
                         autoComplete="email"
                         disabled={loginMutation.isPending}
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-600 drop-shadow" />
                   </FormItem>
                 )}
               />
@@ -127,11 +136,10 @@ export default function SignIn() {
                 name="password"
                 render={({ field }) => (
                   <FormItem className="space-y-1">
-                    <FormLabel>Password</FormLabel>
                     <div className="relative">
                       <FormControl>
                         <Input
-                          className="py-2.5 px-4 h-auto focus-visible:ring-green-400 focus-visible:ring-offset-green-50 pr-[65px]"
+                          className="w-full bg-white/70 rounded-full py-6 px-6 text-gray-700 placeholder:text-gray-400 placeholder:italic border-none shadow-lg text-base focus:outline-none focus:ring-2 focus:ring-white/50 h-auto pr-[80px]" // Increased padding for Show/Hide
                           type={showPassword ? "text" : "password"}
                           placeholder="Password"
                           autoComplete="current-password"
@@ -143,18 +151,18 @@ export default function SignIn() {
                         type="button"
                         variant="link"
                         onClick={() => setShowPassword((prev) => !prev)}
-                        className="absolute inset-y-0 right-0 h-full px-3 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors hover:no-underline"
+                        className="absolute inset-y-0 right-0 h-full px-4 text-sm font-bold text-sky-700 hover:text-sky-600 transition-colors hover:no-underline"
                       >
-                        {showPassword ? "Hide" : "Show"}
+                        {showPassword ? "HIDE" : "SHOW"}
                       </Button>
                     </div>
-                    <FormMessage />
+                    <FormMessage className="text-red-600 drop-shadow" />
                   </FormItem>
                 )}
               />
 
               {/* Keep Me Signed In + Forgot Password */}
-              <div className="flex items-center justify-between pt-1">
+              <div className="flex items-center justify-between pt-1 pb-2">
                 <FormField
                   control={form.control}
                   name="rememberMe"
@@ -164,9 +172,10 @@ export default function SignIn() {
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={field.onChange}
+                          className="border-white data-[state=checked]:bg-green-700 data-[state=checked]:text-white"
                         />
                       </FormControl>
-                      <FormLabel className="text-sm font-medium text-gray-700 cursor-pointer">
+                      <FormLabel className="text-sm font-medium text-white cursor-pointer drop-shadow">
                         Keep me signed in
                       </FormLabel>
                     </FormItem>
@@ -175,7 +184,7 @@ export default function SignIn() {
 
                 <a
                   href="forgot-password"
-                  className="text-sm font-medium text-sky-700 hover:text-sky-600 hover:underline transition-colors"
+                  className="text-sm font-bold text-white hover:text-gray-200 hover:underline transition-colors drop-shadow"
                 >
                   Forgot password?
                 </a>
@@ -183,30 +192,56 @@ export default function SignIn() {
 
               {/* Server Error Message */}
               {form.formState.errors.root?.serverError && (
-                <p className="text-sm font-medium text-destructive text-center">
+                <p className="text-sm font-medium text-red-100 text-center drop-shadow-lg">
                   {form.formState.errors.root.serverError.message}
                 </p>
               )}
 
-              {/* Submit Button */}
+              {/* Submit Button - Large, prominent, white button */}
               <Button
                 type="submit"
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 mt-5 h-auto rounded-lg text-base font-semibold transition-colors"
+                className="w-full bg-white text-green-600 hover:bg-gray-50 py-6 h-auto rounded-full text-xl font-bold uppercase tracking-wider shadow-2xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={loginMutation.isPending}
               >
                 {loginMutation.isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing In...
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    SIGNING IN...
                   </>
                 ) : (
-                  "Sign In"
+                  "SIGN IN"
                 )}
               </Button>
             </form>
           </Form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      {/* Cow Silhouettes at Bottom */}
+      <div className="w-full px-6 pb-8 mt-auto">
+        <div className="max-w-2xl mx-auto flex justify-between items-end">
+          <img
+            src="/cow-silhouette1.svg"
+            alt="Cow"
+            className="h-14 w-18 opacity-70"
+          />
+          <img
+            src="/cow-silhouette1.svg"
+            alt="Cow"
+            className="h-12 w-16 opacity-70 scale-x-[-1]"
+          />
+          <img
+            src="/cow-silhouette1.svg"
+            alt="Cow"
+            className="h-16 w-20 opacity-70"
+          />
+          <img
+            src="/cow-silhouette1.svg"
+            alt="Cow"
+            className="h-12 w-16 opacity-70 scale-x-[-1]"
+          />
+        </div>
+      </div>
     </div>
   );
 }
