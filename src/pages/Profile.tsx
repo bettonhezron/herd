@@ -102,7 +102,6 @@ export default function Profile() {
     email: "",
     phoneNumber: "",
     location: "",
-    bio: "",
   });
 
   useEffect(() => {
@@ -113,7 +112,6 @@ export default function Profile() {
         email: storedUser.email || "",
         phoneNumber: storedUser.phoneNumber || "",
         location: "",
-        bio: "",
       });
     }
   }, [storedUser]);
@@ -263,19 +261,6 @@ export default function Profile() {
                   }
                 />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea
-                id="bio"
-                rows={4}
-                value={formData.bio}
-                disabled={isDisabled}
-                onChange={(e) =>
-                  setFormData({ ...formData, bio: e.target.value })
-                }
-              />
             </div>
 
             <div className="flex justify-end space-x-2">

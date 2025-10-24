@@ -202,9 +202,7 @@ export function TopBar() {
               <DropdownMenuItem onClick={() => navigate("/profile")}>
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/farm-settings")}>
-                Farm Settings
-              </DropdownMenuItem>
+
               <DropdownMenuItem onClick={() => navigate("/preferences")}>
                 Preferences
               </DropdownMenuItem>
