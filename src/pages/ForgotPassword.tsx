@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
 
 export default function ForgotPassword() {
   // State to manage the flow: 1 (Enter Username/Email), 2 (Verify Code), 3 (Reset Password)
@@ -7,11 +7,13 @@ export default function ForgotPassword() {
 
   const [username, setUsername] = useState("");
   const [code, setCode] = useState("");
-  const [newPassword, setNewPassword] = useState(""); // New state for the new password
-  const [confirmPassword, setConfirmPassword] = useState(""); // New state for password confirmation
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [infoMessage, setInfoMessage] = useState(""); // For resend success or success notifications
+  const [infoMessage, setInfoMessage] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // --- Utility for Input Styling ---
   const inputStyle =
@@ -23,7 +25,7 @@ export default function ForgotPassword() {
   const handleSendCode = () => {
     setInfoMessage("");
     if (!username.trim()) {
-      setError("Please enter your email or username.");
+      setError("Please enter your email or username!");
       return;
     }
 
@@ -251,9 +253,9 @@ export default function ForgotPassword() {
           {step === 3 && (
             <div className="space-y-5">
               {/* New Password Field */}
-              <div>
+              <div className="relative">
                 <input
-                  type="password"
+                  type={showNewPassword ? "text" : "password"}
                   placeholder="New Password (min 6 characters)"
                   value={newPassword}
                   onChange={(e) => {
@@ -263,12 +265,23 @@ export default function ForgotPassword() {
                   className={inputStyle}
                   disabled={isLoading}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showNewPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
 
               {/* Confirm Password Field */}
-              <div>
+              <div className="relative">
                 <input
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm New Password"
                   value={confirmPassword}
                   onChange={(e) => {
@@ -278,6 +291,17 @@ export default function ForgotPassword() {
                   className={inputStyle}
                   disabled={isLoading}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
 
               {/* Reset Password Button */}
@@ -308,7 +332,7 @@ export default function ForgotPassword() {
             <div className="text-center pt-2">
               <p
                 className={`${
-                  error ? "text-red-100" : "text-white"
+                  error ? "text-red-600 font-semibold" : "text-white"
                 } text-sm drop-shadow`}
               >
                 {error || infoMessage}

@@ -48,12 +48,11 @@ export default function SignIn() {
     reValidateMode: "onChange",
   });
 
-  // Auto-clear server error after 5 seconds
   useEffect(() => {
     if (form.formState.errors.root?.serverError) {
       const timer = setTimeout(() => {
         form.clearErrors("root.serverError");
-      }, 2500);
+      }, 3500);
 
       return () => clearTimeout(timer);
     }
