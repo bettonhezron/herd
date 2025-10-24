@@ -2,6 +2,7 @@ import { useAuthStore } from "@/store/authStore";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+
 export async function apiFetch<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -18,44 +19,43 @@ export async function apiFetch<T>(
       ...options,
     });
 
-    // handle network-level errors 
     if (!res.ok) {
-      let errorMessage = `API error: ${res.status}`;
       let errorData: any = null;
+      
       try {
         errorData = await res.json();
-        errorMessage = errorData.message || errorMessage;
       } catch {
+        // If response is not JSON, use status text
+        throw new Error(`Request failed: ${res.statusText}`);
       }
 
-      // Only log out if token is invalid or expired 
-      if (
-        res.status === 401 &&
-        (errorData?.message?.toLowerCase().includes("token") ||
-         errorData?.message?.toLowerCase().includes("expired") ||
-         errorData?.message?.toLowerCase().includes("invalid"))
-      ) {
+      // Extract user-friendly message
+      const errorMessage = errorData?.message || `Error: ${res.status}`;
+
+      // Handle authentication errors
+      if (res.status === 401) {
         const { logout } = useAuthStore.getState();
         logout();
-        window.location.href = "/login";
+        
+        // Don't redirect if this is already a login attempt
+        if (!endpoint.includes('/login')) {
+          window.location.href = "/login";
+        }
       }
 
       throw new Error(errorMessage);
     }
 
-    // no content
     if (res.status === 204) {
       return null as T;
     }
 
     return res.json();
   } catch (error: any) {
-    // handle network issues (like "failed to fetch")
     if (error instanceof TypeError && error.message.includes("fetch")) {
-      console.error("Network error or server unreachable:", error);
-      throw new Error("Unable to connect to the server. Please try again later.");
+      console.error("Network error:", error);
+      throw new Error("Unable to connect to the server. Please check your internet connection.");
     }
-
     throw error;
   }
 }

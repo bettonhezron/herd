@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,15 +48,27 @@ export default function SignIn() {
     reValidateMode: "onChange",
   });
 
+  // Auto-clear server error after 2.5 seconds
+  useEffect(() => {
+    if (form.formState.errors.root?.serverError) {
+      const timer = setTimeout(() => {
+        form.clearErrors("root.serverError");
+      }, 2500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [form.formState.errors.root?.serverError, form]);
+
   async function onSubmit(values: SignInFormValues) {
     form.clearErrors("root.serverError");
-    // ... rest of the login logic
+
     loginMutation.mutate(values as LoginPayload, {
       onError: (error) => {
+        const errorMessage = error.message || "Login failed. Please try again.";
+
         form.setError("root.serverError", {
           type: "manual",
-          message:
-            error.message || "Login failed. Please check your credentials.",
+          message: errorMessage,
         });
       },
       onSuccess: () => {
@@ -90,7 +102,7 @@ export default function SignIn() {
           <img
             src="/logo.png"
             alt="DHMS logo"
-            className="mx-auto h-20 w-20 sm:h-24 sm:w-24 mb-6 rounded-2xl object-contain shadow-2xl bg-white p-3" // Larger logo for emphasis
+            className="mx-auto h-20 w-20 sm:h-24 sm:w-24 mb-6 rounded-2xl object-contain shadow-2xl bg-white p-3"
           />
           <h1 className="text-3xl font-bold text-white tracking-wide drop-shadow-lg mb-2">
             Sign In to your Account
@@ -102,22 +114,20 @@ export default function SignIn() {
 
         {/* Form Container */}
         <div className="w-full max-w-sm sm:max-w-md">
-          {" "}
-          {/* This acts as the new card area without borders */}
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-6 sm:space-y-7"
             >
-              {/* Email Field - Styled for the blended look */}
+              {/* Email Field */}
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem className="space-y-1">
+                  <FormItem className="space-y-2">
                     <FormControl>
                       <Input
-                        className="w-full bg-white/70 rounded-full py-6 px-6 text-gray-700 placeholder:text-gray-400 placeholder:italic border-none shadow-lg text-base focus:outline-none focus:ring-2 focus:ring-white/50 h-auto"
+                        className="w-full bg-white/80 backdrop-blur-sm rounded-full py-5 sm:py-6 px-5 sm:px-6 text-gray-800 placeholder:text-gray-500 border-2 border-white/30 shadow-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-white focus:border-white/60 h-auto transition-all"
                         placeholder="Email or Username"
                         type="email"
                         autoComplete="email"
@@ -125,7 +135,7 @@ export default function SignIn() {
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-red-600 drop-shadow" />
+                    <FormMessage className="text-red-700 font-semibold text-sm bg-red-100/90 px-3 py-1 rounded-lg inline-block" />
                   </FormItem>
                 )}
               />
@@ -135,11 +145,11 @@ export default function SignIn() {
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItem className="space-y-1">
+                  <FormItem className="space-y-2">
                     <div className="relative">
                       <FormControl>
                         <Input
-                          className="w-full bg-white/70 rounded-full py-6 px-6 text-gray-700 placeholder:text-gray-400 placeholder:italic border-none shadow-lg text-base focus:outline-none focus:ring-2 focus:ring-white/50 h-auto pr-[80px]" // Increased padding for Show/Hide
+                          className="w-full bg-white/80 backdrop-blur-sm rounded-full py-5 sm:py-6 px-5 sm:px-6 text-gray-800 placeholder:text-gray-500 border-2 border-white/30 shadow-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-white focus:border-white/60 h-auto transition-all pr-[75px]"
                           type={showPassword ? "text" : "password"}
                           placeholder="Password"
                           autoComplete="current-password"
@@ -151,12 +161,12 @@ export default function SignIn() {
                         type="button"
                         variant="link"
                         onClick={() => setShowPassword((prev) => !prev)}
-                        className="absolute inset-y-0 right-0 h-full px-4 text-sm font-bold text-sky-700 hover:text-sky-600 transition-colors hover:no-underline"
+                        className="absolute inset-y-0 right-0 h-full px-4 text-xs sm:text-sm font-bold text-sky-700 hover:text-sky-800 transition-colors hover:no-underline"
                       >
                         {showPassword ? "HIDE" : "SHOW"}
                       </Button>
                     </div>
-                    <FormMessage className="text-red-600 drop-shadow" />
+                    <FormMessage className="text-red-700 font-semibold text-sm bg-red-100/90 px-3 py-1 rounded-lg inline-block" />
                   </FormItem>
                 )}
               />
@@ -167,15 +177,15 @@ export default function SignIn() {
                   control={form.control}
                   name="rememberMe"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-center space-x-2">
+                    <FormItem className="flex flex-row items-center space-x-2.5 space-y-0">
                       <FormControl>
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={field.onChange}
-                          className="border-white data-[state=checked]:bg-green-700 data-[state=checked]:text-white"
+                          className="h-5 w-5 border-2 border-white shadow-md data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 data-[state=checked]:text-white transition-all"
                         />
                       </FormControl>
-                      <FormLabel className="text-sm font-medium text-white cursor-pointer drop-shadow">
+                      <FormLabel className="text-sm font-semibold text-white cursor-pointer drop-shadow-md select-none">
                         Keep me signed in
                       </FormLabel>
                     </FormItem>
@@ -184,7 +194,7 @@ export default function SignIn() {
 
                 <a
                   href="forgot-password"
-                  className="text-sm font-bold text-white hover:text-gray-200 hover:underline transition-colors drop-shadow"
+                  className="text-sm font-bold text-white hover:text-gray-100 hover:underline transition-colors drop-shadow-md"
                 >
                   Forgot password?
                 </a>
@@ -192,15 +202,17 @@ export default function SignIn() {
 
               {/* Server Error Message */}
               {form.formState.errors.root?.serverError && (
-                <p className="text-sm font-medium text-red-100 text-center drop-shadow-lg">
-                  {form.formState.errors.root.serverError.message}
-                </p>
+                <div className="bg-red-500/95 backdrop-blur-sm text-white px-4 py-3 rounded-xl text-center shadow-xl border-2 border-red-400">
+                  <p className="text-sm font-semibold">
+                    {form.formState.errors.root.serverError.message}
+                  </p>
+                </div>
               )}
 
-              {/* Submit Button - Large, prominent, white button */}
+              {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full bg-white text-green-600 hover:bg-gray-50 py-6 h-auto rounded-full text-xl font-bold uppercase tracking-wider shadow-2xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-white text-green-600 hover:bg-green-50 active:bg-gray-100 py-5 sm:py-6 h-auto rounded-full text-lg sm:text-xl font-bold uppercase tracking-wider shadow-2xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none border-2 border-white/50"
                 disabled={loginMutation.isPending}
               >
                 {loginMutation.isPending ? (
