@@ -48,7 +48,7 @@ export default function SignIn() {
     reValidateMode: "onChange",
   });
 
-  // Auto-clear server error after 2.5 seconds
+  // Auto-clear server error after 5 seconds
   useEffect(() => {
     if (form.formState.errors.root?.serverError) {
       const timer = setTimeout(() => {
@@ -97,7 +97,6 @@ export default function SignIn() {
 
       {/* Main Content - Form Area */}
       <div className="flex-1 flex flex-col items-center justify-start px-4 sm:px-6 lg:px-8 py-8">
-        {/* Logo and Title - Use drop-shadow for visibility on the gradient */}
         <div className="text-center mb-8 w-full max-w-sm sm:max-w-md">
           <img
             src="/logo.png"
@@ -135,7 +134,7 @@ export default function SignIn() {
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-red-700 font-semibold text-sm bg-red-100/90 px-3 py-1 rounded-lg inline-block" />
+                    <FormMessage className="text-red-500 font-semibold text-sm drop-shadow-md" />
                   </FormItem>
                 )}
               />
@@ -166,7 +165,7 @@ export default function SignIn() {
                         {showPassword ? "HIDE" : "SHOW"}
                       </Button>
                     </div>
-                    <FormMessage className="text-red-700 font-semibold text-sm bg-red-100/90 px-3 py-1 rounded-lg inline-block" />
+                    <FormMessage className="text-red-500 font-semibold text-sm drop-shadow-md" />
                   </FormItem>
                 )}
               />
