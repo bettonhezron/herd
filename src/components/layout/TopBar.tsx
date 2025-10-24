@@ -18,6 +18,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useMe } from "@/hooks/useAuth";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "../ui/use-toast";
+import { ConfirmLogout } from "../modals/ConfirmLogout";
 
 const recentAlerts = [
   {
@@ -72,6 +73,7 @@ export function TopBar() {
   const [alertsOpen, setAlertsOpen] = useState(false);
 
   const logoutUser = useAuthStore((state) => state.logout);
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
   const { isLoading } = useMe();
 
@@ -88,15 +90,13 @@ export function TopBar() {
   const userRole = user?.role || "Loading...";
   const initials = getInitials(userFirstName);
   const fullName = `${userFirstName} ${userLastName}`.trim();
-
   const handleLogout = () => {
+    setLogoutOpen(false);
     logoutUser();
     toast({
-      title: "Logged Out Successfully!",
-      description: "You have been securely signed out of your account.",
+      title: "Successfully logged out!",
       variant: "default",
     });
-
     navigate("/login");
   };
 
@@ -211,7 +211,7 @@ export function TopBar() {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive"
-                onClick={handleLogout}
+                onClick={() => setLogoutOpen(true)}
               >
                 Log out
               </DropdownMenuItem>
@@ -219,6 +219,12 @@ export function TopBar() {
           </DropdownMenu>
         </div>
       </div>
+
+      <ConfirmLogout
+        open={logoutOpen}
+        onOpenChange={setLogoutOpen}
+        onConfirm={handleLogout}
+      />
     </header>
   );
 }
