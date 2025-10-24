@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
+import {
+  ArrowLeft,
+  Loader2,
+  Eye,
+  EyeOff,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 
 export default function ForgotPassword() {
   // State to manage the flow: 1 (Enter Username/Email), 2 (Verify Code), 3 (Reset Password)
@@ -14,6 +21,20 @@ export default function ForgotPassword() {
   const [infoMessage, setInfoMessage] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Password validation
+  const validatePassword = (password) => {
+    const checks = {
+      length: password.length >= 8,
+      hasLetter: /[a-zA-Z]/.test(password),
+      hasNumber: /[0-9]/.test(password),
+      hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    };
+    return checks;
+  };
+
+  const passwordChecks = validatePassword(newPassword);
+  const isPasswordValid = Object.values(passwordChecks).every((check) => check);
 
   // --- Utility for Input Styling ---
   const inputStyle =
@@ -84,10 +105,12 @@ export default function ForgotPassword() {
   // --- Step 3: Reset Password ---
   const handlePasswordReset = () => {
     setInfoMessage("");
-    if (newPassword.length < 6) {
-      setError("New password must be at least 6 characters.");
+
+    if (!isPasswordValid) {
+      setError("Please ensure your password meets all requirements.");
       return;
     }
+
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -256,7 +279,7 @@ export default function ForgotPassword() {
               <div className="relative">
                 <input
                   type={showNewPassword ? "text" : "password"}
-                  placeholder="New Password (min 6 characters)"
+                  placeholder="New Password"
                   value={newPassword}
                   onChange={(e) => {
                     setNewPassword(e.target.value);
@@ -277,6 +300,81 @@ export default function ForgotPassword() {
                   )}
                 </button>
               </div>
+
+              {/* Password Requirements */}
+              {newPassword && (
+                <div className="bg-white/80 rounded-2xl p-4 space-y-2">
+                  <p className="text-gray-700 font-semibold text-sm mb-2">
+                    Password must contain:
+                  </p>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      {passwordChecks.length ? (
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <XCircle className="h-4 w-4 text-red-500" />
+                      )}
+                      <span
+                        className={`text-xs ${
+                          passwordChecks.length
+                            ? "text-green-700"
+                            : "text-gray-600"
+                        }`}
+                      >
+                        At least 8 characters
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {passwordChecks.hasLetter ? (
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <XCircle className="h-4 w-4 text-red-500" />
+                      )}
+                      <span
+                        className={`text-xs ${
+                          passwordChecks.hasLetter
+                            ? "text-green-700"
+                            : "text-gray-600"
+                        }`}
+                      >
+                        At least one letter (a-z, A-Z)
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {passwordChecks.hasNumber ? (
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <XCircle className="h-4 w-4 text-red-500" />
+                      )}
+                      <span
+                        className={`text-xs ${
+                          passwordChecks.hasNumber
+                            ? "text-green-700"
+                            : "text-gray-600"
+                        }`}
+                      >
+                        At least one number (0-9)
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {passwordChecks.hasSpecial ? (
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <XCircle className="h-4 w-4 text-red-500" />
+                      )}
+                      <span
+                        className={`text-xs ${
+                          passwordChecks.hasSpecial
+                            ? "text-green-700"
+                            : "text-gray-600"
+                        }`}
+                      >
+                        At least one special character (!@#$%^&*...)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Confirm Password Field */}
               <div className="relative">
@@ -311,8 +409,9 @@ export default function ForgotPassword() {
                 className={`${buttonStyle} bg-green-600 text-white hover:bg-green-700`}
                 disabled={
                   isLoading ||
-                  newPassword.length < 6 ||
-                  newPassword !== confirmPassword
+                  !isPasswordValid ||
+                  newPassword !== confirmPassword ||
+                  !confirmPassword
                 }
               >
                 {isLoading ? (
