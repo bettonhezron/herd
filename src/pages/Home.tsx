@@ -58,7 +58,7 @@ export default function Home() {
       {/* Login Button */}
       <div className="pb-16 text-center">
         <Button
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/dashboard")} //later return to login
           className="w-64 bg-white text-green-700 hover:bg-green-50 py-4 h-auto rounded-full text-xl font-bold uppercase tracking-wider shadow-2xl transition-all transform hover:scale-105"
         >
           LOG IN

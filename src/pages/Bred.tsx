@@ -9,6 +9,7 @@ import {
   Pencil,
   Trash2,
   Edit3,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,141 +67,190 @@ interface PregnancyRecord {
   status: "healthy" | "attention" | "critical";
 }
 
-const mockBreedingRecords: BreedingRecord[] = [
-  {
-    id: "B001",
-    animalTag: "A-2401",
-    animalName: "Bessie",
-    breedingDate: "2024-01-15",
-    method: "NATURAL",
-    bullId: "BULL-789",
-    status: "CONFIRMED",
-    expectedCalvingDate: "2024-10-22",
-    notes: "First insemination successful",
-  },
-  {
-    id: "B002",
-    animalTag: "A-2405",
-    animalName: "Daisy",
-    breedingDate: "2024-02-10",
-    method: "NATURAL",
-    bullId: "BULL-456",
-    status: "CONFIRMED",
-    expectedCalvingDate: "2024-11-18",
-  },
-  {
-    id: "B003",
-    animalTag: "A-2410",
-    animalName: "Luna",
-    breedingDate: "2024-03-05",
-    method: "AI",
-    status: "PENDING",
-    notes: "Awaiting pregnancy confirmation",
-  },
-  {
-    id: "B004",
-    animalTag: "A-2415",
-    animalName: "Rosie",
-    breedingDate: "2024-02-20",
-    method: "NATURAL",
-    bullId: "BULL-789",
-    status: "FAILED",
-    notes: "Did not conceive, scheduled for re-breeding",
-  },
-];
+// Generate 100 mock heat detection records
+const generateHeatDetectionAnimals = () => {
+  const names = [
+    "Bella",
+    "Molly",
+    "Ginger",
+    "Daisy",
+    "Luna",
+    "Rosie",
+    "Clover",
+    "Bessie",
+    "Pearl",
+    "Ruby",
+  ];
+  const animals = [];
+  for (let i = 1; i <= 100; i++) {
+    animals.push({
+      id: `H${String(i).padStart(3, "0")}`,
+      tag: `A-${2400 + i}`,
+      name: names[i % names.length] + (i > 10 ? ` ${Math.floor(i / 10)}` : ""),
+      heatDetected: new Date(2024, 2, Math.floor(Math.random() * 20) + 1)
+        .toISOString()
+        .split("T")[0],
+      daysInHeat: Math.floor(Math.random() * 3),
+      lastBred: new Date(
+        2023,
+        Math.floor(Math.random() * 12),
+        Math.floor(Math.random() * 28) + 1
+      )
+        .toISOString()
+        .split("T")[0],
+      daysSinceBirth: Math.floor(Math.random() * 200) + 150,
+    });
+  }
+  return animals;
+};
 
-const mockPregnancyRecords: PregnancyRecord[] = [
-  {
-    id: "P001",
-    animalTag: "A-2401",
-    animalName: "Bessie",
-    breedingDate: "2024-01-15",
-    confirmationDate: "2024-02-15",
-    expectedCalvingDate: "2024-10-22",
-    daysPregnant: 65,
-    trimester: 1,
-    lastCheckup: "2024-03-10",
-    status: "healthy",
-  },
-  {
-    id: "P002",
-    animalTag: "A-2405",
-    animalName: "Daisy",
-    breedingDate: "2024-02-10",
-    confirmationDate: "2024-03-12",
-    expectedCalvingDate: "2024-11-18",
-    daysPregnant: 39,
-    trimester: 1,
-    lastCheckup: "2024-03-12",
-    status: "healthy",
-  },
-  {
-    id: "P003",
-    animalTag: "A-2398",
-    animalName: "Clover",
-    breedingDate: "2023-12-05",
-    confirmationDate: "2024-01-05",
-    expectedCalvingDate: "2024-09-12",
-    daysPregnant: 106,
-    trimester: 2,
-    lastCheckup: "2024-03-15",
-    status: "attention",
-  },
-];
+// Generate 100 mock breeding records
+const generateBreedingRecords = (): BreedingRecord[] => {
+  const names = [
+    "Bessie",
+    "Daisy",
+    "Luna",
+    "Rosie",
+    "Clover",
+    "Pearl",
+    "Ruby",
+    "Misty",
+    "Shadow",
+    "Star",
+  ];
+  const methods: ("AI" | "NATURAL")[] = ["AI", "NATURAL"];
+  const statuses: ("PENDING" | "CONFIRMED" | "FAILED")[] = [
+    "PENDING",
+    "CONFIRMED",
+    "FAILED",
+  ];
+  const records = [];
 
-const calvingEvents = [
-  {
-    id: "C001",
-    animalTag: "A-2390",
-    expectedDate: "2024-03-25",
-    daysUntil: 5,
-    status: "imminent",
-  },
-  {
-    id: "C002",
-    animalTag: "A-2392",
-    expectedDate: "2024-03-28",
-    daysUntil: 8,
-    status: "upcoming",
-  },
-  {
-    id: "C003",
-    animalTag: "A-2395",
-    expectedDate: "2024-04-05",
-    daysUntil: 16,
-    status: "upcoming",
-  },
-];
+  for (let i = 1; i <= 100; i++) {
+    const method = methods[Math.floor(Math.random() * methods.length)];
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
+    const breedingDate = new Date(
+      2024,
+      Math.floor(Math.random() * 3),
+      Math.floor(Math.random() * 28) + 1
+    )
+      .toISOString()
+      .split("T")[0];
 
-const heatDetectionAnimals = [
-  {
-    id: "H001",
-    tag: "A-2420",
-    name: "Bella",
-    heatDetected: "2024-03-18",
-    daysInHeat: 1,
-    lastBred: "2023-06-15",
-    daysSinceBirth: 276,
-  },
-  {
-    id: "H002",
-    tag: "A-2418",
-    name: "Molly",
-    heatDetected: "2024-03-19",
-    daysInHeat: 0,
-    lastBred: "2023-07-20",
-    daysSinceBirth: 240,
-  },
-  {
-    id: "H003",
-    tag: "A-2425",
-    name: "Ginger",
-    heatDetected: "2024-03-17",
-    daysInHeat: 2,
-    lastBred: "2023-05-10",
-    daysSinceBirth: 312,
-  },
-];
+    records.push({
+      id: `B${String(i).padStart(3, "0")}`,
+      animalTag: `A-${2300 + i}`,
+      animalName:
+        names[i % names.length] + (i > 10 ? ` ${Math.floor(i / 10)}` : ""),
+      breedingDate,
+      method,
+      bullId:
+        method === "NATURAL"
+          ? `BULL-${Math.floor(Math.random() * 900) + 100}`
+          : undefined,
+      status,
+      expectedCalvingDate:
+        status !== "FAILED"
+          ? new Date(
+              new Date(breedingDate).getTime() + 280 * 24 * 60 * 60 * 1000
+            )
+              .toISOString()
+              .split("T")[0]
+          : undefined,
+      notes:
+        status === "PENDING"
+          ? "Awaiting pregnancy confirmation"
+          : status === "FAILED"
+          ? "Did not conceive"
+          : "Confirmed pregnant",
+    });
+  }
+  return records;
+};
+
+// Generate 100 mock pregnancy records
+const generatePregnancyRecords = (): PregnancyRecord[] => {
+  const names = [
+    "Bessie",
+    "Daisy",
+    "Clover",
+    "Pearl",
+    "Ruby",
+    "Luna",
+    "Rosie",
+    "Misty",
+    "Shadow",
+    "Star",
+  ];
+  const statuses: ("healthy" | "attention" | "critical")[] = [
+    "healthy",
+    "healthy",
+    "healthy",
+    "attention",
+    "healthy",
+  ];
+  const records = [];
+
+  for (let i = 1; i <= 100; i++) {
+    const daysPregnant = Math.floor(Math.random() * 250) + 30;
+    const trimester = daysPregnant < 93 ? 1 : daysPregnant < 186 ? 2 : 3;
+    const breedingDate = new Date(
+      Date.now() - daysPregnant * 24 * 60 * 60 * 1000
+    )
+      .toISOString()
+      .split("T")[0];
+
+    records.push({
+      id: `P${String(i).padStart(3, "0")}`,
+      animalTag: `A-${2200 + i}`,
+      animalName:
+        names[i % names.length] + (i > 10 ? ` ${Math.floor(i / 10)}` : ""),
+      breedingDate,
+      confirmationDate: new Date(
+        new Date(breedingDate).getTime() + 30 * 24 * 60 * 60 * 1000
+      )
+        .toISOString()
+        .split("T")[0],
+      expectedCalvingDate: new Date(
+        new Date(breedingDate).getTime() + 280 * 24 * 60 * 60 * 1000
+      )
+        .toISOString()
+        .split("T")[0],
+      daysPregnant,
+      trimester,
+      lastCheckup: new Date(
+        Date.now() - Math.floor(Math.random() * 14) * 24 * 60 * 60 * 1000
+      )
+        .toISOString()
+        .split("T")[0],
+      status: statuses[Math.floor(Math.random() * statuses.length)],
+    });
+  }
+  return records;
+};
+
+// Generate 100 mock calving events
+const generateCalvingEvents = () => {
+  const events = [];
+  for (let i = 1; i <= 100; i++) {
+    const daysUntil = Math.floor(Math.random() * 60);
+    events.push({
+      id: `C${String(i).padStart(3, "0")}`,
+      animalTag: `A-${2100 + i}`,
+      expectedDate: new Date(Date.now() + daysUntil * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0],
+      daysUntil,
+      status: daysUntil < 7 ? "imminent" : "upcoming",
+    });
+  }
+  return events.sort((a, b) => a.daysUntil - b.daysUntil);
+};
+
+const heatDetectionAnimals = generateHeatDetectionAnimals();
+const mockBreedingRecords = generateBreedingRecords();
+const mockPregnancyRecords = generatePregnancyRecords();
+const calvingEvents = generateCalvingEvents();
 
 function getStatusColor(status: string) {
   switch (status) {
@@ -242,39 +292,63 @@ function getStatusIcon(status: string) {
 export default function Breeding() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMethod, setSelectedMethod] = useState<string>("all");
+  const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [addBreedingOpen, setAddBreedingOpen] = useState(false);
   const [editBreeding, setEditBreeding] = useState<BreedingRecord | null>(null);
   const [addPregnancyOpen, setAddPregnancyOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<BreedingRecord | null>(
+    null
+  );
 
-  const filteredRecords = mockBreedingRecords.filter((record) => {
+  const filteredHeatAnimals = heatDetectionAnimals.filter(
+    (animal) =>
+      animal.tag.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      animal.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredBreedingRecords = mockBreedingRecords.filter((record) => {
     const matchesSearch =
       record.animalTag.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.animalName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesMethod =
       selectedMethod === "all" || record.method === selectedMethod;
-    return matchesSearch && matchesMethod;
+    const matchesStatus =
+      selectedStatus === "all" || record.status === selectedStatus;
+    return matchesSearch && matchesMethod && matchesStatus;
   });
+
+  const filteredPregnancyRecords = mockPregnancyRecords.filter(
+    (record) =>
+      record.animalTag.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.animalName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredCalvingEvents = calvingEvents.filter((event) =>
+    event.animalTag.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const stats = [
     {
       title: "Animals in Heat",
-      value: "8",
+      value: heatDetectionAnimals.length.toString(),
       change: "Ready for breeding",
     },
     {
       title: "Pending Pregnancy Check",
-      value: "12",
+      value: mockBreedingRecords
+        .filter((r) => r.status === "PENDING")
+        .length.toString(),
       change: "Due for confirmation",
     },
     {
       title: "Active Pregnancies",
-      value: "28",
+      value: mockPregnancyRecords.length.toString(),
       change: "+3 this month",
     },
     {
       title: "Upcoming Calvings",
-      value: "5",
+      value: calvingEvents.filter((e) => e.daysUntil <= 30).length.toString(),
       change: "Next 30 days",
     },
   ];
@@ -340,14 +414,31 @@ export default function Breeding() {
         <TabsContent value="heat">
           <Card>
             <CardHeader>
-              <CardTitle>Heat Detection</CardTitle>
-              <CardDescription>
-                Animals currently in heat and ready for breeding
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Heat Detection</CardTitle>
+                  <CardDescription>
+                    Animals currently in heat and ready for breeding
+                  </CardDescription>
+                </div>
+                <Badge variant="secondary" className="text-lg">
+                  {filteredHeatAnimals.length} animals
+                </Badge>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {heatDetectionAnimals.map((animal) => (
+              <div className="relative mb-6">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search by tag or name..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              <div className="space-y-4 max-h-[600px] overflow-y-auto">
+                {filteredHeatAnimals.map((animal) => (
                   <div key={animal.id} className="p-4 border rounded-lg">
                     <div className="flex items-start justify-between mb-3">
                       <div>
@@ -401,10 +492,17 @@ export default function Breeding() {
         <TabsContent value="breeding">
           <Card>
             <CardHeader>
-              <CardTitle>Breeding Records</CardTitle>
-              <CardDescription>
-                All breeding attempts - pending pregnancy confirmation
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Breeding Records</CardTitle>
+                  <CardDescription>
+                    All breeding attempts - pending pregnancy confirmation
+                  </CardDescription>
+                </div>
+                <Badge variant="secondary" className="text-lg">
+                  {filteredBreedingRecords.length} records
+                </Badge>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -424,11 +522,21 @@ export default function Breeding() {
                 >
                   <option value="all">All Methods</option>
                   <option value="AI">Artificial Insemination</option>
-                  <option value="Natural">Natural Breeding</option>
+                  <option value="NATURAL">Natural Breeding</option>
+                </select>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="px-3 py-2 border border-input bg-background rounded-md text-sm"
+                >
+                  <option value="all">All Status</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="CONFIRMED">Confirmed</option>
+                  <option value="FAILED">Failed</option>
                 </select>
               </div>
 
-              <div className="rounded-md border">
+              <div className="rounded-md border max-h-[600px] overflow-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -442,7 +550,7 @@ export default function Breeding() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredRecords.map((record) => (
+                    {filteredBreedingRecords.map((record) => (
                       <TableRow key={record.id}>
                         <TableCell>
                           <div>
@@ -463,7 +571,7 @@ export default function Breeding() {
                           >
                             {getStatusIcon(record.status)}
                             {record.status.charAt(0).toUpperCase() +
-                              record.status.slice(1)}
+                              record.status.slice(1).toLowerCase()}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-sm">
@@ -479,6 +587,27 @@ export default function Breeding() {
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
+                              {record.status === "PENDING" && (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedRecord(record);
+                                    setAddPregnancyOpen(true);
+                                  }}
+                                >
+                                  <CheckCircle className="w-4 h-4 mr-2" />
+                                  Confirm Pregnancy
+                                </DropdownMenuItem>
+                              )}
+                              {record.status === "PENDING" && (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    // Handle mark as failed
+                                  }}
+                                >
+                                  <X className="w-4 h-4 mr-2" />
+                                  Mark as Failed
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem
                                 onClick={() => setEditBreeding(record)}
                               >
@@ -509,14 +638,31 @@ export default function Breeding() {
         <TabsContent value="pregnancy">
           <Card>
             <CardHeader>
-              <CardTitle>Pregnancy Monitoring</CardTitle>
-              <CardDescription>
-                Monitor pregnant animals and track their progress
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Pregnancy Monitoring</CardTitle>
+                  <CardDescription>
+                    Monitor pregnant animals and track their progress
+                  </CardDescription>
+                </div>
+                <Badge variant="secondary" className="text-lg">
+                  {filteredPregnancyRecords.length} pregnancies
+                </Badge>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {mockPregnancyRecords.map((record) => (
+              <div className="relative mb-6">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search by tag or name..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              <div className="space-y-4 max-h-[600px] overflow-y-auto">
+                {filteredPregnancyRecords.map((record) => (
                   <div key={record.id} className="p-4 border rounded-lg">
                     <div className="flex items-start justify-between mb-3">
                       <div>
@@ -577,15 +723,32 @@ export default function Breeding() {
         <TabsContent value="calving">
           <Card>
             <CardHeader>
-              <CardTitle>Calving Calendar</CardTitle>
-              <CardDescription>
-                Upcoming calving events and birth notifications
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Calving Calendar</CardTitle>
+                  <CardDescription>
+                    Upcoming calving events and birth notifications
+                  </CardDescription>
+                </div>
+                <Badge variant="secondary" className="text-lg">
+                  {filteredCalvingEvents.length} events
+                </Badge>
+              </div>
             </CardHeader>
 
             <CardContent>
-              <div className="space-y-4">
-                {calvingEvents.map((event) => (
+              <div className="relative mb-6">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search by tag..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              <div className="space-y-4 max-h-[600px] overflow-y-auto">
+                {filteredCalvingEvents.map((event) => (
                   <div
                     key={event.id}
                     className="flex items-center justify-between p-4 border rounded-lg"
@@ -636,13 +799,14 @@ export default function Breeding() {
       <AddPregnancyModal
         open={addPregnancyOpen}
         onOpenChange={setAddPregnancyOpen}
+        breedingRecord={selectedRecord}
       />
 
       <DeleteConfirmModal
         open={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
-        title="Delete Health Record?"
-        description="Are you sure you want to delete this health record? This action cannot be undone."
+        title="Delete Breeding Record?"
+        description="Are you sure you want to delete this breeding record? This action cannot be undone."
       />
     </div>
   );

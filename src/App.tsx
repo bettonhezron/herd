@@ -42,9 +42,11 @@ const App = () => (
           {/* Protected dashboard routes */}
           <Route
             element={
-              <ProtectedRoute>
-                <DashboardLayout />
-              </ProtectedRoute>
+              // <ProtectedRoute>   later uncomment
+
+              <DashboardLayout />
+
+              // </ProtectedRoute>
             }
           >
             <Route path="/dashboard" element={<Dashboard />} />
