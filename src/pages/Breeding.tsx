@@ -241,7 +241,7 @@ function getStatusIcon(status: string) {
 
 export default function Breeding() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedMethod, setSelectedMethod] = useState<string>("all");
+  const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [addBreedingOpen, setAddBreedingOpen] = useState(false);
   const [editBreeding, setEditBreeding] = useState<BreedingRecord | null>(null);
@@ -251,29 +251,29 @@ export default function Breeding() {
     const matchesSearch =
       record.animalTag.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.animalName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesMethod =
-      selectedMethod === "all" || record.method === selectedMethod;
-    return matchesSearch && matchesMethod;
+    const matchesStatus =
+      selectedStatus === "all" || record.status === selectedStatus;
+    return matchesSearch && matchesStatus;
   });
 
   const stats = [
     {
-      title: "Animals in Heat",
+      title: "In Heat",
       value: "8",
       change: "Ready for breeding",
     },
     {
-      title: "Pending Pregnancy Check",
+      title: "Pending Checks",
       value: "12",
       change: "Due for confirmation",
     },
     {
-      title: "Active Pregnancies",
+      title: "Pregnancies",
       value: "28",
       change: "+3 this month",
     },
     {
-      title: "Upcoming Calvings",
+      title: "Calvings",
       value: "5",
       change: "Next 30 days",
     },
@@ -312,16 +312,16 @@ export default function Breeding() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         {stats.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="text-xs sm:text-sm font-medium">
                 {stat.title}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="text-xl sm:text-2xl font-bold">{stat.value}</div>
               <p className="text-xs text-muted-foreground">{stat.change}</p>
             </CardContent>
           </Card>
@@ -329,11 +329,31 @@ export default function Breeding() {
       </div>
 
       <Tabs defaultValue="heat" className="space-y-6">
-        <TabsList className="flex overflow-x-auto whitespace-nowrap scrollbar-hide">
-          <TabsTrigger value="heat">Heat Detection</TabsTrigger>
-          <TabsTrigger value="breeding">Breeding Records</TabsTrigger>
-          <TabsTrigger value="pregnancy">Pregnancy Tracking</TabsTrigger>
-          <TabsTrigger value="calving">Calving Calendar</TabsTrigger>
+        <TabsList className="w-full justify-start overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-hide border-b rounded-none bg-transparent p-0">
+          <TabsTrigger
+            value="heat"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+          >
+            Heat Detection
+          </TabsTrigger>
+          <TabsTrigger
+            value="breeding"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+          >
+            Breeding Records
+          </TabsTrigger>
+          <TabsTrigger
+            value="pregnancy"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+          >
+            Pregnancy Tracking
+          </TabsTrigger>
+          <TabsTrigger
+            value="calving"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+          >
+            Calving Calendar
+          </TabsTrigger>
         </TabsList>
 
         {/* Heat Detection Tab */}
@@ -346,35 +366,33 @@ export default function Breeding() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {heatDetectionAnimals.map((animal) => (
-                  <div key={animal.id} className="p-4 border rounded-lg">
+                  <div key={animal.id} className="p-3 sm:p-4 border rounded-lg">
                     <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <div className="flex items-center gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <p className="font-semibold">{animal.tag}</p>
                           <Badge
                             variant="secondary"
-                            className="gap-1 bg-red-500/10 text-red-600 dark:text-red-400"
+                            className="gap-1 bg-red-500/10 text-red-600 dark:text-red-400 text-xs"
                           >
                             <AlertCircle className="w-3 h-3" />
-                            In Heat - Day {animal.daysInHeat + 1}
+                            Day {animal.daysInHeat + 1}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {animal.name}
-                        </p>
                       </div>
                       <Button
                         size="sm"
                         onClick={() => setAddBreedingOpen(true)}
+                        className="ml-2 shrink-0"
                       >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Record Breeding
+                        <Plus className="w-4 h-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Record</span>
                       </Button>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4 mt-3 text-sm">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs sm:text-sm">
                       <div>
                         <p className="text-muted-foreground">Heat Detected</p>
                         <p className="font-medium">{animal.heatDetected}</p>
@@ -383,7 +401,7 @@ export default function Breeding() {
                         <p className="text-muted-foreground">Last Bred</p>
                         <p className="font-medium">{animal.lastBred}</p>
                       </div>
-                      <div>
+                      <div className="col-span-2 sm:col-span-1">
                         <p className="text-muted-foreground">
                           Days Since Birth
                         </p>
@@ -418,13 +436,14 @@ export default function Breeding() {
                   />
                 </div>
                 <select
-                  value={selectedMethod}
-                  onChange={(e) => setSelectedMethod(e.target.value)}
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
                   className="px-3 py-2 border border-input bg-background rounded-md text-sm"
                 >
-                  <option value="all">All Methods</option>
-                  <option value="AI">Artificial Insemination</option>
-                  <option value="Natural">Natural Breeding</option>
+                  <option value="all">All Status</option>
+                  <option value="CONFIRMED">Confirmed</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="FAILED">Failed</option>
                 </select>
               </div>
 
@@ -484,6 +503,13 @@ export default function Breeding() {
                               >
                                 <Pencil className="w-4 h-4 mr-2" />
                                 Edit Record
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                onClick={() => setAddPregnancyOpen(true)}
+                              >
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                                Confirm Pregnancy
                               </DropdownMenuItem>
 
                               <DropdownMenuItem
