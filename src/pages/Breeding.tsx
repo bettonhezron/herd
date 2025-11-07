@@ -329,7 +329,7 @@ export default function Breeding() {
       </div>
 
       <Tabs defaultValue="heat" className="space-y-6">
-        <TabsList>
+        <TabsList className="flex overflow-x-auto whitespace-nowrap scrollbar-hide">
           <TabsTrigger value="heat">Heat Detection</TabsTrigger>
           <TabsTrigger value="breeding">Breeding Records</TabsTrigger>
           <TabsTrigger value="pregnancy">Pregnancy Tracking</TabsTrigger>
