@@ -300,14 +300,6 @@ export default function Breeding() {
             <Plus className="w-4 h-4" />
             Record Breeding
           </Button>
-
-          <Button
-            className="gap-2 px-3 py-2 text-sm sm:text-base"
-            variant="outline"
-            onClick={() => setAddPregnancyOpen(true)}
-          >
-            Confirm Pregnancy
-          </Button>
         </div>
       </div>
 
