@@ -175,15 +175,17 @@ export default function SignIn() {
                   control={form.control}
                   name="rememberMe"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-center space-x-2.5 space-y-0">
+                    <FormItem className="flex flex-row items-center space-x-3">
                       <FormControl>
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={field.onChange}
-                          className="h-5 w-5 border-2 border-white shadow-md data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 data-[state=checked]:text-white transition-all"
+                          className="h-5 w-5 rounded-sm border-2 border-gray-300 bg-white 
+                                   data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 
+                                   data-[state=checked]:text-white transition-colors"
                         />
                       </FormControl>
-                      <FormLabel className="text-sm font-semibold text-white cursor-pointer drop-shadow-md select-none">
+                      <FormLabel className="text-sm font-semibold text-white cursor-pointer select-none">
                         Keep me signed in
                       </FormLabel>
                     </FormItem>

@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Edit3 } from "lucide-react";
 import { AddAnimalModal } from "@/components/modals/AddAnimalModal";
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 import { Animal } from "@/types/animal";
@@ -37,6 +37,12 @@ import {
 } from "@/hooks/useAnimal";
 import { toast } from "sonner";
 import { formatAge } from "@/lib/dateUtils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const getStatusBadge = (status: Animal["status"]) => {
   switch (status) {
@@ -54,7 +60,7 @@ const getStatusBadge = (status: Animal["status"]) => {
       );
     case "DEAD":
       return (
-        <Badge className="bg-health-warning/10 text-health-warning border-health-warning/20">
+        <Badge className="bg-red-500/10 text-red-600 border-red-500/20">
           Dead
         </Badge>
       );
@@ -280,28 +286,34 @@ export default function Animals() {
                         <TableCell>{animal.category}</TableCell>
                         <TableCell>{getStatusBadge(animal.status)}</TableCell>
                         <TableCell>{animal.weight} kg</TableCell>
-                        <TableCell>
-                          <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              title="Edit"
-                              onClick={() => setEditingAnimal(animal)}
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              title="Delete"
-                              onClick={() => {
-                                setAnimalToDelete(animal);
-                                setDeleteModalOpen(true);
-                              }}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <Edit3 className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => setEditingAnimal(animal)}
+                              >
+                                <Pencil className="w-4 h-4 mr-2" />
+                                Edit Animal
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setAnimalToDelete(animal);
+                                  setDeleteModalOpen(true);
+                                }}
+                                className="text-destructive"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete Animal
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))

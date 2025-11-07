@@ -113,7 +113,7 @@ export function AddBreedingModal({
 
             {/* Breeding Date */}
             <div className="grid gap-2">
-              <Label htmlFor="breedingDate">Breeding Date</Label>
+              <Label htmlFor="breedingDate">Service Date</Label>
               <Input
                 id="breedingDate"
                 type="date"

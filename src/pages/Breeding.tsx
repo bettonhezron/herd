@@ -8,6 +8,7 @@ import {
   Baby,
   Pencil,
   Trash2,
+  Edit3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +33,12 @@ import { Progress } from "@/components/ui/progress";
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 import { AddBreedingModal } from "@/components/modals/AddBreedingModal";
 import { AddPregnancyModal } from "@/components/modals/AddPregnancyModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface BreedingRecord {
   id: string;
@@ -333,8 +340,8 @@ export default function Breeding() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Animal</TableHead>
-                      <TableHead>Breeding Date</TableHead>
+                      <TableHead>Animal Tag</TableHead>
+                      <TableHead>Service Date</TableHead>
                       <TableHead>Method</TableHead>
                       <TableHead>Bull ID</TableHead>
                       <TableHead>Status</TableHead>
@@ -374,26 +381,31 @@ export default function Breeding() {
                           {record.expectedCalvingDate || "-"}
                         </TableCell>
 
-                        <TableCell>
-                          <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              title="Edit"
-                              onClick={() => setEditBreeding(record)}
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </Button>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <Edit3 className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
 
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              title="Delete"
-                              onClick={() => setDeleteModalOpen(true)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => setEditBreeding(record)}
+                              >
+                                <Pencil className="w-4 h-4 mr-2" />
+                                Edit Record
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={() => setDeleteModalOpen(true)}
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete Record
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))}

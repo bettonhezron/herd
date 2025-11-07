@@ -21,10 +21,8 @@ import { toast } from "sonner";
 
 interface PregnancyData {
   animalTag: string;
-  animalName: string;
   breedingDate: string;
   confirmationDate: string;
-  status: "healthy" | "attention" | "critical";
 }
 
 interface AddPregnancyModalProps {
@@ -40,10 +38,8 @@ export function AddPregnancyModal({
 }: AddPregnancyModalProps) {
   const [formData, setFormData] = useState<PregnancyData>({
     animalTag: "",
-    animalName: "",
     breedingDate: "",
     confirmationDate: new Date().toISOString().split("T")[0],
-    status: "healthy",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -56,10 +52,8 @@ export function AddPregnancyModal({
     onOpenChange(false);
     setFormData({
       animalTag: "",
-      animalName: "",
       breedingDate: "",
       confirmationDate: new Date().toISOString().split("T")[0],
-      status: "healthy",
     });
   };
 
@@ -89,23 +83,9 @@ export function AddPregnancyModal({
               />
             </div>
 
-            {/* Animal Name */}
-            <div className="grid gap-2">
-              <Label htmlFor="animalName">Animal Name</Label>
-              <Input
-                id="animalName"
-                value={formData.animalName}
-                onChange={(e) =>
-                  setFormData({ ...formData, animalName: e.target.value })
-                }
-                placeholder="Bessie"
-                required
-              />
-            </div>
-
             {/* Breeding Date */}
             <div className="grid gap-2">
-              <Label htmlFor="breedingDate">Original Breeding Date</Label>
+              <Label htmlFor="breedingDate">Service Date</Label>
               <Input
                 id="breedingDate"
                 type="date"
@@ -129,26 +109,6 @@ export function AddPregnancyModal({
                 }
                 required
               />
-            </div>
-
-            {/* Status */}
-            <div className="grid gap-2">
-              <Label htmlFor="status">Health Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value: any) =>
-                  setFormData({ ...formData, status: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="healthy">Healthy</SelectItem>
-                  <SelectItem value="attention">Needs Attention</SelectItem>
-                  <SelectItem value="critical">Critical</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
 
