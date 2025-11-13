@@ -116,6 +116,7 @@ const Auth: React.FC = () => {
               </label>
               <button
                 type="button"
+                onClick={() => navigate("/forgot-password")}
                 className="text-green-600 hover:text-green-700 font-medium"
               >
                 Forgot password?
