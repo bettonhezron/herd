@@ -17,10 +17,10 @@ const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-200 via-green-50 to-amber-50 flex flex-col">
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+      <div className="flex-1 flex flex-col items-center justify-start px-6 pt-12 md:pt-16">
         <div className="text-center space-y-6">
           {/* Logo/Icon */}
-          <div className="mb-6">
+          <div className="mb-4 md:mb-6">
             <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-green-600 rounded-full flex items-center justify-center shadow-lg">
               <svg
                 className="w-10 h-10 sm:w-12 sm:h-12 text-white"
@@ -47,19 +47,18 @@ const LandingPage: React.FC = () => {
           </h1>
 
           {/* Tagline */}
-          <p className="text-sm sm:text-xl md:text-2xl text-gray-600 font-light max-w-xs sm:max-w-2xl mx-auto whitespace-nowrap overflow-hidden text-ellipsis">
+          <p className="text-sm sm:text-xl md:text-2xl text-gray-600 font-light max-w-xs sm:max-w-2xl mx-auto">
             Smart herd management made simple.
           </p>
 
           {/* Feature Highlights */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 md:mt-16">
             <Feature
               icon={HiArrowTrendingUp}
               text="Track Production"
               color="green"
             />
             <Feature icon={GiCow} text="Manage Your Herd" color="grey" />
-
             <Feature
               icon={MdOutlineHealthAndSafety}
               text="Health Monitoring"
@@ -96,7 +95,7 @@ const LandingPage: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <footer className="py-4 text-center text-sm text-gray-500">
+      <footer className="py-4 text-center text-sm text-gray-500  overflow-x-auto">
         © {new Date().getFullYear()} Dairy Herd Management System. All rights
         reserved.
       </footer>
