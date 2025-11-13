@@ -1,6 +1,6 @@
 # Dairy Herd Management System
 
-**URL**:  **https://herd-51h9.vercel.app/**
+**URL**:  **https://dairyherd.vercel.app/**
 
 **Use your preferred IDE**
 
