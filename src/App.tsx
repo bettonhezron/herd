@@ -24,6 +24,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Support from "./pages/Support";
 import Home from "./pages/Home";
 import ForgotPassword from "./pages/ForgotPassword";
+import LandingPage from "./pages/Landing";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -35,8 +37,12 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           {/* Public route */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<SignIn />} />
+          {/* <Route path="/" element={<Home />} />
+          <Route path="/login" element={<SignIn />} /> */}
+
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/signin" element={<Auth />} />
+
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/* Protected dashboard routes */}
