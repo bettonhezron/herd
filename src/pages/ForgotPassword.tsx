@@ -224,12 +224,12 @@ const ForgotPassword: React.FC = () => {
                     handleVerifyCode(e as any)
                   }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-300 text-center text-2xl tracking-widest"
-                  placeholder="000000"
+                  placeholder="------"
                   maxLength={6}
                 />
-                <p className="text-xs text-gray-500 mt-2 text-center">
+                {/* <p className="text-xs text-gray-500 mt-2 text-center">
                   Check console for the generated code
-                </p>
+                </p> */}
               </div>
 
               <div className="text-center text-sm text-gray-600">
