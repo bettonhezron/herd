@@ -39,6 +39,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AddCalvingModal } from "@/components/modals/AddCalvingModal";
 
 interface BreedingRecord {
   id: string;
@@ -152,22 +153,57 @@ const calvingEvents = [
   {
     id: "C001",
     animalTag: "A-2390",
-    expectedDate: "2024-03-25",
-    daysUntil: 5,
+    expectedDate: "2024-11-13", // Today - Due now!
+    daysUntil: 0,
     status: "imminent",
   },
   {
     id: "C002",
+    animalTag: "A-2385",
+    expectedDate: "2024-11-12", // Yesterday - Overdue
+    daysUntil: -1,
+    status: "imminent",
+  },
+  {
+    id: "C003",
+    animalTag: "A-2401",
+    expectedDate: "2024-11-16",
+    daysUntil: 3,
+    status: "imminent",
+  },
+  {
+    id: "C004",
     animalTag: "A-2392",
-    expectedDate: "2024-03-28",
+    expectedDate: "2024-11-18",
+    daysUntil: 5,
+    status: "imminent",
+  },
+  {
+    id: "C005",
+    animalTag: "A-2398",
+    expectedDate: "2024-11-21",
     daysUntil: 8,
     status: "upcoming",
   },
   {
-    id: "C003",
+    id: "C006",
     animalTag: "A-2395",
-    expectedDate: "2024-04-05",
-    daysUntil: 16,
+    expectedDate: "2024-11-27",
+    daysUntil: 14,
+    status: "upcoming",
+  },
+  {
+    id: "C007",
+    animalTag: "A-2403",
+    expectedDate: "2024-12-05",
+    daysUntil: 22,
+    status: "upcoming",
+  },
+  {
+    id: "C008",
+    animalTag: "A-2407",
+    expectedDate: "2024-12-15",
+    daysUntil: 32,
     status: "upcoming",
   },
 ];
@@ -246,6 +282,7 @@ export default function Breeding() {
   const [addBreedingOpen, setAddBreedingOpen] = useState(false);
   const [editBreeding, setEditBreeding] = useState<BreedingRecord | null>(null);
   const [addPregnancyOpen, setAddPregnancyOpen] = useState(false);
+  const [addCalvingOpen, setCalvingOpen] = useState(false);
 
   const filteredRecords = mockBreedingRecords.filter((record) => {
     const matchesSearch =
@@ -298,7 +335,7 @@ export default function Breeding() {
             onClick={() => setAddBreedingOpen(true)}
           >
             <Plus className="w-4 h-4" />
-            Record Breeding
+            Record Heat
           </Button>
         </div>
       </div>
@@ -380,7 +417,9 @@ export default function Breeding() {
                         className="ml-2 shrink-0"
                       >
                         <Plus className="w-4 h-4 sm:mr-2" />
-                        <span className="hidden sm:inline">Record</span>
+                        <span className="hidden sm:inline">
+                          Breeding Record
+                        </span>
                       </Button>
                     </div>
 
@@ -592,6 +631,7 @@ export default function Breeding() {
         </TabsContent>
 
         {/* Calving Calendar Tab */}
+
         <TabsContent value="calving">
           <Card>
             <CardHeader>
@@ -603,37 +643,62 @@ export default function Breeding() {
 
             <CardContent>
               <div className="space-y-4">
-                {calvingEvents.map((event) => (
-                  <div
-                    key={event.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`p-3 rounded-full ${getStatusColor(
-                          event.status
-                        )}`}
-                      >
-                        <Baby className="w-5 h-5" />
+                {calvingEvents.map((event) => {
+                  const isDue = event.daysUntil <= 0;
+                  const isImminent =
+                    event.daysUntil > 0 && event.daysUntil <= 7;
+
+                  return (
+                    <div
+                      key={event.id}
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 border rounded-lg"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`p-3 rounded-full ${getStatusColor(
+                            event.status
+                          )}`}
+                        >
+                          <Baby className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{event.animalTag}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Expected calving date
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">{event.animalTag}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Expected calving date
-                        </p>
+
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                        <div className="text-left sm:text-right">
+                          <p className="font-medium">{event.expectedDate}</p>
+                          <Badge
+                            variant="secondary"
+                            className={`gap-1 ${getStatusColor(
+                              event.status
+                            )} inline-flex mt-1`}
+                          >
+                            {isDue
+                              ? "Due Now"
+                              : `${event.daysUntil} day${
+                                  event.daysUntil !== 1 ? "s" : ""
+                                }`}
+                          </Badge>
+                        </div>
+
+                        {isDue && (
+                          <Button
+                            onClick={() => setCalvingOpen(true)}
+                            size="sm"
+                            className="w-full sm:w-auto"
+                          >
+                            Record Birth
+                          </Button>
+                        )}
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium">{event.expectedDate}</p>
-                      <Badge
-                        variant="secondary"
-                        className={`gap-1 ${getStatusColor(event.status)}`}
-                      >
-                        {event.daysUntil} days
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -655,6 +720,8 @@ export default function Breeding() {
         open={addPregnancyOpen}
         onOpenChange={setAddPregnancyOpen}
       />
+
+      <AddCalvingModal open={addCalvingOpen} onOpenChange={setCalvingOpen} />
 
       <DeleteConfirmModal
         open={deleteModalOpen}
