@@ -1,4 +1,3 @@
-import { BarChart, Heart, LucideIcon, User } from "lucide-react";
 import { GiCow } from "react-icons/gi";
 import { MdOutlineHealthAndSafety } from "react-icons/md";
 import { HiArrowTrendingUp } from "react-icons/hi2";
@@ -7,9 +6,9 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 interface FeatureProps {
-  icon: React.ElementType; // Accept any React icon component
+  icon: React.ElementType;
   text: string;
-  color: string; // Tailwind color, e.g., "green", "amber"
+  color: string;
 }
 
 const LandingPage: React.FC = () => {
@@ -21,10 +20,10 @@ const LandingPage: React.FC = () => {
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         <div className="text-center space-y-6">
           {/* Logo/Icon */}
-          <div className="mb-8">
-            <div className="w-20 h-20 mx-auto bg-green-600 rounded-full flex items-center justify-center shadow-lg">
+          <div className="mb-6">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-green-600 rounded-full flex items-center justify-center shadow-lg">
               <svg
-                className="w-12 h-12 text-white"
+                className="w-10 h-10 sm:w-12 sm:h-12 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -40,15 +39,15 @@ const LandingPage: React.FC = () => {
           </div>
 
           {/* Title */}
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-800 tracking-tight">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-gray-800 tracking-tight whitespace-nowrap">
             Dairy Herd Management
-            <span className="block text-4xl md:text-5xl mt-2 text-green-700">
+            <span className="block text-xl sm:text-4xl md:text-5xl mt-1 sm:mt-2 text-green-700">
               System
             </span>
           </h1>
 
           {/* Tagline */}
-          <p className="text-xl md:text-2xl text-gray-600 font-light max-w-2xl mx-auto">
+          <p className="text-sm sm:text-xl md:text-2xl text-gray-600 font-light max-w-xs sm:max-w-2xl mx-auto whitespace-nowrap overflow-hidden text-ellipsis">
             Smart herd management made simple.
           </p>
 
@@ -71,8 +70,8 @@ const LandingPage: React.FC = () => {
           {/* CTA Button */}
           <div className="pt-8">
             <button
-              onClick={() => navigate("/signin")} //later return to login
-              className="inline-block px-12 py-4 bg-green-600 hover:bg-green-700 text-white text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 cursor-pointer"
+              onClick={() => navigate("/signin")}
+              className="inline-block px-12 py-4 bg-green-600 hover:bg-green-700 text-white text-sm sm:text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 cursor-pointer"
             >
               Sign In
             </button>
@@ -98,7 +97,8 @@ const LandingPage: React.FC = () => {
 
       {/* Footer */}
       <footer className="py-4 text-center text-sm text-gray-500">
-        © 2024 Dairy Herd Management System. All rights reserved.
+        © {new Date().getFullYear()} Dairy Herd Management System. All rights
+        reserved.
       </footer>
     </div>
   );
