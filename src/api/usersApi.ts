@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/fetcher";
+import { apiFetch } from "@/lib/apiFetch";
 import { UserAnalytics } from "@/types/auths";
 import { UpdateUserPayload, User } from "@/types/user";
 

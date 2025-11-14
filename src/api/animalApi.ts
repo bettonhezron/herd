@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/fetcher";
+import { apiFetch } from "@/lib/apiFetch";
 import { Animal, AnimalsAnalytics, CreateAnimalPayload, UpdateAnimalPayload } from "@/types/animal";
 
 const ANIMAL_BASE_URL = "/animals";

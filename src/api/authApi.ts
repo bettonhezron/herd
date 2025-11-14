@@ -1,31 +1,17 @@
-import { apiFetch } from "@/lib/fetcher";
-import {
-  LoginPayload,
-  LoginResponse,
-  RegisterPayload,
-  RegisterResponse,
-  User,
-} from "@/types/auths";
+import { apiFetch } from "@/lib/apiFetch";
+import { LoginPayload, LoginResponse, RegisterPayload, User } from "@/types/auths";
 
-// login
-export async function login(data: LoginPayload): Promise<LoginResponse> {
-  return apiFetch<LoginResponse>("/auth/login", {
+export const login = (payload: LoginPayload): Promise<LoginResponse> =>
+  apiFetch("/auth/login", {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
   });
-}
 
-// register
-export async function register(
-  data: RegisterPayload
-): Promise<RegisterResponse> {
-  return apiFetch<RegisterResponse>("/auth/register", {
+export const register = (payload: RegisterPayload): Promise<LoginResponse> =>
+  apiFetch("/auth/register", {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
   });
-}
 
-// get logged-in user profile
-export async function getMe(): Promise<User> {
-  return apiFetch<User>("/auth/me");
-}
+export const getMe = (): Promise<User> =>
+  apiFetch("/auth/me");
