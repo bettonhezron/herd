@@ -2,6 +2,11 @@ import React, { useState, useEffect } from "react";
 import { ArrowLeft, Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 import { MdMarkEmailRead } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import {
+  useRequestPasswordReset,
+  useVerifyPasswordResetCode,
+  useResetPassword,
+} from "@/hooks/usePassword";
 
 type Step = "email" | "verify" | "reset" | "success";
 
@@ -16,22 +21,22 @@ const ForgotPassword: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [timer, setTimer] = useState(0);
-  const [generatedCode, setGeneratedCode] = useState("");
 
   const navigate = useNavigate();
 
-  // Countdown timer for resend code
+  const requestReset = useRequestPasswordReset();
+  const verifyResetCode = useVerifyPasswordResetCode();
+  const resetPasswordMutation = useResetPassword();
+
   useEffect(() => {
     if (timer > 0) {
-      const interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
+      const interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
       return () => clearInterval(interval);
     }
   }, [timer]);
 
-  // Simulate sending verification code
-  const handleSendCode = (e: React.MouseEvent) => {
+  // Step 1: Send OTP
+  const handleSendCode = async (e: React.MouseEvent) => {
     e.preventDefault();
     setError("");
 
@@ -41,20 +46,19 @@ const ForgotPassword: React.FC = () => {
     }
 
     setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      setGeneratedCode(code);
-      console.log("Verification code:", code); // In real app, this would be sent via email
+    try {
+      await requestReset.mutateAsync({ email });
       setIsLoading(false);
       setStep("verify");
-      setTimer(60); // Start 60 second countdown
-    }, 1500);
+      setTimer(60);
+    } catch (err: any) {
+      setIsLoading(false);
+      setError(err.response?.data?.error || "Failed to send verification code");
+    }
   };
 
-  // Simulate verifying code
-  const handleVerifyCode = (e: React.MouseEvent) => {
+  // Step 2: Verify OTP
+  const handleVerifyCode = async (e: React.MouseEvent) => {
     e.preventDefault();
     setError("");
 
@@ -64,39 +68,18 @@ const ForgotPassword: React.FC = () => {
     }
 
     setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      if (code === generatedCode) {
-        setIsLoading(false);
-        setStep("reset");
-      } else {
-        setIsLoading(false);
-        setError("Invalid verification code. Please try again.");
-      }
-    }, 1000);
-  };
-
-  // Resend verification code
-  const handleResendCode = () => {
-    if (timer > 0) return;
-
-    setError("");
-    setCode("");
-    setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      setGeneratedCode(code);
-      console.log("New verification code:", code);
+    try {
+      await verifyResetCode.mutateAsync({ email, code });
       setIsLoading(false);
-      setTimer(60);
-    }, 1000);
+      setStep("reset");
+    } catch (err: any) {
+      setIsLoading(false);
+      setError(err.response?.data?.error || "Incorrect verification code");
+    }
   };
 
-  // Simulate resetting password
-  const handleResetPassword = (e: React.MouseEvent) => {
+  // Step 3: Reset Password
+  const handleResetPassword = async (e: React.MouseEvent) => {
     e.preventDefault();
     setError("");
 
@@ -111,27 +94,39 @@ const ForgotPassword: React.FC = () => {
     }
 
     setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await resetPasswordMutation.mutateAsync({ email, newPassword });
       setIsLoading(false);
       setStep("success");
-    }, 1500);
+    } catch (err: any) {
+      setIsLoading(false);
+      setError(err.response?.data?.error || "Failed to reset password");
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (timer > 0) return;
+    setCode("");
+    setError("");
+    setIsLoading(true);
+    try {
+      await requestReset.mutateAsync({ email });
+      setIsLoading(false);
+      setTimer(60);
+    } catch (err: any) {
+      setIsLoading(false);
+      setError(err.response?.data?.error || "Failed to resend code");
+    }
   };
 
   const handleBack = () => {
-    if (step === "email") {
-      navigate("/signin"); // go back to sign-in page
-    } else {
-      // go to previous step in forgot password flow
-      navigate(-1); // or handle step logic if using local state
-    }
+    if (step === "email") navigate("/signin");
+    else setStep("email");
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-100 via-green-50 to-green-50 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        {/* Back Button */}
         <div className="mb-6 text-left">
           <button
             onClick={handleBack}
@@ -143,7 +138,7 @@ const ForgotPassword: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-2xl p-8 space-y-6">
-          {/* Header */}
+          {/* Icon and header */}
           <div className="text-center space-y-2">
             <div className="w-16 h-16 mx-auto bg-green-600 rounded-full flex items-center justify-center shadow-lg">
               {step === "success" ? (
@@ -170,68 +165,43 @@ const ForgotPassword: React.FC = () => {
             </p>
           </div>
 
-          {/* Step 1: Email Input */}
+          {/* Step content */}
           {step === "email" && (
             <div className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onKeyDown={(e) =>
-                    e.key === "Enter" && handleSendCode(e as any)
-                  }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-300"
-                  placeholder="you@example.com"
-                />
-              </div>
-
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-300"
+              />
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                   {error}
                 </div>
               )}
-
               <button
                 onClick={handleSendCode}
                 disabled={isLoading}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 disabled:opacity-50"
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md disabled:opacity-50"
               >
                 {isLoading ? "Sending..." : "Send Verification Code"}
               </button>
             </div>
           )}
 
-          {/* Step 2: Verify Code */}
           {step === "verify" && (
             <div className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Verification Code
-                </label>
-                <input
-                  type="text"
-                  value={code}
-                  onChange={(e) =>
-                    setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-                  }
-                  onKeyDown={(e) =>
-                    e.key === "Enter" &&
-                    code.length === 6 &&
-                    handleVerifyCode(e as any)
-                  }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-300 text-center text-2xl tracking-widest"
-                  placeholder="------"
-                  maxLength={6}
-                />
-                {/* <p className="text-xs text-gray-500 mt-2 text-center">
-                  Check console for the generated code
-                </p> */}
-              </div>
-
+              <input
+                type="text"
+                value={code}
+                onChange={(e) =>
+                  setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                }
+                maxLength={6}
+                placeholder="------"
+                className="w-full px-4 py-3 border rounded-lg text-center text-2xl tracking-widest focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-300"
+              />
               <div className="text-center text-sm text-gray-600">
                 Didn't receive the code?{" "}
                 <button
@@ -247,83 +217,63 @@ const ForgotPassword: React.FC = () => {
                   {timer > 0 ? `Resend in ${timer}s` : "Resend Code"}
                 </button>
               </div>
-
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                   {error}
                 </div>
               )}
-
               <button
                 onClick={handleVerifyCode}
                 disabled={isLoading || code.length !== 6}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? "Verifying..." : "Verify Code"}
+                Verify Code
               </button>
             </div>
           )}
 
-          {/* Step 3: Reset Password */}
           {step === "reset" && (
             <div className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  New Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showNewPassword ? "text" : "password"}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-300 pr-12"
-                    placeholder="Enter new password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  >
-                    {showNewPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
+              <div className="relative">
+                <input
+                  type={showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-300 pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showNewPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    onKeyDown={(e) =>
-                      e.key === "Enter" && handleResetPassword(e as any)
-                    }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-300 pr-12"
-                    placeholder="Confirm new password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg text-sm">
-                Password must be at least 8 characters long
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-300 pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
 
               {error && (
@@ -335,28 +285,22 @@ const ForgotPassword: React.FC = () => {
               <button
                 onClick={handleResetPassword}
                 disabled={isLoading}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 disabled:opacity-50"
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md disabled:opacity-50"
               >
                 {isLoading ? "Resetting..." : "Reset Password"}
               </button>
             </div>
           )}
 
-          {/* Step 4: Success */}
           {step === "success" && (
-            <div className="space-y-5">
-              <div className="text-center py-4">
-                <div className="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
-                  <CheckCircle className="w-12 h-12 text-green-600" />
-                </div>
-                <p className="text-gray-600 mb-6">
-                  You can now sign in with your new password
-                </p>
-              </div>
-
+            <div className="space-y-5 text-center">
+              <CheckCircle className="w-12 h-12 text-green-600 mx-auto" />
+              <p className="text-gray-600">
+                You can now sign in with your new password
+              </p>
               <button
                 onClick={() => navigate("/signin")}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200"
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md"
               >
                 Back to Sign In
               </button>
