@@ -2,10 +2,7 @@ import { useAuthStore } from "@/store/authStore";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export async function apiFetch<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
+export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = useAuthStore.getState().token;
 
   try {
@@ -21,23 +18,28 @@ export async function apiFetch<T>(
     // 204 No Content
     if (res.status === 204) return null as T;
 
-    let data: any = null;
     const contentType = res.headers.get("Content-Type");
+    let data: any = null;
     if (contentType?.includes("application/json")) {
       data = await res.json();
     }
 
-    // Handle 401 Unauthorized (expired or invalid token)
+    // Handle 401 Unauthorized
     if (res.status === 401) {
       const { logout } = useAuthStore.getState();
-      logout();
-      if (!endpoint.includes("/signin")) {
+
+      // Only log out and redirect if user is already logged in
+      if (token && !endpoint.includes("/auth/login") && !endpoint.includes("/auth/signin")) {
+        logout();
         window.location.href = "/signin";
+        return Promise.reject(new Error("Unauthorized, logging out..."));
       }
-      throw new Error(data?.message || data?.error || "Unauthorized");
+
+      // For login endpoints, just throw error (don't clear form)
+      throw new Error(data?.message || data?.error || "Invalid credentials");
     }
 
-    // Handle other errors
+    // Handle other HTTP errors
     if (!res.ok) {
       const message = data?.message || data?.error || res.statusText || `Error: ${res.status}`;
       throw new Error(message);
@@ -48,9 +50,7 @@ export async function apiFetch<T>(
     // Network errors
     if (error instanceof TypeError && error.message.includes("fetch")) {
       console.error("Network error:", error);
-      throw new Error(
-        "Unable to connect to the server.Try again later."
-      );
+      throw new Error("Unable to connect to the server. Try again later.");
     }
 
     // Re-throw other errors

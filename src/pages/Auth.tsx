@@ -36,7 +36,7 @@ const Auth: React.FC = () => {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return Object.keys(newErrors).length === 0; // True if no errors
   };
 
   const handleSubmit = (e: React.MouseEvent) => {
