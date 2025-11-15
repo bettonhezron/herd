@@ -7,13 +7,43 @@ import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 const Auth: React.FC = () => {
   const navigate = useNavigate();
   const loginMutation = useLogin();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
+  // Validation state
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+    {}
+  );
+
+  const validateForm = () => {
+    const newErrors: { email?: string; password?: string } = {};
+
+    // Email validation
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Enter a valid email address";
+    }
+
+    // Password validation
+    if (!password.trim()) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e: React.MouseEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
+
     loginMutation.mutate(
       { email, password },
       {
@@ -69,10 +99,18 @@ const Auth: React.FC = () => {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-300"
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setErrors({ ...errors, email: undefined });
+                }}
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-300 ${
+                  errors.email ? "border-red-400" : "border-gray-300"
+                }`}
                 placeholder="you@example.com"
               />
+              {errors.email && (
+                <p className="text-red-600 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
 
             {/* Password */}
@@ -84,15 +122,19 @@ const Auth: React.FC = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-300 pr-12"
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setErrors({ ...errors, password: undefined });
+                  }}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-300 pr-12 ${
+                    errors.password ? "border-red-400" : "border-gray-300"
+                  }`}
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -101,6 +143,9 @@ const Auth: React.FC = () => {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+              )}
             </div>
 
             {/* Remember & Forgot */}
@@ -123,7 +168,7 @@ const Auth: React.FC = () => {
               </button>
             </div>
 
-            {/* Error */}
+            {/* Backend Error */}
             {loginMutation.isError && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                 {loginMutation.error.message}
