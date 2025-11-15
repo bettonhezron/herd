@@ -33,4 +33,17 @@ export interface Animal {
 >;
   
 
-  
+export interface AnimalSummary {
+  id: number;
+  tagNumber: string;
+  name: string;
+  gender: string;
+  breed: string;
+  ageInMonths: number;
+  animalType: string;
+  animalCategory: string;
+  status: string;
+  lactationStatus: string;
+  daysInMilk: number;
+  weight: number;
+}

@@ -1,11 +1,23 @@
 import { apiFetch } from "@/lib/apiFetch";
 import { UserAnalytics } from "@/types/auths";
-import { UpdateUserPayload, User } from "@/types/user";
+import { PageResponse, UpdateUserPayload, User } from "@/types/user";
 
 const USER_BASE_URL = "/users";
 
-export const fetchUsers = (): Promise<User[]> =>
-  apiFetch(USER_BASE_URL);
+interface FetchUsersParams {
+  page: number;
+  size?: number; 
+}
+
+export const fetchUsers = ({ page, size = 10 }: FetchUsersParams): Promise<PageResponse<User>> => {
+  const queryString = new URLSearchParams({ 
+      page: page.toString(), 
+      size: size.toString() 
+  }).toString();
+  
+  return apiFetch(`${USER_BASE_URL}?${queryString}`);
+};
+
 
 export const fetchUserById = (id: number): Promise<User> =>
   apiFetch(`${USER_BASE_URL}/${id}`);

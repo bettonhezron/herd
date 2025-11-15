@@ -6,12 +6,14 @@ import {
   updateAnimal,
   deleteAnimal,
   fetchAnimalAnalytics,
+  fetchAnimalsSummary,
 } from "@/api/animalApi";
 import {
   Animal,
   CreateAnimalPayload,
   UpdateAnimalPayload,
   AnimalsAnalytics,
+  AnimalSummary,
 } from "@/types/animal";
 
 export const ANIMAL_BASE_URL = "/animals";
@@ -28,6 +30,15 @@ export const useAnimals = (): UseQueryResult<Animal[]> => {
   return useQuery({
     queryKey: animalKeys.lists(),
     queryFn: fetchAnimals,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+//  Get animals summary
+export const useAnimalSummary = (): UseQueryResult<AnimalSummary[]> => {
+  return useQuery({
+    queryKey: animalKeys.lists(),
+    queryFn: fetchAnimalsSummary,
     staleTime: 5 * 60 * 1000,
   });
 };

@@ -8,11 +8,10 @@ import {
   User,
   Edit3,
   Trash2,
-  Stethoscope,
-  Users,
-  Briefcase,
   ToggleLeft,
   ToggleRight,
+  ChevronLeft, // New icon for pagination
+  ChevronRight, // New icon for pagination
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +42,11 @@ import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 import { AddUserModal } from "@/components/modals/AddUserModal";
 import { ManagePermissionsModal } from "@/components/modals/ManagePemission";
 
+import { MdOutlineAdminPanelSettings } from "react-icons/md";
+import { RiAdminLine } from "react-icons/ri";
+import { GiStethoscope } from "react-icons/gi";
+import { Users } from "lucide-react";
+
 import {
   useUsers,
   useUpdateUser,
@@ -56,6 +60,8 @@ import { useRegister } from "@/hooks/useAuth";
 import { User as UserType } from "@/types/user";
 import { formatLastLogin } from "@/lib/timeUtils";
 
+const PAGE_SIZE = 8;
+
 interface StatCard {
   title: string;
   value: number;
@@ -65,7 +71,21 @@ interface StatCard {
 
 export default function UserManagement() {
   const queryClient = useQueryClient();
-  const { data: users = [], isPending } = useUsers();
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(PAGE_SIZE);
+
+  const {
+    data: pageData,
+    isPending: isUsersPending,
+    isFetching: isUsersFetching,
+    isError: isUsersError,
+  } = useUsers({ page: currentPage, size: pageSize });
+
+  const users = pageData?.content || [];
+  const totalPages = pageData?.totalPages || 1;
+  const totalElements = pageData?.totalElements || 0;
+
   const updateUserMutation = useUpdateUser();
   const deleteUserMutation = useDeleteUser();
   const registerMutation = useRegister();
@@ -75,6 +95,7 @@ export default function UserManagement() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState<string>("all");
+
   const [addUserOpen, setAddUserOpen] = useState(false);
   const [editUser, setEditUser] = useState<UserType | null>(null);
   const [permissionsUser, setPermissionsUser] = useState<UserType | null>(null);
@@ -83,7 +104,7 @@ export default function UserManagement() {
   const stats: StatCard[] = [
     {
       title: "Total Users",
-      value: data?.totalUsers ?? 0,
+      value: totalElements,
       icon: Users,
       change: "All staff members",
     },
@@ -96,18 +117,17 @@ export default function UserManagement() {
     {
       title: "Admin Users",
       value: data?.adminUsers ?? 0,
-      icon: Shield,
+      icon: MdOutlineAdminPanelSettings,
       change: "Users with admin access",
     },
     {
       title: "Worker Users",
       value: data?.workerUsers ?? 0,
-
       change: "General farm workers",
     },
   ];
 
-  const filteredUsers = useMemo(() => {
+  const displayUsers = useMemo(() => {
     return users.filter((user) => {
       const matchesSearch =
         user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -121,13 +141,13 @@ export default function UserManagement() {
   const getRoleIcon = (role: string) => {
     switch (role) {
       case "ADMIN":
-        return <Shield className="w-4 h-4" />;
+        return <RiAdminLine className="w-4 h-4" />;
       case "MANAGER":
         return <UserCheck className="w-4 h-4" />;
       case "WORKER":
         return <User className="w-4 h-4" />;
       case "VETERINARIAN":
-        return <Stethoscope className="w-4 h-4" />;
+        return <GiStethoscope className="w-4 h-4" />;
       default:
         return <User className="w-4 h-4" />;
     }
@@ -172,6 +192,7 @@ export default function UserManagement() {
   const handleActivateDeactivate = (user: UserType) => {
     const onSuccessHandler = () => {
       queryClient.invalidateQueries({ queryKey: userKeys.stats() });
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     };
 
     if (user.status === "ACTIVE") {
@@ -179,6 +200,15 @@ export default function UserManagement() {
     } else {
       activateUserMutation.mutate(user.id, { onSuccess: onSuccessHandler });
     }
+  };
+
+  // pagination Handlers
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
+  };
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 0));
   };
 
   return (
@@ -263,7 +293,14 @@ export default function UserManagement() {
             </select>
           </div>
 
-          <div className="rounded-md border">
+          <div className="rounded-md border relative">
+            {/* Show a spinner  fetching new pages */}
+            {isUsersFetching && !isUsersPending && (
+              <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center z-10">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            )}
+
             <Table>
               <TableHeader>
                 <TableRow>
@@ -276,108 +313,157 @@ export default function UserManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div className="flex items-center space-x-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage
-                            src={user.photoUrl || undefined}
-                            alt={user.firstName}
-                          />
-                          <AvatarFallback>
-                            {user.firstName[0]}
-                            {user.lastName[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">
-                            {user.firstName} {user.lastName}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {user.email}
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-
-                    <TableCell>{user.email}</TableCell>
-
-                    <TableCell>
-                      <Badge className={`gap-1 ${getRoleColor(user.role)}`}>
-                        {getRoleIcon(user.role)}
-                        {user.role}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge className={getStatusColor(user.status)}>
-                        {user.status}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatLastLogin(user.lastLogin)}
-                    </TableCell>
-
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <Edit3 className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => setEditUser(user)}>
-                            <Edit3 className="w-4 h-4 mr-2" />
-                            Edit User
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => setPermissionsUser(user)}
-                          >
-                            <Shield className="w-4 h-4 mr-2" />
-                            Manage Permissions
-                          </DropdownMenuItem>
-
-                          {/* Conditional Activate/Deactivate Item */}
-                          <DropdownMenuItem
-                            onClick={() => handleActivateDeactivate(user)}
-                          >
-                            {user.status === "ACTIVE" ? (
-                              <>
-                                <ToggleRight className="w-4 h-4 mr-2" />
-                                Deactivate User
-                              </>
-                            ) : (
-                              <>
-                                <ToggleLeft className="w-4 h-4 mr-2" />
-                                Activate User
-                              </>
-                            )}
-                          </DropdownMenuItem>
-
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => setDeleteUser(user)}
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Delete User
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                {isUsersPending ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      Loading users...
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : isUsersError ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="h-24 text-center text-red-500"
+                    >
+                      Failed to load users.
+                    </TableCell>
+                  </TableRow>
+                ) : displayUsers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      No users found matching your current page or criteria.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  displayUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell>
+                        <div className="flex items-center space-x-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage
+                              src={user.photoUrl || undefined}
+                              alt={user.firstName}
+                            />
+                            <AvatarFallback>
+                              {user.firstName[0]}
+                              {user.lastName[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium">
+                              {user.firstName} {user.lastName}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {user.email}
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+
+                      <TableCell>{user.email}</TableCell>
+
+                      <TableCell>
+                        <Badge className={`gap-1 ${getRoleColor(user.role)}`}>
+                          {getRoleIcon(user.role)}
+                          {user.role}
+                        </Badge>
+                      </TableCell>
+
+                      <TableCell>
+                        <Badge className={getStatusColor(user.status)}>
+                          {user.status}
+                        </Badge>
+                      </TableCell>
+
+                      <TableCell className="text-sm text-muted-foreground">
+                        {formatLastLogin(user.lastLogin)}
+                      </TableCell>
+
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <Edit3 className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => setEditUser(user)}>
+                              <Edit3 className="w-4 h-4 mr-2" />
+                              Edit User
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setPermissionsUser(user)}
+                            >
+                              <Shield className="w-4 h-4 mr-2" />
+                              Manage Permissions
+                            </DropdownMenuItem>
+
+                            {/* Conditional Activate/Deactivate Item */}
+                            <DropdownMenuItem
+                              onClick={() => handleActivateDeactivate(user)}
+                            >
+                              {user.status === "ACTIVE" ? (
+                                <>
+                                  <ToggleRight className="w-4 h-4 mr-2" />
+                                  Deactivate User
+                                </>
+                              ) : (
+                                <>
+                                  <ToggleLeft className="w-4 h-4 mr-2" />
+                                  Activate User
+                                </>
+                              )}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => setDeleteUser(user)}
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Delete User
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
 
-          {filteredUsers.length === 0 && (
-            <div className="text-center py-8">
-              <User className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">
-                No users found matching your search criteria.
-              </p>
+          {/*  Pagination Controls */}
+          {!isUsersPending && totalPages > 1 && (
+            <div className="flex items-center justify-between py-4">
+              <div className="text-sm text-muted-foreground">
+                Showing {displayUsers.length} of {totalElements + " "}
+                results.
+              </div>
+              <div className="space-x-2 flex items-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePreviousPage}
+                  disabled={currentPage === 0 || isUsersFetching}
+                >
+                  <ChevronLeft className="w-4 h-4 mr-1" />
+                  Previous
+                </Button>
+
+                <span className="text-sm font-medium">
+                  Page {currentPage + 1} of {totalPages}
+                </span>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleNextPage}
+                  disabled={currentPage >= totalPages - 1 || isUsersFetching}
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>

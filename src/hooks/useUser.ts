@@ -7,7 +7,7 @@ import {
   fetchUserStats,
   updateUser,
 } from "@/api/usersApi";
-import { UpdateUserPayload, User } from "@/types/user";
+import { PageResponse, UpdateUserPayload, User } from "@/types/user";
 import {
   useMutation,
   useQuery,
@@ -17,6 +17,11 @@ import {
 
 const USER_BASE_URL = "/users";
 
+interface UseUsersParams {
+  page: number;
+  size?: number;
+}
+
 export const userKeys = {
   all: [USER_BASE_URL] as const,
   lists: () => [...userKeys.all, "list"] as const,
@@ -25,10 +30,11 @@ export const userKeys = {
 };
 
 //  Fetch all users
-export const useUsers = (): UseQueryResult<User[]> => {
+export const useUsers = ({ page, size = 10 }: UseUsersParams): UseQueryResult<PageResponse<User>> => {
   return useQuery({
-    queryKey: userKeys.lists(),
-    queryFn: fetchUsers,
+    queryKey: [...userKeys.lists(), { page, size }], 
+    
+    queryFn: () => fetchUsers({ page, size }),
   });
 };
 
@@ -98,3 +104,5 @@ export const useUserStats = () => {
     staleTime: 5 * 60 * 1000, 
   });
 };
+
+

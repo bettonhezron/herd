@@ -19,3 +19,15 @@ export type UpdateUserPayload = Omit<
   User,
   'id' | 'createdAt' | 'updatedAt' | 'lastLogin' | 'status' | 'role'
 > & { role?: UserRole };
+
+
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalPages: number;
+  totalElements: number;
+  first: boolean;
+  last: boolean;
+  numberOfElements: number;
+}

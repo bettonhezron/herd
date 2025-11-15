@@ -1,11 +1,16 @@
 import { apiFetch } from "@/lib/apiFetch";
-import { Animal, AnimalsAnalytics, CreateAnimalPayload, UpdateAnimalPayload } from "@/types/animal";
+import { Animal, AnimalsAnalytics, AnimalSummary, CreateAnimalPayload, UpdateAnimalPayload } from "@/types/animal";
 
 const ANIMAL_BASE_URL = "/animals";
 
 // Fetch all animals
 export const fetchAnimals = (): Promise<Animal[]> =>
   apiFetch(ANIMAL_BASE_URL);
+
+// Fetch all animals
+export const fetchAnimalsSummary = (): Promise<AnimalSummary[]> =>
+  apiFetch(`${ANIMAL_BASE_URL}/summary`);
+
 
 // Fetch a single animal by ID
 export const fetchAnimalById = (id: number): Promise<Animal> =>
