@@ -35,7 +35,7 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
         return Promise.reject(new Error("Unauthorized, logging out..."));
       }
 
-      // For login endpoints, just throw error (don't clear form)
+      // For login endpoints, just throw error 
       throw new Error(data?.message || data?.error || "Invalid credentials");
     }
 
