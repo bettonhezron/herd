@@ -97,7 +97,7 @@ export function TopBar() {
       title: "Successfully logged out!",
       variant: "default",
     });
-    navigate("/login");
+    navigate("/signin");
   };
 
   return (

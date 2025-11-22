@@ -15,242 +15,263 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
-import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { useState, useEffect, useMemo } from "react";
+import { useRecordMilking, useUpdateMilkingRecord } from "@/hooks/useMilking";
+import { useAnimalSummary } from "@/hooks/useAnimal";
+import {
+  MilkingRecordRequest,
+  MilkingRecordResponse,
+  MilkingShift,
+  SHIFT_OPTIONS,
+} from "@/types/milking";
+import { Loader2, Search } from "lucide-react";
 
 interface AddMilkingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  editData?: {
-    id: string;
-    animalId: string;
-    animalName: string;
-    date: string;
-    time: string;
-    quantity: number;
-    fat: number;
-    protein: number;
-    scc: number;
-    temperature: number;
-    quality: string;
-    session: string;
-  };
+  editData?: MilkingRecordResponse;
 }
+
+const initialFormState = {
+  animalId: "",
+  milkingDate: new Date().toISOString().split("T")[0],
+  shift: MilkingShift.MORNING,
+  quantity: "",
+  remarks: "",
+};
 
 export function AddMilkingModal({
   open,
   onOpenChange,
   editData,
 }: AddMilkingModalProps) {
-  const [formData, setFormData] = useState({
-    animalId: editData?.animalId || "",
-    date: editData?.date || new Date().toISOString().split("T")[0],
-    time: editData?.time || "",
-    quantity: editData?.quantity?.toString() || "",
-    fat: editData?.fat?.toString() || "",
-    protein: editData?.protein?.toString() || "",
-    scc: editData?.scc?.toString() || "",
-    temperature: editData?.temperature?.toString() || "",
-    quality: editData?.quality || "good",
-    session: editData?.session || "morning",
-  });
+  const [formData, setFormData] = useState(initialFormState);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success(
-      editData
-        ? "Milking record updated successfully"
-        : "Milking record added successfully"
+  const { data: animals, isLoading: animalsLoading } = useAnimalSummary();
+  const recordMilking = useRecordMilking();
+  const updateMilking = useUpdateMilkingRecord();
+
+  const isLoading = recordMilking.isPending || updateMilking.isPending;
+
+  // Filter for lactating cows only
+  const lactatingCows = useMemo(() => {
+    if (!animals) return [];
+    return animals.filter(
+      (animal) =>
+        animal.gender === "FEMALE" &&
+        animal.lactationStatus === "LACTATING" &&
+        animal.status === "ACTIVE"
     );
-    onOpenChange(false);
+  }, [animals]);
+
+  // Filter by search query
+  const filteredAnimals = useMemo(() => {
+    if (!searchQuery.trim()) return lactatingCows;
+    const query = searchQuery.toLowerCase();
+    return lactatingCows.filter(
+      (animal) =>
+        animal.tagNumber.toLowerCase().includes(query) ||
+        animal.name?.toLowerCase().includes(query)
+    );
+  }, [lactatingCows, searchQuery]);
+
+  // Reset form when modal opens/closes or editData changes
+  useEffect(() => {
+    if (open && editData) {
+      setFormData({
+        animalId: editData.animalId.toString(),
+        milkingDate: editData.milkingDate,
+        shift: editData.shift,
+        quantity: editData.quantity.toString(),
+        remarks: editData.remarks || "",
+      });
+      setSearchQuery("");
+    } else if (open) {
+      setFormData(initialFormState);
+      setSearchQuery("");
+    }
+  }, [open, editData]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const payload: MilkingRecordRequest = {
+      animalId: parseInt(formData.animalId),
+      milkingDate: formData.milkingDate,
+      shift: formData.shift,
+      quantity: parseFloat(formData.quantity),
+      remarks: formData.remarks || undefined,
+    };
+
+    try {
+      if (editData) {
+        await updateMilking.mutateAsync({ id: editData.id, payload });
+      } else {
+        await recordMilking.mutateAsync(payload);
+      }
+      onOpenChange(false);
+    } catch {
+      // Error handled by mutation's onError
+    }
   };
 
+  // Get selected animal details for display
+  const selectedAnimal = useMemo(() => {
+    if (!formData.animalId || !animals) return null;
+    return animals.find((a) => a.id.toString() === formData.animalId);
+  }, [formData.animalId, animals]);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      {/* Wider but scrollable dialog for long forms */}
-      <DialogContent className="w-[90%] max-w-2xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={isLoading ? undefined : onOpenChange}>
+      <DialogContent className="w-[90%] max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {editData ? "Edit Milking Record" : "Add Milking Record"}
           </DialogTitle>
           <DialogDescription>
             {editData
-              ? "Update the milking record details"
-              : "Record new milking session details and quality metrics"}
+              ? `Update record for ${editData.animalName || editData.animalTag}`
+              : "Record new milking session"}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Animal + Session */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="animalId">Animal ID *</Label>
-              <Select
-                value={formData.animalId}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, animalId: value })
-                }
-              >
-                <SelectTrigger id="animalId">
-                  <SelectValue placeholder="Select animal" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="A001">A001 - Bessie</SelectItem>
-                  <SelectItem value="A002">A002 - Daisy</SelectItem>
-                  <SelectItem value="A003">A003 - Luna</SelectItem>
-                  <SelectItem value="A004">A004 - Stella</SelectItem>
-                  <SelectItem value="A005">A005 - Rose</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="session">Session *</Label>
-              <Select
-                value={formData.session}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, session: value })
-                }
-              >
-                <SelectTrigger id="session">
-                  <SelectValue placeholder="Select session" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="morning">Morning</SelectItem>
-                  <SelectItem value="evening">Evening</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Date + Time */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="date">Date *</Label>
-              <Input
-                id="date"
-                type="date"
-                value={formData.date}
-                onChange={(e) =>
-                  setFormData({ ...formData, date: e.target.value })
-                }
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="time">Time *</Label>
-              <Input
-                id="time"
-                type="time"
-                value={formData.time}
-                onChange={(e) =>
-                  setFormData({ ...formData, time: e.target.value })
-                }
-                required
-              />
-            </div>
-          </div>
-
-          {/* Quantity + Temperature */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="quantity">Quantity (Liters) *</Label>
-              <Input
-                id="quantity"
-                type="number"
-                step="0.1"
-                placeholder="28.5"
-                value={formData.quantity}
-                onChange={(e) =>
-                  setFormData({ ...formData, quantity: e.target.value })
-                }
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="temperature">Temperature (°C) *</Label>
-              <Input
-                id="temperature"
-                type="number"
-                step="0.1"
-                placeholder="37.2"
-                value={formData.temperature}
-                onChange={(e) =>
-                  setFormData({ ...formData, temperature: e.target.value })
-                }
-                required
-              />
-            </div>
-          </div>
-
-          {/* Fat + Protein + SCC */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="fat">Fat % *</Label>
-              <Input
-                id="fat"
-                type="number"
-                step="0.1"
-                placeholder="3.8"
-                value={formData.fat}
-                onChange={(e) =>
-                  setFormData({ ...formData, fat: e.target.value })
-                }
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="protein">Protein % *</Label>
-              <Input
-                id="protein"
-                type="number"
-                step="0.1"
-                placeholder="3.2"
-                value={formData.protein}
-                onChange={(e) =>
-                  setFormData({ ...formData, protein: e.target.value })
-                }
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="scc">SCC *</Label>
-              <Input
-                id="scc"
-                type="number"
-                placeholder="150000"
-                value={formData.scc}
-                onChange={(e) =>
-                  setFormData({ ...formData, scc: e.target.value })
-                }
-                required
-              />
-            </div>
-          </div>
-
-          {/* Quality */}
+          {/* Animal Selection */}
           <div className="space-y-2">
-            <Label htmlFor="quality">Quality Assessment *</Label>
+            <Label htmlFor="animalId">Animal *</Label>
             <Select
-              value={formData.quality}
-              onValueChange={(value) =>
-                setFormData({ ...formData, quality: value })
-              }
+              value={formData.animalId}
+              onValueChange={(value) => {
+                setFormData({ ...formData, animalId: value });
+                setSearchQuery("");
+              }}
+              disabled={isLoading || !!editData}
             >
-              <SelectTrigger id="quality">
-                <SelectValue placeholder="Select quality" />
+              <SelectTrigger id="animalId">
+                <SelectValue placeholder="Select animal">
+                  {selectedAnimal
+                    ? `${selectedAnimal.tagNumber} - ${
+                        selectedAnimal.name || "Unnamed"
+                      }`
+                    : "Select animal"}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="excellent">Excellent</SelectItem>
-                <SelectItem value="good">Good</SelectItem>
-                <SelectItem value="fair">Fair</SelectItem>
-                <SelectItem value="poor">Poor</SelectItem>
+                <div className="px-2 pb-2">
+                  <div className="flex items-center border rounded-md px-2">
+                    <Search className="h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search by tag or name..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    />
+                  </div>
+                </div>
+                {animalsLoading ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  </div>
+                ) : filteredAnimals.length === 0 ? (
+                  <div className="py-4 text-center text-sm text-muted-foreground">
+                    {searchQuery
+                      ? "No animals found"
+                      : "No lactating cows available"}
+                  </div>
+                ) : (
+                  filteredAnimals.map((animal) => (
+                    <SelectItem key={animal.id} value={animal.id.toString()}>
+                      <div className="flex items-center justify-between w-full">
+                        <span className="font-medium">{animal.tagNumber}</span>
+                        <span className="text-muted-foreground ml-2">
+                          {animal.name || "Unnamed"}
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
+            {selectedAnimal && (
+              <p className="text-xs text-muted-foreground">
+                {selectedAnimal.breed} • {selectedAnimal.daysInMilk} days in
+                milk
+              </p>
+            )}
+          </div>
+
+          {/* Date + Shift */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="milkingDate">Date *</Label>
+              <Input
+                id="milkingDate"
+                type="date"
+                value={formData.milkingDate}
+                onChange={(e) =>
+                  setFormData({ ...formData, milkingDate: e.target.value })
+                }
+                required
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="shift">Shift *</Label>
+              <Select
+                value={formData.shift}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, shift: value as MilkingShift })
+                }
+                disabled={isLoading}
+              >
+                <SelectTrigger id="shift">
+                  <SelectValue placeholder="Select shift" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SHIFT_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.icon} {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Quantity */}
+          <div className="space-y-2">
+            <Label htmlFor="quantity">Quantity (Liters) *</Label>
+            <Input
+              id="quantity"
+              type="number"
+              step="0.1"
+              min="0"
+              placeholder="e.g. 25.5"
+              value={formData.quantity}
+              onChange={(e) =>
+                setFormData({ ...formData, quantity: e.target.value })
+              }
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          {/* Remarks */}
+          <div className="space-y-2">
+            <Label htmlFor="remarks">Remarks</Label>
+            <Textarea
+              id="remarks"
+              placeholder="Optional notes about this milking session..."
+              value={formData.remarks}
+              onChange={(e) =>
+                setFormData({ ...formData, remarks: e.target.value })
+              }
+              disabled={isLoading}
+              rows={3}
+            />
           </div>
 
           {/* Footer */}
@@ -259,12 +280,24 @@ export function AddMilkingModal({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="min-w-[100px]"
+              disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button type="submit" className="min-w-[140px]">
-              {editData ? "Update Record" : "Save Record"}
+            <Button
+              type="submit"
+              disabled={isLoading || !formData.animalId || !formData.quantity}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {editData ? "Updating..." : "Saving..."}
+                </>
+              ) : editData ? (
+                "Update Record"
+              ) : (
+                "Save Record"
+              )}
             </Button>
           </div>
         </form>
