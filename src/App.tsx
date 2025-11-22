@@ -9,7 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Animals from "./pages/Animals";
 import NotFound from "./pages/NotFound";
 import UserManagement from "./pages/Users";
-import Milking from "./pages/Milking";
+
 import SettingsPage from "./pages/Settings";
 import Reports from "./pages/Reports";
 import Analytics from "./pages/Analytics";
@@ -26,6 +26,8 @@ import Home from "./pages/Home";
 import ForgotPassword from "./pages/ForgotPassword";
 import LandingPage from "./pages/Landing";
 import Auth from "./pages/Auth";
+import MilkingPage from "./pages/MilkingPage";
+import Milking from "./pages/milk";
 
 const queryClient = new QueryClient();
 

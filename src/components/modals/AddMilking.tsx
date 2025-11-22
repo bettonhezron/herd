@@ -16,70 +16,45 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useRecordMilking, useUpdateMilkingRecord } from "@/hooks/useMilking";
-import { useAnimalSummary } from "@/hooks/useAnimal";
-import {
-  MilkingRecordRequest,
-  MilkingRecordResponse,
-  MilkingShift,
-  SHIFT_OPTIONS,
-} from "@/types/milking";
-import { Loader2, Search } from "lucide-react";
+import { useAnimals } from "@/hooks/useAnimal";
+import { MilkingShift, SHIFT_OPTIONS } from "@/types/milking";
 
 interface AddMilkingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  editData?: MilkingRecordResponse;
+  editData?: {
+    id: number;
+    animalId: number;
+    animalTag: string;
+    milkingDate: string;
+    shift: MilkingShift;
+    quantity: number;
+    remarks?: string;
+  };
 }
-
-const initialFormState = {
-  animalId: "",
-  milkingDate: new Date().toISOString().split("T")[0],
-  shift: MilkingShift.MORNING,
-  quantity: "",
-  remarks: "",
-};
 
 export function AddMilkingModal({
   open,
   onOpenChange,
   editData,
 }: AddMilkingModalProps) {
-  const [formData, setFormData] = useState(initialFormState);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const { data: animals, isLoading: animalsLoading } = useAnimalSummary();
+  const { data: animals, isLoading: animalsLoading } = useAnimals();
   const recordMilking = useRecordMilking();
   const updateMilking = useUpdateMilkingRecord();
 
-  const isLoading = recordMilking.isPending || updateMilking.isPending;
+  const [formData, setFormData] = useState({
+    animalId: editData?.animalId?.toString() || "",
+    milkingDate:
+      editData?.milkingDate || new Date().toISOString().split("T")[0],
+    shift: editData?.shift || MilkingShift.MORNING,
+    quantity: editData?.quantity?.toString() || "",
+    remarks: editData?.remarks || "",
+  });
 
-  // Filter for lactating cows only
-  const lactatingCows = useMemo(() => {
-    if (!animals) return [];
-    return animals.filter(
-      (animal) =>
-        animal.gender === "FEMALE" &&
-        animal.lactationStatus === "LACTATING" &&
-        animal.status === "ACTIVE"
-    );
-  }, [animals]);
-
-  // Filter by search query
-  const filteredAnimals = useMemo(() => {
-    if (!searchQuery.trim()) return lactatingCows;
-    const query = searchQuery.toLowerCase();
-    return lactatingCows.filter(
-      (animal) =>
-        animal.tagNumber.toLowerCase().includes(query) ||
-        animal.name?.toLowerCase().includes(query)
-    );
-  }, [lactatingCows, searchQuery]);
-
-  // Reset form when modal opens/closes or editData changes
   useEffect(() => {
-    if (open && editData) {
+    if (editData) {
       setFormData({
         animalId: editData.animalId.toString(),
         milkingDate: editData.milkingDate,
@@ -87,17 +62,13 @@ export function AddMilkingModal({
         quantity: editData.quantity.toString(),
         remarks: editData.remarks || "",
       });
-      setSearchQuery("");
-    } else if (open) {
-      setFormData(initialFormState);
-      setSearchQuery("");
     }
-  }, [open, editData]);
+  }, [editData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const payload: MilkingRecordRequest = {
+    const payload = {
       animalId: parseInt(formData.animalId),
       milkingDate: formData.milkingDate,
       shift: formData.shift,
@@ -107,33 +78,43 @@ export function AddMilkingModal({
 
     try {
       if (editData) {
-        await updateMilking.mutateAsync({ id: editData.id, payload });
+        await updateMilking.mutateAsync({
+          id: editData.id,
+          payload,
+        });
       } else {
         await recordMilking.mutateAsync(payload);
       }
       onOpenChange(false);
-    } catch {
-      // Error handled by mutation's onError
+      // Reset form
+      setFormData({
+        animalId: "",
+        milkingDate: new Date().toISOString().split("T")[0],
+        shift: MilkingShift.MORNING,
+        quantity: "",
+        remarks: "",
+      });
+    } catch (error) {
+      // Error handled by mutation
     }
   };
 
-  // Get selected animal details for display
-  const selectedAnimal = useMemo(() => {
-    if (!formData.animalId || !animals) return null;
-    return animals.find((a) => a.id.toString() === formData.animalId);
-  }, [formData.animalId, animals]);
+  // Filter only lactating cows
+  const lactatingCows = animals?.filter(
+    (animal) => animal.lactationStatus === "LACTATING"
+  );
 
   return (
-    <Dialog open={open} onOpenChange={isLoading ? undefined : onOpenChange}>
-      <DialogContent className="w-[90%] max-w-md max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="w-[90%] max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {editData ? "Edit Milking Record" : "Add Milking Record"}
+            {editData ? "Edit Milking Record" : "Record Milking Session"}
           </DialogTitle>
           <DialogDescription>
             {editData
-              ? `Update record for ${editData.animalName || editData.animalTag}`
-              : "Record new milking session"}
+              ? "Update the milking record details"
+              : "Record milk production for a lactating cow"}
           </DialogDescription>
         </DialogHeader>
 
@@ -143,63 +124,28 @@ export function AddMilkingModal({
             <Label htmlFor="animalId">Animal *</Label>
             <Select
               value={formData.animalId}
-              onValueChange={(value) => {
-                setFormData({ ...formData, animalId: value });
-                setSearchQuery("");
-              }}
-              disabled={isLoading || !!editData}
+              onValueChange={(value) =>
+                setFormData({ ...formData, animalId: value })
+              }
+              disabled={!!editData || animalsLoading}
             >
               <SelectTrigger id="animalId">
-                <SelectValue placeholder="Select animal">
-                  {selectedAnimal
-                    ? `${selectedAnimal.tagNumber} - ${
-                        selectedAnimal.name || "Unnamed"
-                      }`
-                    : "Select animal"}
-                </SelectValue>
+                <SelectValue placeholder="Select lactating cow" />
               </SelectTrigger>
               <SelectContent>
-                <div className="px-2 pb-2">
-                  <div className="flex items-center border rounded-md px-2">
-                    <Search className="h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search by tag or name..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                    />
-                  </div>
-                </div>
-                {animalsLoading ? (
-                  <div className="flex items-center justify-center py-4">
-                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                  </div>
-                ) : filteredAnimals.length === 0 ? (
-                  <div className="py-4 text-center text-sm text-muted-foreground">
-                    {searchQuery
-                      ? "No animals found"
-                      : "No lactating cows available"}
-                  </div>
-                ) : (
-                  filteredAnimals.map((animal) => (
-                    <SelectItem key={animal.id} value={animal.id.toString()}>
-                      <div className="flex items-center justify-between w-full">
-                        <span className="font-medium">{animal.tagNumber}</span>
-                        <span className="text-muted-foreground ml-2">
-                          {animal.name || "Unnamed"}
-                        </span>
-                      </div>
-                    </SelectItem>
-                  ))
+                {lactatingCows?.map((animal) => (
+                  <SelectItem key={animal.id} value={animal.id.toString()}>
+                    {animal.tagNumber}
+                    {/* {animal.daysInMilk && ` (${animal.daysInMilk} DIM)`} */}
+                  </SelectItem>
+                ))}
+                {lactatingCows?.length === 0 && (
+                  <SelectItem value="none" disabled>
+                    No lactating cows available
+                  </SelectItem>
                 )}
               </SelectContent>
             </Select>
-            {selectedAnimal && (
-              <p className="text-xs text-muted-foreground">
-                {selectedAnimal.breed} • {selectedAnimal.daysInMilk} days in
-                milk
-              </p>
-            )}
           </div>
 
           {/* Date + Shift */}
@@ -213,8 +159,9 @@ export function AddMilkingModal({
                 onChange={(e) =>
                   setFormData({ ...formData, milkingDate: e.target.value })
                 }
+                max={new Date().toISOString().split("T")[0]}
                 required
-                disabled={isLoading}
+                disabled={!!editData}
               />
             </div>
 
@@ -225,7 +172,7 @@ export function AddMilkingModal({
                 onValueChange={(value) =>
                   setFormData({ ...formData, shift: value as MilkingShift })
                 }
-                disabled={isLoading}
+                disabled={!!editData}
               >
                 <SelectTrigger id="shift">
                   <SelectValue placeholder="Select shift" />
@@ -249,27 +196,28 @@ export function AddMilkingModal({
               type="number"
               step="0.1"
               min="0"
-              placeholder="e.g. 25.5"
+              placeholder="12.5"
               value={formData.quantity}
               onChange={(e) =>
                 setFormData({ ...formData, quantity: e.target.value })
               }
               required
-              disabled={isLoading}
             />
+            <p className="text-xs text-muted-foreground">
+              Enter milk quantity in liters
+            </p>
           </div>
 
           {/* Remarks */}
           <div className="space-y-2">
-            <Label htmlFor="remarks">Remarks</Label>
+            <Label htmlFor="remarks">Remarks (Optional)</Label>
             <Textarea
               id="remarks"
-              placeholder="Optional notes about this milking session..."
+              placeholder="Any observations or notes..."
               value={formData.remarks}
               onChange={(e) =>
                 setFormData({ ...formData, remarks: e.target.value })
               }
-              disabled={isLoading}
               rows={3}
             />
           </div>
@@ -280,24 +228,19 @@ export function AddMilkingModal({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading}
+              disabled={recordMilking.isPending || updateMilking.isPending}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={isLoading || !formData.animalId || !formData.quantity}
+              disabled={recordMilking.isPending || updateMilking.isPending}
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {editData ? "Updating..." : "Saving..."}
-                </>
-              ) : editData ? (
-                "Update Record"
-              ) : (
-                "Save Record"
-              )}
+              {recordMilking.isPending || updateMilking.isPending
+                ? "Saving..."
+                : editData
+                ? "Update Record"
+                : "Save Record"}
             </Button>
           </div>
         </form>
