@@ -211,15 +211,17 @@ export default function Health() {
       value: "8",
       change: "Next 30 days",
     },
-    {
-      title: "Overdue Vaccinations",
-      value: "3",
-      change: "Requires attention",
-    },
+
     {
       title: "Active Treatments",
       value: "5",
       change: "In progress",
+    },
+
+    {
+      title: "Overdue Vaccinations",
+      value: "3",
+      change: "Requires attention",
     },
   ];
 
