@@ -9,6 +9,7 @@ import {
   Pencil,
   Trash2,
   Edit3,
+  XCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,212 +32,47 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
-import { AddBreedingModal } from "@/components/modals/AddBreedingModal";
-import { AddPregnancyModal } from "@/components/modals/AddPregnancyModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AddCalvingModal } from "@/components/modals/AddCalvingModal";
+import { HeatDetectionModal } from "@/components/modals/HeatDetectionModal";
+import { BreedingModal } from "@/components/modals/AddBreedingModal";
+import { ConfirmPregnancyModal } from "@/components/modals/ConfirmPregnancyModal";
+import { MarkPregnancyFailedModal } from "@/components/modals/MarkPregnancyFailedModal";
+import { CalvingModal } from "@/components/modals/CalvingModal";
+import { SkipHeatModal } from "@/components/modals/SkipHeatModal";
 
-interface BreedingRecord {
-  id: string;
-  animalTag: string;
-  animalName: string;
-  breedingDate: string;
-  method: "AI" | "NATURAL";
-  bullId?: string;
-  status: "PENDING" | "CONFIRMED" | "FAILED";
-  expectedCalvingDate?: string;
-  actualCalvingDate?: string;
-  notes?: string;
-}
-
-interface PregnancyRecord {
-  id: string;
-  animalTag: string;
-  animalName: string;
-  breedingDate: string;
-  confirmationDate: string;
-  expectedCalvingDate: string;
-  daysPregnant: number;
-  trimester: 1 | 2 | 3;
-  lastCheckup: string;
-  status: "healthy" | "attention" | "critical";
-}
-
-const mockBreedingRecords: BreedingRecord[] = [
-  {
-    id: "B001",
-    animalTag: "A-2401",
-    animalName: "Bessie",
-    breedingDate: "2024-01-15",
-    method: "NATURAL",
-    bullId: "BULL-789",
-    status: "CONFIRMED",
-    expectedCalvingDate: "2024-10-22",
-    notes: "First insemination successful",
-  },
-  {
-    id: "B002",
-    animalTag: "A-2405",
-    animalName: "Daisy",
-    breedingDate: "2024-02-10",
-    method: "NATURAL",
-    bullId: "BULL-456",
-    status: "CONFIRMED",
-    expectedCalvingDate: "2024-11-18",
-  },
-  {
-    id: "B003",
-    animalTag: "A-2410",
-    animalName: "Luna",
-    breedingDate: "2024-03-05",
-    method: "AI",
-    status: "PENDING",
-    notes: "Awaiting pregnancy confirmation",
-  },
-  {
-    id: "B004",
-    animalTag: "A-2415",
-    animalName: "Rosie",
-    breedingDate: "2024-02-20",
-    method: "NATURAL",
-    bullId: "BULL-789",
-    status: "FAILED",
-    notes: "Did not conceive, scheduled for re-breeding",
-  },
-];
-
-const mockPregnancyRecords: PregnancyRecord[] = [
-  {
-    id: "P001",
-    animalTag: "A-2401",
-    animalName: "Bessie",
-    breedingDate: "2024-01-15",
-    confirmationDate: "2024-02-15",
-    expectedCalvingDate: "2024-10-22",
-    daysPregnant: 65,
-    trimester: 1,
-    lastCheckup: "2024-03-10",
-    status: "healthy",
-  },
-  {
-    id: "P002",
-    animalTag: "A-2405",
-    animalName: "Daisy",
-    breedingDate: "2024-02-10",
-    confirmationDate: "2024-03-12",
-    expectedCalvingDate: "2024-11-18",
-    daysPregnant: 39,
-    trimester: 1,
-    lastCheckup: "2024-03-12",
-    status: "healthy",
-  },
-  {
-    id: "P003",
-    animalTag: "A-2398",
-    animalName: "Clover",
-    breedingDate: "2023-12-05",
-    confirmationDate: "2024-01-05",
-    expectedCalvingDate: "2024-09-12",
-    daysPregnant: 106,
-    trimester: 2,
-    lastCheckup: "2024-03-15",
-    status: "attention",
-  },
-];
-
-const calvingEvents = [
-  {
-    id: "C001",
-    animalTag: "A-2390",
-    expectedDate: "2024-11-13", // Today - Due now!
-    daysUntil: 0,
-    status: "imminent",
-  },
-  {
-    id: "C002",
-    animalTag: "A-2385",
-    expectedDate: "2024-11-12", // Yesterday - Overdue
-    daysUntil: -1,
-    status: "imminent",
-  },
-  {
-    id: "C003",
-    animalTag: "A-2401",
-    expectedDate: "2024-11-16",
-    daysUntil: 3,
-    status: "imminent",
-  },
-  {
-    id: "C004",
-    animalTag: "A-2392",
-    expectedDate: "2024-11-18",
-    daysUntil: 5,
-    status: "imminent",
-  },
-  {
-    id: "C005",
-    animalTag: "A-2398",
-    expectedDate: "2024-11-21",
-    daysUntil: 8,
-    status: "upcoming",
-  },
-  {
-    id: "C006",
-    animalTag: "A-2395",
-    expectedDate: "2024-11-27",
-    daysUntil: 14,
-    status: "upcoming",
-  },
-  {
-    id: "C007",
-    animalTag: "A-2403",
-    expectedDate: "2024-12-05",
-    daysUntil: 22,
-    status: "upcoming",
-  },
-  {
-    id: "C008",
-    animalTag: "A-2407",
-    expectedDate: "2024-12-15",
-    daysUntil: 32,
-    status: "upcoming",
-  },
-];
-
-const heatDetectionAnimals = [
-  {
-    id: "H001",
-    tag: "A-2420",
-    name: "Bella",
-    heatDetected: "2024-03-18",
-    daysInHeat: 1,
-    lastBred: "2023-06-15",
-    daysSinceBirth: 276,
-  },
-  {
-    id: "H002",
-    tag: "A-2418",
-    name: "Molly",
-    heatDetected: "2024-03-19",
-    daysInHeat: 0,
-    lastBred: "2023-07-20",
-    daysSinceBirth: 240,
-  },
-  {
-    id: "H003",
-    tag: "A-2425",
-    name: "Ginger",
-    heatDetected: "2024-03-17",
-    daysInHeat: 2,
-    lastBred: "2023-05-10",
-    daysSinceBirth: 312,
-  },
-];
+// Import hooks
+import {
+  useAnimalsInHeat,
+  useBreedingStats,
+  useAllHeatDetections,
+  useActivePregnancies,
+  useUpcomingCalvings,
+  useOverdueCalvings,
+  usePendingPregnancyChecks,
+  useCreateHeatDetection,
+  useUpdateHeatDetection,
+  useDeleteHeatDetection,
+  useCreateBreedingFromHeat,
+  useSkipHeatDetection,
+  useConfirmPregnancy,
+  useMarkPregnancyFailed,
+  useRecordCalving,
+  useUpdateBreedingRecord,
+  useDeleteBreedingRecord,
+} from "@/hooks/useBreeding";
+import {
+  HeatDetectionResponse,
+  BreedingRecordResponse,
+  BreedingStatus,
+  ActionTaken,
+  HeatDetectionRequest,
+  BreedingRecordRequest,
+} from "@/types/breeding";
 
 function getStatusColor(status: string) {
   switch (status) {
@@ -251,6 +87,7 @@ function getStatusColor(status: string) {
       return "bg-red-500/10 text-red-600 dark:text-red-400";
     case "attention":
     case "imminent":
+    case "COMPLETED":
       return "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400";
     default:
       return "bg-gray-500/10 text-gray-600 dark:text-gray-400";
@@ -270,51 +107,239 @@ function getStatusIcon(status: string) {
     case "attention":
     case "imminent":
       return <AlertCircle className="w-3 h-3" />;
+    case "COMPLETED":
+      return <Baby className="w-3 h-3" />;
     default:
       return null;
   }
 }
 
-export default function Breeding() {
+function getActionColor(action: ActionTaken) {
+  switch (action) {
+    case ActionTaken.BRED:
+      return "bg-green-500/10 text-green-600 dark:text-green-400";
+    case ActionTaken.SKIP:
+      return "bg-orange-500/10 text-orange-600 dark:text-orange-400";
+    case ActionTaken.PENDING:
+    default:
+      return "bg-gray-500/10 text-gray-600 dark:text-gray-400";
+  }
+}
+
+export default function BreedingPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [addBreedingOpen, setAddBreedingOpen] = useState(false);
-  const [editBreeding, setEditBreeding] = useState<BreedingRecord | null>(null);
-  const [addPregnancyOpen, setAddPregnancyOpen] = useState(false);
-  const [addCalvingOpen, setCalvingOpen] = useState(false);
 
-  const filteredRecords = mockBreedingRecords.filter((record) => {
+  // Modal states
+  const [heatModalOpen, setHeatModalOpen] = useState(false);
+  const [breedingModalOpen, setBreedingModalOpen] = useState(false);
+  const [confirmPregnancyModalOpen, setConfirmPregnancyModalOpen] =
+    useState(false);
+  const [failedPregnancyModalOpen, setFailedPregnancyModalOpen] =
+    useState(false);
+  const [calvingModalOpen, setCalvingModalOpen] = useState(false);
+  const [skipHeatModalOpen, setSkipHeatModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  // Selected records
+  const [selectedHeat, setSelectedHeat] =
+    useState<HeatDetectionResponse | null>(null);
+  const [selectedBreeding, setSelectedBreeding] =
+    useState<BreedingRecordResponse | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    type: "heat" | "breeding";
+    id: number;
+  } | null>(null);
+
+  // Query hooks
+  const { data: stats } = useBreedingStats();
+  const { data: inHeatAnimals, isLoading: loadingHeat } = useAnimalsInHeat();
+  const { data: allHeatDetections } = useAllHeatDetections();
+  const { data: pendingChecks, isLoading: loadingPending } =
+    usePendingPregnancyChecks();
+  const { data: activePregnancies, isLoading: loadingPregnancies } =
+    useActivePregnancies();
+  const { data: upcomingCalvings } = useUpcomingCalvings(30);
+  const { data: overdueCalvings } = useOverdueCalvings();
+
+  // Mutation hooks
+  const createHeatMutation = useCreateHeatDetection();
+  const updateHeatMutation = useUpdateHeatDetection();
+  const deleteHeatMutation = useDeleteHeatDetection();
+  const createBreedingMutation = useCreateBreedingFromHeat();
+  const skipHeatMutation = useSkipHeatDetection();
+  const confirmPregnancyMutation = useConfirmPregnancy();
+  const failPregnancyMutation = useMarkPregnancyFailed();
+  const recordCalvingMutation = useRecordCalving();
+  const updateBreedingMutation = useUpdateBreedingRecord();
+  const deleteBreedingMutation = useDeleteBreedingRecord();
+
+  // Combine upcoming and overdue calvings
+  const allCalvings = [...(overdueCalvings || []), ...(upcomingCalvings || [])];
+
+  // Filter breeding records (pending checks)
+  const filteredRecords = (pendingChecks || []).filter((record) => {
     const matchesSearch =
       record.animalTag.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.animalName.toLowerCase().includes(searchTerm.toLowerCase());
+      (record.animalName?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase()
+      );
     const matchesStatus =
       selectedStatus === "all" || record.status === selectedStatus;
     return matchesSearch && matchesStatus;
   });
 
-  const stats = [
-    {
-      title: "In Heat",
-      value: "8",
-      change: "Ready for breeding",
-    },
-    {
-      title: "Pending Checks",
-      value: "12",
-      change: "Due for confirmation",
-    },
-    {
-      title: "Pregnancies",
-      value: "28",
-      change: "+3 this month",
-    },
-    {
-      title: "Calvings",
-      value: "5",
-      change: "Next 30 days",
-    },
-  ];
+  // Handler functions
+  const handleCreateOrUpdateHeat = (
+    data: HeatDetectionRequest & { id?: number }
+  ) => {
+    if (data.id) {
+      updateHeatMutation.mutate(
+        { id: data.id, payload: data },
+        {
+          onSuccess: () => {
+            setHeatModalOpen(false);
+            setSelectedHeat(null);
+          },
+        }
+      );
+    } else {
+      createHeatMutation.mutate(data, {
+        onSuccess: () => {
+          setHeatModalOpen(false);
+        },
+      });
+    }
+  };
+
+  const handleCreateBreeding = (data: BreedingRecordRequest) => {
+    if (!selectedHeat) return;
+
+    createBreedingMutation.mutate(
+      { heatId: selectedHeat.id, payload: data },
+      {
+        onSuccess: () => {
+          setBreedingModalOpen(false);
+          setSelectedHeat(null);
+        },
+      }
+    );
+  };
+
+  const handleSkipHeat = (reason?: string) => {
+    if (!selectedHeat) return;
+
+    skipHeatMutation.mutate(
+      { heatId: selectedHeat.id, reason },
+      {
+        onSuccess: () => {
+          setSkipHeatModalOpen(false);
+          setSelectedHeat(null);
+        },
+      }
+    );
+  };
+
+  const handleConfirmPregnancy = (data: {
+    confirmationDate?: string;
+    remarks?: string;
+  }) => {
+    if (!selectedBreeding) return;
+
+    confirmPregnancyMutation.mutate(
+      { breedingId: selectedBreeding.id, ...data },
+      {
+        onSuccess: () => {
+          setConfirmPregnancyModalOpen(false);
+          setSelectedBreeding(null);
+        },
+      }
+    );
+  };
+
+  const handleMarkPregnancyFailed = (data: {
+    checkDate?: string;
+    reason?: string;
+  }) => {
+    if (!selectedBreeding) return;
+
+    failPregnancyMutation.mutate(
+      { breedingId: selectedBreeding.id, ...data },
+      {
+        onSuccess: () => {
+          setFailedPregnancyModalOpen(false);
+          setSelectedBreeding(null);
+        },
+      }
+    );
+  };
+
+  const handleRecordCalving = (data: {
+    calvingDate?: string;
+    remarks?: string;
+  }) => {
+    if (!selectedBreeding) return;
+
+    recordCalvingMutation.mutate(
+      { breedingId: selectedBreeding.id, ...data },
+      {
+        onSuccess: () => {
+          setCalvingModalOpen(false);
+          setSelectedBreeding(null);
+        },
+      }
+    );
+  };
+
+  const handleDelete = () => {
+    if (!deleteTarget) return;
+
+    if (deleteTarget.type === "heat") {
+      deleteHeatMutation.mutate(deleteTarget.id, {
+        onSuccess: () => {
+          setDeleteModalOpen(false);
+          setDeleteTarget(null);
+        },
+      });
+    } else {
+      deleteBreedingMutation.mutate(deleteTarget.id, {
+        onSuccess: () => {
+          setDeleteModalOpen(false);
+          setDeleteTarget(null);
+        },
+      });
+    }
+  };
+
+  const openBreedingModal = (heat: HeatDetectionResponse) => {
+    setSelectedHeat(heat);
+    setBreedingModalOpen(true);
+  };
+
+  const openSkipModal = (heat: HeatDetectionResponse) => {
+    setSelectedHeat(heat);
+    setSkipHeatModalOpen(true);
+  };
+
+  const openConfirmPregnancyModal = (breeding: BreedingRecordResponse) => {
+    setSelectedBreeding(breeding);
+    setConfirmPregnancyModalOpen(true);
+  };
+
+  const openFailedPregnancyModal = (breeding: BreedingRecordResponse) => {
+    setSelectedBreeding(breeding);
+    setFailedPregnancyModalOpen(true);
+  };
+
+  const openCalvingModal = (breeding: BreedingRecordResponse) => {
+    setSelectedBreeding(breeding);
+    setCalvingModalOpen(true);
+  };
+
+  const openDeleteModal = (type: "heat" | "breeding", id: number) => {
+    setDeleteTarget({ type, id });
+    setDeleteModalOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -332,7 +357,10 @@ export default function Breeding() {
         <div className="flex flex-wrap gap-2 sm:gap-4">
           <Button
             className="gap-2 px-3 py-2 text-sm sm:text-base"
-            onClick={() => setAddBreedingOpen(true)}
+            onClick={() => {
+              setSelectedHeat(null);
+              setHeatModalOpen(true);
+            }}
           >
             <Plus className="w-4 h-4" />
             Record Heat
@@ -342,19 +370,65 @@ export default function Breeding() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-        {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">
-                {stat.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">{stat.change}</p>
-            </CardContent>
-          </Card>
-        ))}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              In Heat
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl sm:text-2xl font-bold">
+              {stats?.inHeatCount || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">Ready for breeding</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              Pending Checks
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl sm:text-2xl font-bold">
+              {stats?.pendingChecksCount || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Due for confirmation
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              Pregnancies
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl sm:text-2xl font-bold">
+              {stats?.activePregnanciesCount || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              +{stats?.confirmedThisMonth || 0} this month
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              Calvings
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl sm:text-2xl font-bold">
+              {stats?.upcomingCalvingsCount || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">Next 30 days</p>
+          </CardContent>
+        </Card>
       </div>
 
       <Tabs defaultValue="heat" className="space-y-6">
@@ -395,53 +469,110 @@ export default function Breeding() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {heatDetectionAnimals.map((animal) => (
-                  <div key={animal.id} className="p-3 sm:p-4 border rounded-lg">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-semibold">{animal.tag}</p>
-                          <Badge
-                            variant="secondary"
-                            className="gap-1 bg-red-500/10 text-red-600 dark:text-red-400 text-xs"
-                          >
-                            <AlertCircle className="w-3 h-3" />
-                            Day {animal.daysInHeat + 1}
-                          </Badge>
+              {loadingHeat ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Loading...
+                </div>
+              ) : !inHeatAnimals || inHeatAnimals.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No animals in heat at the moment
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {inHeatAnimals.map((animal) => (
+                    <div
+                      key={animal.id}
+                      className="p-3 sm:p-4 border rounded-lg"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-semibold">{animal.animalTag}</p>
+                            {animal.animalName && (
+                              <span className="text-sm text-muted-foreground">
+                                ({animal.animalName})
+                              </span>
+                            )}
+                            <Badge
+                              variant="secondary"
+                              className={`gap-1 ${getActionColor(
+                                animal.actionTaken
+                              )} text-xs`}
+                            >
+                              {animal.actionTaken === ActionTaken.PENDING ? (
+                                <>
+                                  <AlertCircle className="w-3 h-3" />
+                                  Day {animal.daysInHeat + 1}
+                                </>
+                              ) : (
+                                animal.actionTaken
+                              )}
+                            </Badge>
+                          </div>
                         </div>
+                        {animal.actionTaken === ActionTaken.PENDING && (
+                          <div className="flex gap-2 ml-2 shrink-0">
+                            <Button
+                              size="sm"
+                              onClick={() => openBreedingModal(animal)}
+                              className="gap-1"
+                            >
+                              <Plus className="w-4 h-4" />
+                              <span className="hidden sm:inline">Breed</span>
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openSkipModal(animal)}
+                            >
+                              <XCircle className="w-4 h-4" />
+                              <span className="hidden sm:inline">Skip</span>
+                            </Button>
+                          </div>
+                        )}
                       </div>
-                      <Button
-                        size="sm"
-                        onClick={() => setAddBreedingOpen(true)}
-                        className="ml-2 shrink-0"
-                      >
-                        <Plus className="w-4 h-4 sm:mr-2" />
-                        <span className="hidden sm:inline">
-                          Breeding Record
-                        </span>
-                      </Button>
-                    </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs sm:text-sm">
-                      <div>
-                        <p className="text-muted-foreground">Heat Detected</p>
-                        <p className="font-medium">{animal.heatDetected}</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs sm:text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Heat Detected</p>
+                          <p className="font-medium">
+                            {new Date(
+                              animal.heatDetectedDate
+                            ).toLocaleDateString()}
+                          </p>
+                        </div>
+                        {animal.lastBredDate && (
+                          <div>
+                            <p className="text-muted-foreground">Last Bred</p>
+                            <p className="font-medium">
+                              {new Date(
+                                animal.lastBredDate
+                              ).toLocaleDateString()}
+                            </p>
+                          </div>
+                        )}
+                        {animal.daysSinceLastBirth && (
+                          <div className="col-span-2 sm:col-span-1">
+                            <p className="text-muted-foreground">
+                              Days Since Birth
+                            </p>
+                            <p className="font-medium">
+                              {animal.daysSinceLastBirth}
+                            </p>
+                          </div>
+                        )}
                       </div>
-                      <div>
-                        <p className="text-muted-foreground">Last Bred</p>
-                        <p className="font-medium">{animal.lastBred}</p>
-                      </div>
-                      <div className="col-span-2 sm:col-span-1">
-                        <p className="text-muted-foreground">
-                          Days Since Birth
-                        </p>
-                        <p className="font-medium">{animal.daysSinceBirth}</p>
-                      </div>
+
+                      {animal.notes && (
+                        <div className="mt-3 text-sm text-muted-foreground">
+                          <p className="font-medium">Notes:</p>
+                          <p>{animal.notes}</p>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -472,92 +603,140 @@ export default function Breeding() {
                   className="px-3 py-2 border border-input bg-background rounded-md text-sm"
                 >
                   <option value="all">All Status</option>
-                  <option value="CONFIRMED">Confirmed</option>
-                  <option value="PENDING">Pending</option>
-                  <option value="FAILED">Failed</option>
+                  <option value={BreedingStatus.PENDING}>Pending</option>
+                  <option value={BreedingStatus.CONFIRMED}>Confirmed</option>
+                  <option value={BreedingStatus.FAILED}>Failed</option>
+                  <option value={BreedingStatus.COMPLETED}>Completed</option>
                 </select>
               </div>
 
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Animal Tag</TableHead>
-                      <TableHead>Service Date</TableHead>
-                      <TableHead>Method</TableHead>
-                      <TableHead>Bull ID</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Expected Calving</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredRecords.map((record) => (
-                      <TableRow key={record.id}>
-                        <TableCell>
-                          <div>
-                            <p className="font-medium">{record.animalTag}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell>{record.breedingDate}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{record.method}</Badge>
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          {record.bullId || "-"}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant="secondary"
-                            className={`gap-1 ${getStatusColor(record.status)}`}
-                          >
-                            {getStatusIcon(record.status)}
-                            {record.status.charAt(0).toUpperCase() +
-                              record.status.slice(1)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          {record.expectedCalvingDate || "-"}
-                        </TableCell>
-
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <Edit3 className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => setEditBreeding(record)}
-                              >
-                                <Pencil className="w-4 h-4 mr-2" />
-                                Edit Record
-                              </DropdownMenuItem>
-
-                              <DropdownMenuItem
-                                onClick={() => setAddPregnancyOpen(true)}
-                              >
-                                <CheckCircle className="w-4 h-4 mr-2" />
-                                Confirm Pregnancy
-                              </DropdownMenuItem>
-
-                              <DropdownMenuItem
-                                className="text-destructive"
-                                onClick={() => setDeleteModalOpen(true)}
-                              >
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                Delete Record
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
+              {loadingPending ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Loading...
+                </div>
+              ) : filteredRecords.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No breeding records found
+                </div>
+              ) : (
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Animal Tag</TableHead>
+                        <TableHead>Service Date</TableHead>
+                        <TableHead>Method</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Expected Calving</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredRecords.map((record) => (
+                        <TableRow key={record.id}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{record.animalTag}</p>
+                              {record.animalName && (
+                                <p className="text-xs text-muted-foreground">
+                                  {record.animalName}
+                                </p>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {new Date(record.breedingDate).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {record.method || "AI"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant="secondary"
+                              className={`gap-1 ${getStatusColor(
+                                record.status
+                              )}`}
+                            >
+                              {getStatusIcon(record.status)}
+                              {record.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            {new Date(
+                              record.expectedCalvingDate
+                            ).toLocaleDateString()}
+                            {record.daysUntilCalving !== undefined && (
+                              <span className="text-xs text-muted-foreground block">
+                                {record.daysUntilCalving > 0
+                                  ? `in ${record.daysUntilCalving} days`
+                                  : record.daysUntilCalving === 0
+                                  ? "Due today"
+                                  : `${Math.abs(
+                                      record.daysUntilCalving
+                                    )} days overdue`}
+                              </span>
+                            )}
+                          </TableCell>
+
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <Edit3 className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+
+                              <DropdownMenuContent align="end">
+                                {record.status === BreedingStatus.PENDING && (
+                                  <>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        openConfirmPregnancyModal(record)
+                                      }
+                                    >
+                                      <CheckCircle className="w-4 h-4 mr-2" />
+                                      Confirm Pregnancy
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        openFailedPregnancyModal(record)
+                                      }
+                                    >
+                                      <XCircle className="w-4 h-4 mr-2" />
+                                      Mark as Failed
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
+
+                                {record.status === BreedingStatus.CONFIRMED && (
+                                  <DropdownMenuItem
+                                    onClick={() => openCalvingModal(record)}
+                                  >
+                                    <Baby className="w-4 h-4 mr-2" />
+                                    Record Calving
+                                  </DropdownMenuItem>
+                                )}
+
+                                <DropdownMenuItem
+                                  className="text-destructive"
+                                  onClick={() =>
+                                    openDeleteModal("breeding", record.id)
+                                  }
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  Delete Record
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -572,66 +751,115 @@ export default function Breeding() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {mockPregnancyRecords.map((record) => (
-                  <div key={record.id} className="p-4 border rounded-lg">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-semibold">{record.animalTag}</p>
-                          <Badge
-                            variant="secondary"
-                            className={`gap-1 ${getStatusColor(record.status)}`}
-                          >
-                            {getStatusIcon(record.status)}
-                            {record.status.charAt(0).toUpperCase() +
-                              record.status.slice(1)}
+              {loadingPregnancies ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Loading...
+                </div>
+              ) : !activePregnancies || activePregnancies.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No active pregnancies
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {activePregnancies.map((record) => {
+                    const daysPregnant = record.daysPregnant || 0;
+                    const progressPercent = Math.round(
+                      (daysPregnant / 283) * 100
+                    );
+                    const trimester =
+                      daysPregnant <= 94 ? 1 : daysPregnant <= 188 ? 2 : 3;
+
+                    return (
+                      <div key={record.id} className="p-4 border rounded-lg">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="font-semibold">
+                                {record.animalTag}
+                              </p>
+                              {record.animalName && (
+                                <span className="text-sm text-muted-foreground">
+                                  ({record.animalName})
+                                </span>
+                              )}
+                              <Badge
+                                variant="secondary"
+                                className={`gap-1 ${getStatusColor(
+                                  record.status
+                                )}`}
+                              >
+                                {getStatusIcon(record.status)}
+                                {record.status}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Trimester {trimester} • {daysPregnant} days
+                              pregnant
+                            </p>
+                          </div>
+                          <Badge variant="outline">
+                            Expected:{" "}
+                            {new Date(
+                              record.expectedCalvingDate
+                            ).toLocaleDateString()}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Trimester {record.trimester} • {record.daysPregnant}{" "}
-                          days pregnant
-                        </p>
-                      </div>
-                      <Badge variant="outline">
-                        Expected: {record.expectedCalvingDate}
-                      </Badge>
-                    </div>
 
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">
-                          Pregnancy Progress
-                        </span>
-                        <span className="font-medium">
-                          {Math.round((record.daysPregnant / 280) * 100)}%
-                        </span>
-                      </div>
-                      <Progress
-                        value={(record.daysPregnant / 280) * 100}
-                        className="h-2"
-                      />
-                    </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">
+                              Pregnancy Progress
+                            </span>
+                            <span className="font-medium">
+                              {progressPercent}%
+                            </span>
+                          </div>
+                          <Progress value={progressPercent} className="h-2" />
+                        </div>
 
-                    <div className="grid grid-cols-2 gap-4 mt-3 text-sm">
-                      <div>
-                        <p className="text-muted-foreground">Breeding Date</p>
-                        <p className="font-medium">{record.breedingDate}</p>
+                        <div className="grid grid-cols-2 gap-4 mt-3 text-sm">
+                          <div>
+                            <p className="text-muted-foreground">
+                              Breeding Date
+                            </p>
+                            <p className="font-medium">
+                              {new Date(
+                                record.breedingDate
+                              ).toLocaleDateString()}
+                            </p>
+                          </div>
+                          {record.pregnancyConfirmationDate && (
+                            <div>
+                              <p className="text-muted-foreground">
+                                Confirmed On
+                              </p>
+                              <p className="font-medium">
+                                {new Date(
+                                  record.pregnancyConfirmationDate
+                                ).toLocaleDateString()}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        {record.remarks && (
+                          <div className="mt-3 text-sm">
+                            <p className="text-muted-foreground font-medium">
+                              Notes:
+                            </p>
+                            <p>{record.remarks}</p>
+                          </div>
+                        )}
                       </div>
-                      <div>
-                        <p className="text-muted-foreground">Last Checkup</p>
-                        <p className="font-medium">{record.lastCheckup}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* Calving Calendar Tab */}
-
         <TabsContent value="calving">
           <Card>
             <CardHeader>
@@ -642,92 +870,166 @@ export default function Breeding() {
             </CardHeader>
 
             <CardContent>
-              <div className="space-y-4">
-                {calvingEvents.map((event) => {
-                  const isDue = event.daysUntil <= 0;
-                  const isImminent =
-                    event.daysUntil > 0 && event.daysUntil <= 7;
+              {!allCalvings || allCalvings.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No upcoming calvings in the next 30 days
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {allCalvings.map((event) => {
+                    const daysUntil = event.daysUntilCalving || 0;
+                    const isDue = daysUntil <= 0;
+                    const isImminent = daysUntil > 0 && daysUntil <= 7;
+                    const status =
+                      isDue || event.isOverdue
+                        ? "imminent"
+                        : isImminent
+                        ? "imminent"
+                        : "upcoming";
 
-                  return (
-                    <div
-                      key={event.id}
-                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 border rounded-lg"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div
-                          className={`p-3 rounded-full ${getStatusColor(
-                            event.status
-                          )}`}
-                        >
-                          <Baby className="w-5 h-5" />
+                    return (
+                      <div
+                        key={event.id}
+                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 border rounded-lg"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div
+                            className={`p-3 rounded-full ${getStatusColor(
+                              status
+                            )}`}
+                          >
+                            <Baby className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {event.animalTag}
+                              {event.animalName && (
+                                <span className="text-sm text-muted-foreground ml-1">
+                                  ({event.animalName})
+                                </span>
+                              )}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Expected calving date
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium">{event.animalTag}</p>
-                          <p className="text-sm text-muted-foreground">
-                            Expected calving date
-                          </p>
+
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                          <div className="text-left sm:text-right">
+                            <p className="font-medium">
+                              {new Date(
+                                event.expectedCalvingDate
+                              ).toLocaleDateString()}
+                            </p>
+                            <Badge
+                              variant="secondary"
+                              className={`gap-1 ${getStatusColor(
+                                status
+                              )} inline-flex mt-1`}
+                            >
+                              {event.isOverdue ? (
+                                <span className="text-red-600 font-semibold">
+                                  {Math.abs(daysUntil)} day
+                                  {Math.abs(daysUntil) !== 1 ? "s" : ""} overdue
+                                </span>
+                              ) : daysUntil === 0 ? (
+                                "Due Today"
+                              ) : daysUntil < 0 ? (
+                                <span className="text-red-600 font-semibold">
+                                  {Math.abs(daysUntil)} day
+                                  {Math.abs(daysUntil) !== 1 ? "s" : ""} overdue
+                                </span>
+                              ) : (
+                                `${daysUntil} day${daysUntil !== 1 ? "s" : ""}`
+                              )}
+                            </Badge>
+                          </div>
+
+                          {(isDue || event.isOverdue || daysUntil <= 3) && (
+                            <Button
+                              onClick={() => openCalvingModal(event)}
+                              size="sm"
+                              className="w-full sm:w-auto"
+                            >
+                              Record Birth
+                            </Button>
+                          )}
                         </div>
                       </div>
-
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-                        <div className="text-left sm:text-right">
-                          <p className="font-medium">{event.expectedDate}</p>
-                          <Badge
-                            variant="secondary"
-                            className={`gap-1 ${getStatusColor(
-                              event.status
-                            )} inline-flex mt-1`}
-                          >
-                            {isDue
-                              ? "Due Now"
-                              : `${event.daysUntil} day${
-                                  event.daysUntil !== 1 ? "s" : ""
-                                }`}
-                          </Badge>
-                        </div>
-
-                        {isDue && (
-                          <Button
-                            onClick={() => setCalvingOpen(true)}
-                            size="sm"
-                            className="w-full sm:w-auto"
-                          >
-                            Record Birth
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
 
-      <AddBreedingModal
-        open={addBreedingOpen}
-        onOpenChange={setAddBreedingOpen}
+      {/* Modals */}
+      <HeatDetectionModal
+        open={heatModalOpen}
+        onOpenChange={setHeatModalOpen}
+        heatDetection={selectedHeat}
+        onSubmit={handleCreateOrUpdateHeat}
+        isSubmitting={
+          createHeatMutation.isPending || updateHeatMutation.isPending
+        }
       />
 
-      <AddBreedingModal
-        open={!!editBreeding}
-        onOpenChange={(open) => !open && setEditBreeding(null)}
-        breeding={editBreeding}
+      <BreedingModal
+        open={breedingModalOpen}
+        onOpenChange={setBreedingModalOpen}
+        heatDetection={selectedHeat}
+        onSubmit={handleCreateBreeding}
+        isSubmitting={createBreedingMutation.isPending}
       />
 
-      <AddPregnancyModal
-        open={addPregnancyOpen}
-        onOpenChange={setAddPregnancyOpen}
+      <SkipHeatModal
+        open={skipHeatModalOpen}
+        onOpenChange={setSkipHeatModalOpen}
+        heatDetection={selectedHeat}
+        onSkip={handleSkipHeat}
+        isSubmitting={skipHeatMutation.isPending}
       />
 
-      <AddCalvingModal open={addCalvingOpen} onOpenChange={setCalvingOpen} />
+      <ConfirmPregnancyModal
+        open={confirmPregnancyModalOpen}
+        onOpenChange={setConfirmPregnancyModalOpen}
+        breedingRecord={selectedBreeding}
+        onConfirm={handleConfirmPregnancy}
+        isSubmitting={confirmPregnancyMutation.isPending}
+      />
+
+      <MarkPregnancyFailedModal
+        open={failedPregnancyModalOpen}
+        onOpenChange={setFailedPregnancyModalOpen}
+        breedingRecord={selectedBreeding}
+        onMarkFailed={handleMarkPregnancyFailed}
+        isSubmitting={failPregnancyMutation.isPending}
+      />
+
+      <CalvingModal
+        open={calvingModalOpen}
+        onOpenChange={setCalvingModalOpen}
+        breedingRecord={selectedBreeding}
+        onRecordCalving={handleRecordCalving}
+        isSubmitting={recordCalvingMutation.isPending}
+      />
 
       <DeleteConfirmModal
         open={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
-        title="Delete Health Record?"
-        description="Are you sure you want to delete this health record? This action cannot be undone."
+        title={`Delete ${
+          deleteTarget?.type === "heat" ? "Heat Detection" : "Breeding Record"
+        }?`}
+        description={`Are you sure you want to delete this ${
+          deleteTarget?.type === "heat" ? "heat detection" : "breeding record"
+        }? This action cannot be undone.`}
+        onConfirm={handleDelete}
+        isDeleting={
+          deleteHeatMutation.isPending || deleteBreedingMutation.isPending
+        }
       />
     </div>
   );

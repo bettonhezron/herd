@@ -14,7 +14,6 @@ import SettingsPage from "./pages/Settings";
 import Reports from "./pages/Reports";
 import Analytics from "./pages/Analytics";
 import Health from "./pages/Health";
-import Breeding from "./pages/Breeding";
 import Profile from "./pages/Profile";
 import Preferences from "./pages/Preferences";
 import FeedsPage from "./pages/Feeds";
@@ -28,6 +27,7 @@ import LandingPage from "./pages/Landing";
 import Auth from "./pages/Auth";
 import MilkingPage from "./pages/MilkingPage";
 import Milking from "./pages/milk";
+import BreedingPage from "./pages/Breeding";
 
 const queryClient = new QueryClient();
 
@@ -59,7 +59,7 @@ const App = () => (
           >
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/animals" element={<Animals />} />
-            <Route path="/breeding" element={<Breeding />} />
+            <Route path="/breeding" element={<BreedingPage />} />
             <Route path="/milking" element={<Milking />} />
             <Route path="/feeding" element={<FeedsPage />} />
             <Route path="/health" element={<Health />} />

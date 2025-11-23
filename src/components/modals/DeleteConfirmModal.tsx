@@ -16,6 +16,7 @@ interface DeleteConfirmModalProps {
   title?: string;
   description?: string;
   onConfirm?: () => void;
+  isDeleting?: boolean; // <-- ADD THIS
 }
 
 export function DeleteConfirmModal({
@@ -24,8 +25,11 @@ export function DeleteConfirmModal({
   title = "Are you sure?",
   description = "This action cannot be undone. This will permanently delete the record.",
   onConfirm,
+  isDeleting = false, // default
 }: DeleteConfirmModalProps) {
   const handleConfirm = () => {
+    if (isDeleting) return; // prevent double-click
+
     if (onConfirm) {
       onConfirm();
     } else {
@@ -47,12 +51,14 @@ export function DeleteConfirmModal({
         </AlertDialogHeader>
 
         <AlertDialogFooter className="flex flex-row items-center justify-end gap-2">
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+
           <AlertDialogAction
             onClick={handleConfirm}
+            disabled={isDeleting}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            Delete
+            {isDeleting ? "Deleting..." : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
