@@ -945,7 +945,9 @@ export default function BreedingPage() {
                                   {Math.abs(daysUntil) !== 1 ? "s" : ""} overdue
                                 </span>
                               ) : (
-                                `${daysUntil} day${daysUntil !== 1 ? "s" : ""}`
+                                `In ${daysUntil} day${
+                                  daysUntil !== 1 ? "s" : ""
+                                }`
                               )}
                             </Badge>
                           </div>

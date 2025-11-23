@@ -11,6 +11,10 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
+import { GiCow } from "react-icons/gi";
+import { MdOutlineHealthAndSafety } from "react-icons/md";
+import { SiSimpleanalytics } from "react-icons/si";
+import { TbBrandGoogleAnalytics } from "react-icons/tb";
 
 import {
   Sidebar,
@@ -26,15 +30,15 @@ import {
 
 const mainItems = [
   { title: "Overview", url: "/dashboard", icon: Home },
-  { title: "Animals", url: "/animals", icon: PawPrintIcon },
+  { title: "Animals", url: "/animals", icon: GiCow },
   { title: "Breeding", url: "/breeding", icon: Heart },
   { title: "Milking", url: "/milking", icon: Droplets },
-  { title: "Health", url: "/health", icon: Activity },
+  { title: "Health", url: "/health", icon: MdOutlineHealthAndSafety },
   { title: "Feeding", url: "/feeding", icon: LeafIcon },
 ];
 
 const analyticsItems = [
-  { title: "Analytics", url: "/analytics", icon: Activity },
+  { title: "Analytics", url: "/analytics", icon: TbBrandGoogleAnalytics },
   { title: "Reports", url: "/reports", icon: FileText },
 ];
 
