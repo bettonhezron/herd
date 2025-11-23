@@ -1,15 +1,4 @@
-import { useState } from "react";
-import {
-  Plus,
-  Search,
-  Calendar,
-  Download,
-  Filter,
-  Edit,
-  Trash2,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -17,7 +6,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -32,223 +30,157 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-} from "recharts";
+  Plus,
+  Search,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Edit3,
+  Trash2,
+  AlertCircle,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { AddMilkingModal } from "@/components/modals/AddMilking";
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
+import {
+  useMilkingRecordsByDate,
+  useDailyMilkingStats,
+  useCowMilkingSummaries,
+  useDeleteMilkingRecord,
+} from "@/hooks/useMilking";
+import {
+  MilkingRecordResponse,
+  MilkingShift,
+  SHIFT_OPTIONS,
+} from "@/types/milking";
 
-interface MilkingRecord {
-  id: string;
-  animalId: string;
-  animalName: string;
-  animalTag: string;
-  date: string;
-  time: string;
-  quantity: number;
-  fat: number;
-  protein: number;
-  scc: number;
-  temperature: number;
-  quality: "excellent" | "good" | "fair" | "poor";
-  session: "morning" | "evening";
-}
+import { SiGooglecalendar } from "react-icons/si";
+import { GiMilkCarton } from "react-icons/gi";
+import { GiCow } from "react-icons/gi";
 
-const mockMilkingData: MilkingRecord[] = [
-  {
-    id: "1",
-    animalId: "A001",
-    animalName: "Bessie",
-    animalTag: "001",
-    date: "2024-01-15",
-    time: "06:30",
-    quantity: 28.5,
-    fat: 3.8,
-    protein: 3.2,
-    scc: 150000,
-    temperature: 37.2,
-    quality: "excellent",
-    session: "morning",
-  },
-  {
-    id: "2",
-    animalId: "A002",
-    animalName: "Daisy",
-    animalTag: "002",
-    date: "2024-01-15",
-    time: "06:35",
-    quantity: 32.1,
-    fat: 4.1,
-    protein: 3.4,
-    scc: 180000,
-    temperature: 37.5,
-    quality: "excellent",
-    session: "morning",
-  },
-  {
-    id: "3",
-    animalId: "A003",
-    animalName: "Luna",
-    animalTag: "003",
-    date: "2024-01-15",
-    time: "06:40",
-    quantity: 25.8,
-    fat: 3.6,
-    protein: 3.1,
-    scc: 220000,
-    temperature: 37.8,
-    quality: "good",
-    session: "morning",
-  },
-  {
-    id: "4",
-    animalId: "A004",
-    animalName: "Stella",
-    animalTag: "004",
-    date: "2024-01-15",
-    time: "18:30",
-    quantity: 26.4,
-    fat: 3.9,
-    protein: 3.3,
-    scc: 320000,
-    temperature: 38.1,
-    quality: "fair",
-    session: "evening",
-  },
-  {
-    id: "5",
-    animalId: "A005",
-    animalName: "Rose",
-    animalTag: "005",
-    date: "2024-01-15",
-    time: "18:35",
-    quantity: 29.7,
-    fat: 4.0,
-    protein: 3.5,
-    scc: 450000,
-    temperature: 38.5,
-    quality: "poor",
-    session: "evening",
-  },
-];
+const PAGE_SIZE = 10;
 
-const productionData = [
-  { day: "Mon", morning: 245, evening: 232 },
-  { day: "Tue", morning: 258, evening: 241 },
-  { day: "Wed", morning: 251, evening: 238 },
-  { day: "Thu", morning: 264, evening: 249 },
-  { day: "Fri", morning: 249, evening: 235 },
-  { day: "Sat", morning: 267, evening: 253 },
-  { day: "Sun", morning: 242, evening: 229 },
-];
+const getShiftBadge = (shift: MilkingShift) => {
+  const config = {
+    MORNING: {
+      color: "bg-orange-100 text-orange-700 border-orange-200",
+      icon: "☀️",
+    },
+    AFTERNOON: {
+      color: "bg-blue-100 text-blue-700 border-blue-200",
+      icon: "🌤️",
+    },
+    EVENING: {
+      color: "bg-indigo-100 text-indigo-700 border-indigo-200",
+      icon: "🌙",
+    },
+  };
 
-const qualityTrendData = [
-  { date: "Jan 10", avgFat: 3.7, avgProtein: 3.2, avgSCC: 185000 },
-  { date: "Jan 11", avgFat: 3.8, avgProtein: 3.3, avgSCC: 195000 },
-  { date: "Jan 12", avgFat: 3.9, avgProtein: 3.1, avgSCC: 175000 },
-  { date: "Jan 13", avgFat: 3.6, avgProtein: 3.4, avgSCC: 210000 },
-  { date: "Jan 14", avgFat: 3.8, avgProtein: 3.2, avgSCC: 180000 },
-  { date: "Jan 15", avgFat: 3.9, avgProtein: 3.3, avgSCC: 264000 },
-];
-
-const getQualityColor = (quality: string) => {
-  switch (quality) {
-    case "excellent":
-      return "text-green-600 bg-green-50 border-green-200";
-    case "good":
-      return "text-blue-600 bg-blue-50 border-blue-200";
-    case "fair":
-      return "text-yellow-600 bg-yellow-50 border-yellow-200";
-    case "poor":
-      return "text-red-600 bg-red-50 border-red-200";
-    default:
-      return "text-gray-600 bg-gray-50 border-gray-200";
-  }
+  const { color, icon } = config[shift];
+  return (
+    <Badge className={`${color} border gap-1`}>
+      <span>{icon}</span>
+      {shift}
+    </Badge>
+  );
 };
 
-const getSessionColor = (session: string) => {
-  return session === "morning"
-    ? "text-amber-600 bg-amber-50 border-amber-200"
-    : "text-indigo-600 bg-indigo-50 border-indigo-200";
+const getTrendBadge = (trend: string) => {
+  const config = {
+    INCREASING: { color: "bg-green-100 text-green-700", icon: TrendingUp },
+    DECREASING: { color: "bg-red-100 text-red-700", icon: TrendingDown },
+    STABLE: { color: "bg-gray-100 text-gray-700", icon: Minus },
+  };
+
+  const { color, icon: Icon } = config[trend] || config.STABLE;
+  return (
+    <Badge className={color}>
+      <Icon className="w-3 h-3 mr-1" />
+    </Badge>
+  );
 };
 
 export default function Milking() {
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSession, setSelectedSession] = useState<string>("all");
-  const [selectedQuality, setSelectedQuality] = useState<string>("all");
+  const [shiftFilter, setShiftFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [activeTab, setActiveTab] = useState("records");
+
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingRecord, setEditingRecord] =
+    useState<MilkingRecordResponse | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<MilkingRecord | null>(
-    null
-  );
+  const [recordToDelete, setRecordToDelete] =
+    useState<MilkingRecordResponse | null>(null);
 
-  const filteredRecords = mockMilkingData.filter((record) => {
-    const matchesSearch =
-      record.animalName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.animalTag.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSession =
-      selectedSession === "all" || record.session === selectedSession;
-    const matchesQuality =
-      selectedQuality === "all" || record.quality === selectedQuality;
+  const { data: records = [], isLoading: recordsLoading } =
+    useMilkingRecordsByDate(selectedDate);
+  const { data: stats } = useDailyMilkingStats(selectedDate);
+  const { data: summaries = [] } = useCowMilkingSummaries(selectedDate);
+  const deleteMutation = useDeleteMilkingRecord();
 
-    return matchesSearch && matchesSession && matchesQuality;
-  });
+  // Filter records
+  const filteredRecords = useMemo(() => {
+    return records.filter((record) => {
+      const matchesSearch =
+        record.animalTag.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        record.animalName?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesShift =
+        shiftFilter === "all" || record.shift === shiftFilter;
+      return matchesSearch && matchesShift;
+    });
+  }, [records, searchTerm, shiftFilter]);
 
-  const totalQuantity = mockMilkingData.reduce(
-    (sum, record) => sum + record.quantity,
-    0
-  );
-  const avgFat =
-    mockMilkingData.reduce((sum, record) => sum + record.fat, 0) /
-    mockMilkingData.length;
-  const avgProtein =
-    mockMilkingData.reduce((sum, record) => sum + record.protein, 0) /
-    mockMilkingData.length;
-  const avgSCC =
-    mockMilkingData.reduce((sum, record) => sum + record.scc, 0) /
-    mockMilkingData.length;
+  // Pagination
+  const totalPages = Math.ceil(filteredRecords.length / PAGE_SIZE);
+  const paginatedRecords = useMemo(() => {
+    const start = currentPage * PAGE_SIZE;
+    return filteredRecords.slice(start, start + PAGE_SIZE);
+  }, [filteredRecords, currentPage]);
 
-  const stats = [
-    {
-      title: "Total Production",
-      value: `${totalQuantity.toFixed(1)}L`,
-      change: "+5.2% from yesterday",
-    },
-    {
-      title: "Average Fat %",
-      value: `${avgFat.toFixed(2)}%`,
-      change: "Within target range",
-    },
-    {
-      title: "Average Protein %",
-      value: `${avgProtein.toFixed(2)}%`,
-      change: "+0.1% from last week",
-    },
-    {
-      title: "Average SCC",
-      value: `${(avgSCC / 1000).toFixed(0)}K`,
-      change: "2 alerts need attention",
-    },
-  ];
+  const handleDelete = () => {
+    if (!recordToDelete?.id) return;
+    deleteMutation.mutate(recordToDelete.id);
+    setDeleteModalOpen(false);
+    setRecordToDelete(null);
+  };
+
+  const exportData = () => {
+    const csv = [
+      ["Date", "Tag", "Name", "Shift", "Quantity (L)", "Recorded By"],
+      ...filteredRecords.map((r) => [
+        r.milkingDate,
+        r.animalTag,
+        r.animalName || "-",
+        r.shift,
+        r.quantity,
+        r.recordedBy,
+      ]),
+    ]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `milking-records-${selectedDate}.csv`;
+    a.click();
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground flex items-center gap-2">
             Milking Management
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-2">
@@ -256,276 +188,392 @@ export default function Milking() {
           </p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-2 self-start sm:self-auto">
+          <Input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="w-[180px]"
+            max={new Date().toISOString().split("T")[0]}
+          />
           <Button
-            className="gap-2 px-4 py-2 text-sm sm:px-5 sm:py-2.5 sm:text-base"
             onClick={() => setAddModalOpen(true)}
+            className="gap-2 px-3 py-2 text-sm sm:text-base bg-primary hover:bg-primary-hover"
           >
             <Plus className="w-4 h-4" />
             Record Milking
           </Button>
-
-          <Button
-            variant="outline"
-            className="gap-2 px-4 py-2 text-sm sm:px-5 sm:py-2.5 sm:text-base"
-          >
-            <Download className="w-4 h-4" />
-            Export Report
-          </Button>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Milk</CardTitle>
+            <GiMilkCarton className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {stats?.totalMilkProduced.toFixed(1) || 0} L
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Avg: {stats?.averageMilkPerCow.toFixed(1) || 0} L/cow
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Cows Milked</CardTitle>
+            <GiCow className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {stats?.totalCowsMilked || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {stats?.activeLactatingCows || 0} available
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">By Shift</CardTitle>
+            <SiGooglecalendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">☀️ Morning:</span>
+                <span className="font-medium">
+                  {stats?.morningMilk.toFixed(1) || 0} L
+                </span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">🌤️ Afternoon:</span>
+                <span className="font-medium">
+                  {stats?.afternoonMilk.toFixed(1) || 0} L
+                </span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">🌙 Evening:</span>
+                <span className="font-medium">
+                  {stats?.eveningMilk.toFixed(1) || 0} L
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Not Milked</CardTitle>
+            <AlertCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-600">
+              {stats?.cowsNotMilkedToday || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">Cows need attention</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="records">Milking Records</TabsTrigger>
+          <TabsTrigger value="performance">Cow Performance</TabsTrigger>
+        </TabsList>
+
+        {/* Records Tab */}
+        <TabsContent value="records" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <CardTitle>Daily Records</CardTitle>
+                  <CardDescription>
+                    All milking sessions for{" "}
+                    {new Date(selectedDate).toLocaleDateString()}
+                  </CardDescription>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={exportData}
+                  className="gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Export
+                </Button>
+              </div>
             </CardHeader>
+
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">{stat.change}</p>
+              {/* Filters */}
+              <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by tag or name..."
+                    className="pl-10"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+
+                <Select value={shiftFilter} onValueChange={setShiftFilter}>
+                  <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectValue placeholder="Filter by shift" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Shifts</SelectItem>
+                    {SHIFT_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.icon} {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Table */}
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Animal</TableHead>
+                      <TableHead>Shift</TableHead>
+                      <TableHead>Quantity (L)</TableHead>
+                      <TableHead>Days in Milk</TableHead>
+                      <TableHead>Stage</TableHead>
+                      <TableHead>Recorded By</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {recordsLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="h-24 text-center">
+                          Loading records...
+                        </TableCell>
+                      </TableRow>
+                    ) : paginatedRecords.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="h-24 text-center">
+                          No milking records found for this date.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      paginatedRecords.map((record) => (
+                        <TableRow key={record.id}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{record.animalTag}</p>
+                              {record.animalName && (
+                                <p className="text-sm text-muted-foreground">
+                                  {record.animalName}
+                                </p>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>{getShiftBadge(record.shift)}</TableCell>
+                          <TableCell className="font-medium">
+                            {record.quantity.toFixed(1)} L
+                          </TableCell>
+                          <TableCell>
+                            {record.daysInMilk
+                              ? `${record.daysInMilk} days`
+                              : "—"}
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-muted-foreground">
+                              {record.lactationStage || "—"}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            {record.recordedBy}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <Edit3 className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => setEditingRecord(record)}
+                                >
+                                  <Edit3 className="w-4 h-4 mr-2" />
+                                  Edit Record
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="text-destructive"
+                                  onClick={() => {
+                                    setRecordToDelete(record);
+                                    setDeleteModalOpen(true);
+                                  }}
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  Delete Record
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+              {!recordsLoading && totalPages > 1 && (
+                <div className="flex items-center justify-between py-4">
+                  <div className="text-sm text-muted-foreground">
+                    Showing {paginatedRecords.length} of{" "}
+                    {filteredRecords.length} results
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                      disabled={currentPage === 0}
+                    >
+                      <ChevronLeft className="w-4 h-4 mr-1" />
+                      Previous
+                    </Button>
+
+                    <span className="text-sm font-medium">
+                      Page {currentPage + 1} of {totalPages}
+                    </span>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages - 1, p + 1))
+                      }
+                      disabled={currentPage >= totalPages - 1}
+                    >
+                      Next
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
-        ))}
-      </div>
+        </TabsContent>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Weekly Production (Liters)</CardTitle>
-            <CardDescription>
-              Morning vs Evening milking sessions
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                morning: { label: "Morning", color: "hsl(var(--chart-1))" },
-                evening: { label: "Evening", color: "hsl(var(--chart-3))" },
-              }}
-            >
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={productionData}>
-                  <XAxis dataKey="day" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="morning" fill="hsl(var(--chart-1))" />
-                  <Bar dataKey="evening" fill="hsl(var(--chart-3))" />
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+        {/* Performance Tab */}
+        <TabsContent value="performance" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Cow Performance Analysis</CardTitle>
+              <CardDescription>
+                Individual cow production trends and analytics
+              </CardDescription>
+            </CardHeader>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Quality Trends</CardTitle>
-            <CardDescription>
-              Fat %, Protein %, and SCC over time
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                avgFat: { label: "Fat %", color: "hsl(var(--primary))" },
-                avgProtein: {
-                  label: "Protein %",
-                  color: "hsl(var(--secondary))",
-                },
-              }}
-            >
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={qualityTrendData}>
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line
-                    type="monotone"
-                    dataKey="avgFat"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={2}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="avgProtein"
-                    stroke="hsl(var(--secondary))"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      </div>
+            <CardContent>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Animal</TableHead>
+                      <TableHead>Days in Milk</TableHead>
+                      <TableHead>Today</TableHead>
+                      <TableHead>7-Day Avg</TableHead>
+                      <TableHead>30-Day Avg</TableHead>
+                      <TableHead>Trend</TableHead>
+                      <TableHead>Last Milked</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {summaries.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="h-24 text-center">
+                          No performance data available.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      summaries.map((summary) => (
+                        <TableRow key={summary.animalId}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{summary.tagNumber}</p>
+                              {summary.name && (
+                                <p className="text-sm text-muted-foreground">
+                                  {summary.name}
+                                </p>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {summary.daysInMilk
+                              ? `${summary.daysInMilk} days`
+                              : "—"}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {summary.todayTotal.toFixed(1)} L
+                          </TableCell>
+                          <TableCell>
+                            {summary.weekAverage.toFixed(1)} L
+                          </TableCell>
+                          <TableCell>
+                            {summary.monthAverage.toFixed(1)} L
+                          </TableCell>
+                          <TableCell>{getTrendBadge(summary.trend)}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {summary.lastMilked
+                              ? new Date(
+                                  summary.lastMilked
+                                ).toLocaleDateString()
+                              : "—"}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
-      {/* Milking Records */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Milking Records</CardTitle>
-          <CardDescription>
-            Track individual animal milk production and quality metrics
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Search by animal name or tag..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <select
-              value={selectedSession}
-              onChange={(e) => setSelectedSession(e.target.value)}
-              className="px-3 py-2 border border-input bg-background rounded-md text-sm"
-            >
-              <option value="all">All Sessions</option>
-              <option value="morning">Morning</option>
-              <option value="evening">Evening</option>
-            </select>
-            <select
-              value={selectedQuality}
-              onChange={(e) => setSelectedQuality(e.target.value)}
-              className="px-3 py-2 border border-input bg-background rounded-md text-sm"
-            >
-              <option value="all">All Quality</option>
-              <option value="excellent">Excellent</option>
-              <option value="good">Good</option>
-              <option value="fair">Fair</option>
-              <option value="poor">Poor</option>
-            </select>
-          </div>
-
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Animal</TableHead>
-                  <TableHead>Date & Time</TableHead>
-                  <TableHead>Session</TableHead>
-                  <TableHead>Quantity (L)</TableHead>
-                  <TableHead>Fat %</TableHead>
-                  <TableHead>Protein %</TableHead>
-                  <TableHead>SCC</TableHead>
-                  <TableHead>Quality</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredRecords.map((record) => (
-                  <TableRow key={record.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{record.animalName}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Tag: {record.animalTag}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{record.date}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {record.time}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="secondary"
-                        className={getSessionColor(record.session)}
-                      >
-                        {record.session === "morning" ? (
-                          <Calendar className="w-3 h-3 mr-1" />
-                        ) : (
-                          <Calendar className="w-3 h-3 mr-1" />
-                        )}
-                        {record.session.charAt(0).toUpperCase() +
-                          record.session.slice(1)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {record.quantity}L
-                    </TableCell>
-                    <TableCell>{record.fat}%</TableCell>
-                    <TableCell>{record.protein}%</TableCell>
-                    <TableCell>
-                      <span
-                        className={
-                          record.scc > 400000 ? "text-red-600 font-medium" : ""
-                        }
-                      >
-                        {(record.scc / 1000).toFixed(0)}K
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="secondary"
-                        className={getQualityColor(record.quality)}
-                      >
-                        {record.quality.charAt(0).toUpperCase() +
-                          record.quality.slice(1)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedRecord(record);
-                            setEditModalOpen(true);
-                          }}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedRecord(record);
-                            setDeleteModalOpen(true);
-                          }}
-                        >
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-
-          {filteredRecords.length === 0 && (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">
-                No milking records found matching your search criteria.
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
+      {/* Modals */}
       <AddMilkingModal open={addModalOpen} onOpenChange={setAddModalOpen} />
+
       <AddMilkingModal
-        open={editModalOpen}
-        onOpenChange={setEditModalOpen}
-        editData={selectedRecord || undefined}
+        open={!!editingRecord}
+        onOpenChange={(open) => !open && setEditingRecord(null)}
+        editData={
+          editingRecord
+            ? {
+                id: editingRecord.id,
+                animalId: editingRecord.animalId,
+                animalTag: editingRecord.animalTag,
+                milkingDate: editingRecord.milkingDate,
+                shift: editingRecord.shift,
+                quantity: editingRecord.quantity,
+                remarks: editingRecord.remarks,
+              }
+            : undefined
+        }
       />
+
       <DeleteConfirmModal
         open={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
         title="Delete Milking Record"
-        description="Are you sure you want to delete this milking record?"
+        description={`Are you sure you want to delete this milking record for ${recordToDelete?.animalTag}? This action cannot be undone.`}
+        onConfirm={handleDelete}
       />
     </div>
   );

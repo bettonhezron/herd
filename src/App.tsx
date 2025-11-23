@@ -26,7 +26,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import LandingPage from "./pages/Landing";
 import Auth from "./pages/Auth";
 import MilkingPage from "./pages/MilkingPage";
-import Milking from "./pages/milk";
+import Milking from "./pages/Milking";
 import BreedingPage from "./pages/Breeding";
 
 const queryClient = new QueryClient();
