@@ -15,6 +15,7 @@ import {
   confirmPregnancy,
   markPregnancyFailed,
   recordCalving,
+  fetchAllBreedingRecords, // ADD THIS IMPORT
   fetchBreedingRecordById,
   fetchBreedingRecordsByAnimal,
   fetchBreedingRecordsByStatus,
@@ -58,7 +59,7 @@ export const breedingKeys = {
   stats: () => [...breedingKeys.all, "stats"] as const,
 };
 
-// ==================== HEAT DETECTION QUERIES ====================
+// == HEAT DETECTION QUERIES ==
 
 export const useHeatDetection = (id: number): UseQueryResult<HeatDetectionResponse> => {
   return useQuery({
@@ -97,13 +98,21 @@ export const useAnimalsInHeat = (): UseQueryResult<HeatDetectionResponse[]> => {
   });
 };
 
-// ==================== BREEDING RECORD QUERIES ====================
+// == BREEDING RECORD QUERIES ==
 
 export const useBreedingRecord = (id: number): UseQueryResult<BreedingRecordResponse> => {
   return useQuery({
     queryKey: breedingKeys.record(id),
     queryFn: () => fetchBreedingRecordById(id),
     enabled: !!id,
+  });
+};
+
+// ADD THIS NEW HOOK
+export const useAllBreedingRecords = (): UseQueryResult<BreedingRecordResponse[]> => {
+  return useQuery({
+    queryKey: breedingKeys.records(),
+    queryFn: fetchAllBreedingRecords,
   });
 };
 
@@ -159,7 +168,7 @@ export const useBreedingStats = (): UseQueryResult<BreedingStatsResponse> => {
   });
 };
 
-// ==================== HEAT DETECTION MUTATIONS ====================
+// == HEAT DETECTION MUTATIONS ===
 
 export const useCreateHeatDetection = () => {
   const queryClient = useQueryClient();
@@ -210,7 +219,7 @@ export const useDeleteHeatDetection = () => {
   });
 };
 
-// ==================== BREEDING WORKFLOW MUTATIONS ====================
+// == BREEDING WORKFLOW MUTATIONS ==
 
 export const useCreateBreedingFromHeat = () => {
   const queryClient = useQueryClient();

@@ -36,14 +36,12 @@ export function CalvingModal({
 
   useEffect(() => {
     if (open && breedingRecord) {
-      // If overdue, use today's date, otherwise use expected date if close
       const today = new Date();
       const expectedDate = new Date(breedingRecord.expectedCalvingDate);
       const daysDiff = Math.floor(
         (today.getTime() - expectedDate.getTime()) / (1000 * 60 * 60 * 24)
       );
 
-      // If within 7 days of expected date, suggest expected date
       const suggestedDate =
         Math.abs(daysDiff) <= 7
           ? breedingRecord.expectedCalvingDate
@@ -127,11 +125,11 @@ export function CalvingModal({
                 onChange={(e) =>
                   setFormData({ ...formData, remarks: e.target.value })
                 }
-                placeholder="Calf details (sex, health, weight), delivery notes, or other observations..."
+                placeholder="Calf details (gender, health, weight), delivery notes, or other observations..."
                 rows={4}
               />
               <p className="text-xs text-muted-foreground">
-                Tip: Include calf tag ID, sex, birth weight, and any
+                Tip: Include calf tag ID, gender, birth weight, and any
                 complications
               </p>
             </div>

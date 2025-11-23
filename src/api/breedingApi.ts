@@ -12,7 +12,7 @@ import {
 const BREEDING_BASE_URL = "/breeding-records";
 const HEAT_BASE_URL = "/heat-detections";
 
-// ==================== HEAT DETECTION ====================
+// == HEAT DETECTION ==
 
 export const createHeatDetection = (payload: HeatDetectionRequest): Promise<HeatDetectionResponse> =>
   apiFetch(HEAT_BASE_URL, {
@@ -62,7 +62,7 @@ export const deleteHeatDetection = (id: number): Promise<void> =>
     method: "DELETE",
   });
 
-// ==================== BREEDING RECORDS ====================
+// == BREEDING RECORDS ==
 
 export const createBreedingFromHeat = (
   heatId: number,
@@ -73,12 +73,17 @@ export const createBreedingFromHeat = (
     body: JSON.stringify(payload),
   });
 
+
+export const fetchAllBreedingRecords = (): Promise<BreedingRecordResponse[]> =>
+    apiFetch(`${BREEDING_BASE_URL}`);
+
 export const skipHeatDetection = (heatId: number, reason?: string): Promise<void> => {
   const params = reason ? `?reason=${encodeURIComponent(reason)}` : "";
   return apiFetch(`${BREEDING_BASE_URL}/heat/${heatId}/skip${params}`, {
     method: "POST",
   });
 };
+
 
 export const confirmPregnancy = (
   breedingId: number,

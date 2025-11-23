@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Plus,
   Search,
@@ -6,7 +6,6 @@ import {
   CheckCircle,
   Clock,
   Baby,
-  Pencil,
   Trash2,
   Edit3,
   XCircle,
@@ -45,7 +44,7 @@ import { MarkPregnancyFailedModal } from "@/components/modals/MarkPregnancyFaile
 import { CalvingModal } from "@/components/modals/CalvingModal";
 import { SkipHeatModal } from "@/components/modals/SkipHeatModal";
 
-// Import hooks
+// hooks
 import {
   useAnimalsInHeat,
   useBreedingStats,
@@ -64,6 +63,7 @@ import {
   useRecordCalving,
   useUpdateBreedingRecord,
   useDeleteBreedingRecord,
+  useAllBreedingRecords,
 } from "@/hooks/useBreeding";
 import {
   HeatDetectionResponse,
@@ -155,8 +155,10 @@ export default function BreedingPage() {
   const { data: stats } = useBreedingStats();
   const { data: inHeatAnimals, isLoading: loadingHeat } = useAnimalsInHeat();
   const { data: allHeatDetections } = useAllHeatDetections();
-  const { data: pendingChecks, isLoading: loadingPending } =
-    usePendingPregnancyChecks();
+
+  const { data: allBreedingRecords = [], isLoading: loadingPending } =
+    useAllBreedingRecords();
+
   const { data: activePregnancies, isLoading: loadingPregnancies } =
     useActivePregnancies();
   const { data: upcomingCalvings } = useUpcomingCalvings(30);
@@ -177,17 +179,19 @@ export default function BreedingPage() {
   // Combine upcoming and overdue calvings
   const allCalvings = [...(overdueCalvings || []), ...(upcomingCalvings || [])];
 
-  // Filter breeding records (pending checks)
-  const filteredRecords = (pendingChecks || []).filter((record) => {
-    const matchesSearch =
-      record.animalTag.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (record.animalName?.toLowerCase() || "").includes(
-        searchTerm.toLowerCase()
-      );
-    const matchesStatus =
-      selectedStatus === "all" || record.status === selectedStatus;
-    return matchesSearch && matchesStatus;
-  });
+  // CHANGE THIS - Update the filter logic to use allBreedingRecords
+  const filteredRecords = useMemo(() => {
+    return allBreedingRecords.filter((record) => {
+      const matchesSearch =
+        record.animalTag.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (record.animalName?.toLowerCase() || "").includes(
+          searchTerm.toLowerCase()
+        );
+      const matchesStatus =
+        selectedStatus === "all" || record.status === selectedStatus;
+      return matchesSearch && matchesStatus;
+    });
+  }, [allBreedingRecords, searchTerm, selectedStatus]);
 
   // Handler functions
   const handleCreateOrUpdateHeat = (
@@ -583,7 +587,7 @@ export default function BreedingPage() {
             <CardHeader>
               <CardTitle>Breeding Records</CardTitle>
               <CardDescription>
-                All breeding attempts - pending pregnancy confirmation
+                Track all breeding records from service to calving
               </CardDescription>
             </CardHeader>
             <CardContent>

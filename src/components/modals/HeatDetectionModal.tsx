@@ -106,7 +106,7 @@ export function HeatDetectionModal({
                 <SelectContent>
                   {femaleAnimals.map((animal) => (
                     <SelectItem key={animal.id} value={animal.id.toString()}>
-                      {animal.tagNumber} - {animal.name || "Unnamed"}
+                      {animal.tagNumber}
                     </SelectItem>
                   ))}
                 </SelectContent>
