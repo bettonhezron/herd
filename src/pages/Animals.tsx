@@ -340,7 +340,7 @@ export default function Animals() {
                   <TableHead>Age</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Lactation</TableHead>
+                  <TableHead>Lactation Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
